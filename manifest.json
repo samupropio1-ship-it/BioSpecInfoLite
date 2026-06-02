@@ -1,0 +1,25 @@
+{
+  "name": "BioSpecInfo — Chimica Interattiva",
+  "short_name": "BioSpecInfo",
+  "description": "Piattaforma chimica completa: spettri NMR/IR, viewer 3D, 324 reazioni, 26 vie biosintetiche, 6 strutture biologiche, farmaci, biomolecole, AI Chat.",
+  "start_url": "./index.html",
+  "id": "biospecinfo-app",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#1B5E20",
+  "theme_color": "#1B5E20",
+  "lang": "it",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "books", "medical"],
+  "prefer_related_applications": false,
+  "icons": [
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "launch_handler": {"client_mode": "navigate-existing"},
+  "handle_links": "preferred"
+}
