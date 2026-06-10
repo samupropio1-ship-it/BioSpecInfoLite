@@ -1,7 +1,7 @@
 // BioSpecInfo Service Worker — cache file singolo HTML + risorse + API PubChem/RCSB
 'use strict';
 
-const CACHE_VERSION = 'biospecinfo-v33-2026-06';
+const CACHE_VERSION = 'biospecinfo-v54-2026-06';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const API_CACHE = CACHE_VERSION + '-api';
 
@@ -27,7 +27,7 @@ self.addEventListener('install', function(e){
   );
 });
 
-// Activate: rimuove cache vecchie
+// Activate: rimuove cache vecchie, poi forza reload di tutti i client aperti
 self.addEventListener('activate', function(e){
   e.waitUntil(
     caches.keys().then(function(keys){
@@ -36,7 +36,18 @@ self.addEventListener('activate', function(e){
           return caches.delete(k);
         }
       }));
-    }).then(function(){ return self.clients.claim(); })
+    })
+    .then(function(){ return self.clients.claim(); })
+    .then(function(){ return self.clients.matchAll({type:'window'}); })
+    .then(function(clients){
+      clients.forEach(function(c){
+        // navigate() forces a full reload with new cached resources — works on old pages too
+        c.navigate(c.url).catch(function(){
+          // Fallback: postMessage if navigate isn't supported
+          c.postMessage({type:'BSI_SW_UPDATED'});
+        });
+      });
+    })
   );
 });
 
@@ -56,9 +67,13 @@ self.addEventListener('fetch', function(e){
     e.respondWith(cacheFirst(req, API_CACHE));
     return;
   }
-  // Same-origin: cache-first con fallback network
+  // Same-origin: network-first per index.html (sempre aggiornato), cache-first per il resto
   if(url.origin === self.location.origin){
-    e.respondWith(cacheFirst(req, STATIC_CACHE));
+    if(url.pathname.endsWith('/') || url.pathname.endsWith('/index.html') || url.pathname === ''){
+      e.respondWith(networkFirst(req, STATIC_CACHE));
+    } else {
+      e.respondWith(cacheFirst(req, STATIC_CACHE));
+    }
     return;
   }
   // Altre cross-origin: network-first
@@ -88,7 +103,7 @@ function networkFirst(req, cacheName){
     }
     return r;
   }).catch(function(){
-    return caches.match(req);
+    return caches.match(req).then(function(cached){ return cached || caches.match('./index.html'); });
   });
 }
 
