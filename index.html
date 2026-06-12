@@ -661,7 +661,10 @@ input::placeholder, textarea::placeholder { color: #888888; }
 </style>
 </head>
 <body>
-<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v40-2026-06';</script>
+<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v56-2026-06';
+// URL Web App di Google Apps Script per telemetria accessi/errori/feedback (vedi tools/telemetria-feedback.gs).
+// Lasciare vuoto disabilita l'invio remoto: i dati restano solo in coda locale (bsi_telemetry_queue).
+window.BSI_TELEMETRY_URL='';</script>
 
 
 <!-- ═══════════════ HEADER ═══════════════ -->
@@ -31174,56 +31177,6 @@ function _smAnal(smi){
   return {fgs:fgs, ret:ret};
 }
 
-// ══ 6. Vie di sintesi suggerite dai gruppi funzionali ═════════════════════════
-function _fgSyn(fgs, name){
-  var r=[], seen={};
-  function add(obj){ if(!seen[obj.nm]){seen[obj.nm]=1; r.push(obj);} }
-  fgs.forEach(function(fg){
-    var t=fg.t;
-    if(t.includes('Acido carbossilico')){
-      add({n:1,nm:'Ossidazione alcol 1°',re:'RCH₂OH → RCOOH',me:'KMnO₄ in H₂SO₄ caldo ossida a COOH; Jones (CrO₃) alternativa',ct:'KMnO₄/H₂SO₄ caldo o CrO₃·2py (PCC poi Jones)'});
-      add({n:2,nm:'Carboxilazione Grignard',re:'RMgX+CO₂(s)→RCOOMgX→RCOOH',me:'Addizione RMgX su CO₂ solida; idrolisi acida del magnesiato',ct:'Et₂O anidro, CO₂(s); poi HCl dil., H₂O'});
-    }
-    if(t.includes('Estere')){
-      add({n:1,nm:'Esterificazione Fischer',re:'RCOOH+R\'OH⇌RCOOR\'+H₂O',me:'Acid-cat: proton. C=O→addiz. R\'OH→eliminaz. H₂O (equil. favorito con Dean-Stark)',ct:'H₂SO₄ cat., toluene+Dean-Stark, Δ'});
-      add({n:2,nm:'Via cloruro acilico',re:'RCOCl+R\'OH→RCOOR\'',me:'SNA su carbonile più reattivo; base (Et₃N) neutralizza HCl; reaz. rapida',ct:'Et₃N, DCM, 0°C'});
-    }
-    if(t.includes('Ammide')){
-      add({n:1,nm:'Coupling EDC/HOBt',re:'RCOOH+H₂NR\'→RCONHR\'',me:'EDC attiva COOH→O-acilisourea; HOBt evita epimerizzazione; SNA da NH₂',ct:'EDC·HCl, HOBt, DIPEA, DMF, 0°C→RT, 12h'});
-      add({n:2,nm:'Via cloruro acilico',re:'RCOCl+H₂NR\'→RCONHR\'+HCl',me:'SNA: Cl⁻ ottimo leaving group; reaz. veloce a 0°C',ct:'Piridina, DCM, 0°C'});
-    }
-    if(t.includes('Carbonile')){
-      add({n:1,nm:'Ossidazione alcol (PCC)',re:'R₂CHOH→R₂C=O (chetone) / RCH₂OH→RCHO',me:'PCC ossida selettivamente 2° e 1° senza sovraossidare aldeidi; Swern per sensibili',ct:'PCC, DCM, RT; o Swern (DMSO/Cl₂CO), –78°C'});
-      add({n:2,nm:'Friedel-Crafts acilazione (Ar)',re:'ArH+RCOCl→Ar–COR',me:'AlCl₃ genera acilelio RCO⁺; SEAr; complesso Al lavato con H₂O',ct:'AlCl₃ (1.1 eq), DCM o CS₂, 0°C→RT'});
-    }
-    if(t.includes('Aromatico')){
-      add({n:1,nm:'SEAr alogenazione',re:'ArH+Cl₂/Br₂→Ar–X+HX',me:'Cat. Lewis (FeCl₃/FeBr₃) genera X⁺; σ-complesso Wheland→deprotonazione',ct:'Cl₂/FeCl₃ o Br₂/FeBr₃, DCM, RT'});
-      add({n:2,nm:'SEAr nitrazione',re:'ArH+HNO₃→Ar–NO₂+H₂O',me:'H₂SO₄ genera NO₂⁺; SEAr; ortopara direttori attivano',ct:'HNO₃ dil./H₂SO₄ conc., 0–5°C (mono)'});
-    }
-    if(t.includes('Alchene')){
-      add({n:1,nm:'Eliminazione E2',re:'R–CHXCH₂R\'+base→RCH=CHR\'+HX',me:'Anti-periplanare sincrono: H-β abstrato mentre X⁻ parte; regola Zaitsev vs Hofmann',ct:'KOt-Bu/DMSO (Hofmann) o KOH/EtOH,Δ (Zaitsev)'});
-      add({n:2,nm:'Reazione di Wittig',re:'R₂C=O+Ph₃P=CR\'₂→R₂C=CR\'₂+Ph₃P=O',me:'Ylide+carbonile→[2+2] ossafosfetano→retro-[2+2]; Z (unstab.) o E (stab.)',ct:'Ph₃P, n-BuLi, THF, –78°C (ylide instabilizzata)'});
-    }
-    if(t.includes('Alcol')){
-      add({n:1,nm:'Riduzione NaBH₄/LiAlH₄',re:'R₂C=O→R₂CHOH',me:'NaBH₄ trasferisce H⁻ al C-carbonilico; LiAlH₄ per acidi/esteri/nitrili',ct:'NaBH₄, MeOH, 0°C (chetoni); LiAlH₄, Et₂O, 0°C→RF'});
-      add({n:2,nm:'Idratazione alchene',re:'RCH=CH₂+H₂O→RCH(OH)CH₃',me:'Markovnikov: H⁺ al C meno sost.; BH₃→ossidazione: anti-Markovnikov',ct:'H₂SO₄/H₂O (Markovnikov) o BH₃·THF poi H₂O₂/NaOH'});
-    }
-    if(t.includes('Ammina')){
-      add({n:1,nm:'Aminazione riduttiva',re:'R₂C=O+H₂NR\'→R₂C=NR\'→R₂CHNHR\'',me:'pH≈5: imina si forma; NaBH₃CN riduce selettivamente immine non carbonili',ct:'NaBH₃CN, MeOH/AcOH (pH 5), RT, 12h'});
-      add({n:2,nm:'Riduzione nitrile/nitro',re:'RCN→RCH₂NH₂; ArNO₂→ArNH₂',me:'LiAlH₄ riduce CN; H₂/Pd o Fe/HCl riducono NO₂',ct:'LiAlH₄, Et₂O (CN); H₂/Pd/C o Fe/AcOH (NO₂)'});
-    }
-    if(t.includes('Alogenuro')){
-      add({n:1,nm:'HX su alchene (Markovnikov)',re:'CH₂=CR₂+HX→CH₃CXR₂',me:'AE: H⁺ al C meno sost.→carbenio Markovnikov→X⁻ attacca',ct:'HBr, DCM, 0°C; o HCl(g), CH₂Cl₂'});
-      add({n:2,nm:'Alcol+SOCl₂',re:'ROH+SOCl₂→RCl+SO₂+HCl',me:'Piridin. forma clorosolfito→SN₂ (inversione Walden)',ct:'SOCl₂, piridina, 0°C; o PBr₃, Et₂O (bromuro)'});
-    }
-    if(t.includes('Alchino')){
-      add({n:1,nm:'Eliminazione doppia su gem-dibromo',re:'RCHBr₂+2NaNH₂→RC≡CH',me:'E2 doppia; NaNH₂ base forte; via vinil bromuro',ct:'NaNH₂, NH₃ liq., –33°C'});
-      add({n:2,nm:'Alchilazione acetiluro',re:'RC≡C⁻Na⁺+R\'X→RC≡CR\'',me:'SN2 su alchil alogenuro 1°; acetiluro formato con NaNH₂',ct:'NaNH₂, NH₃ liq.; poi R\'X primario'});
-    }
-  });
-  return r.slice(0,5);
-}
-
 // ══ 7. Render risultati SR ════════════════════════════════════════════════════
 function _renderSR(el, name, props, cid, fgData, localData){
   var h='';
@@ -31404,6 +31357,8 @@ window.openSR14=function(){
 var _ITEMS=[
   {sec:'🔬 Funzioni chimiche'},
   {ic:'⚗️',nm:'Sintesi & Retrosintesi',ds:'Qualsiasi molecola via PubChem',key:'sr',hl:true},
+  {ic:'⚛️',nm:'Lab Quantistico',ds:'Orbitali 3D, spettroscopie, cinetica e altre 10 simulazioni',key:'qlab',hl:true},
+  {ic:'📋',nm:'Questionario & Feedback',ds:'Vota l\'app, segnala bug o idee',key:'feedback',hl:true},
   {ic:'🧪',nm:'Sintesi Organica',ds:'Reazioni animate con meccanismi',key:'ssyn'},
   {ic:'🔄',nm:'Retrosintesi',ds:'Disconnessioni sistematiche',key:'sretro'},
   {sec:'⚙️ Strumenti'},
@@ -31435,6 +31390,8 @@ function _act(key){
   _closeSheet();
   setTimeout(function(){
     if(key==='sr')       { window.openSR14(); return; }
+    if(key==='qlab')     { if(typeof window.openQuantumLab==='function') window.openQuantumLab(); return; }
+    if(key==='feedback') { if(typeof window.openFeedback21==='function') window.openFeedback21(); return; }
     if(key==='ssyn')     { var b=document.querySelector('[data-s=ssyn]');   if(b)b.click(); return; }
     if(key==='sretro')   { var b=document.querySelector('[data-s=sretro]'); if(b)b.click(); return; }
     if(key==='export')   { _trigOld('Esporta'); return; }
@@ -34050,6 +34007,903 @@ function _hookModal(){
 console.log('BioSpecInfo v20 — SR SVG visibility fix ✔');
 })();
 </script>
+
+<script>
+// ─── BioSpecInfo v21 · Telemetria accessi/errori/allerte (privacy-friendly) ──
+(function(){
+'use strict';
+
+var TELEMETRY_URL=(window.BSI_TELEMETRY_URL||'').trim();
+var QUEUE_KEY='bsi_telemetry_queue';
+var MAX_QUEUE=60;
+
+function _deviceId(){
+  try{
+    var id=localStorage.getItem('bsi_device_id');
+    if(!id){ id='dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); localStorage.setItem('bsi_device_id',id); }
+    return id;
+  }catch(e){ return 'dev-unknown'; }
+}
+
+function _ctx(){
+  return {
+    ts:new Date().toISOString(),
+    device:_deviceId(),
+    edition:(window.BSI_EDITION||'pro'),
+    appVersion:(window.BSI_APP_VERSION||''),
+    ua:navigator.userAgent,
+    lang:navigator.language,
+    screen:(screen.width+'x'+screen.height)
+  };
+}
+
+function _queuePush(payload){
+  try{
+    var q=JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]');
+    q.push(payload);
+    if(q.length>MAX_QUEUE) q=q.slice(q.length-MAX_QUEUE);
+    localStorage.setItem(QUEUE_KEY,JSON.stringify(q));
+  }catch(e){}
+}
+
+function _send(payload){
+  if(!TELEMETRY_URL){ _queuePush(payload); return; }
+  try{
+    fetch(TELEMETRY_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+      .catch(function(){ _queuePush(payload); });
+  }catch(e){ _queuePush(payload); }
+}
+
+function _flushQueue(){
+  if(!TELEMETRY_URL) return;
+  try{
+    var q=JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]');
+    if(!q.length) return;
+    localStorage.removeItem(QUEUE_KEY);
+    q.forEach(function(p){ _send(p); });
+  }catch(e){}
+}
+
+window._bsiTelemetry=function(type,data){
+  var payload=_ctx(); payload.type=type;
+  if(data){ for(var k in data){ if(data.hasOwnProperty(k)) payload[k]=data[k]; } }
+  _send(payload);
+};
+
+// ── 1. Log accesso (una volta per sessione del browser) ──
+try{
+  if(!sessionStorage.getItem('bsi_session_logged')){
+    sessionStorage.setItem('bsi_session_logged','1');
+    window._bsiTelemetry('accesso',{referrer:(document.referrer||'')});
+  }
+}catch(e){}
+_flushQueue();
+window.addEventListener('online',_flushQueue);
+
+// ── 2. Verifica integrità licenza PRO (rileva manomissioni di localStorage) ──
+function _hash(s){
+  var h=0;
+  for(var i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; }
+  return 'h'+(h>>>0).toString(36);
+}
+try{
+  var lic=localStorage.getItem('bsi_pro_license');
+  if(lic){
+    var chkKey='bsi_pro_license_chk';
+    var expected=localStorage.getItem(chkKey);
+    var actual=_hash(lic+'|bsi-salt-2026');
+    if(!expected){
+      localStorage.setItem(chkKey,actual);
+    } else if(expected!==actual){
+      if(!sessionStorage.getItem('bsi_lic_alert_sent')){
+        sessionStorage.setItem('bsi_lic_alert_sent','1');
+        window._bsiTelemetry('allerta',{tipo:'licenza_modificata',dettagli:'bsi_pro_license non corrisponde al checksum salvato in precedenza'});
+      }
+      localStorage.setItem(chkKey,actual);
+    }
+  }
+}catch(e){}
+
+// ── 3. Euristica DevTools aperti (best-effort, non invasiva) ──
+(function(){
+  var THRESH=170, sent=false;
+  function check(){
+    if(sent) return;
+    var wd=window.outerWidth-window.innerWidth;
+    var hd=window.outerHeight-window.innerHeight;
+    if(wd>THRESH || hd>THRESH){
+      sent=true;
+      window._bsiTelemetry('allerta',{tipo:'devtools_aperti',dettagli:'finestra '+window.outerWidth+'x'+window.outerHeight+' vs viewport '+window.innerWidth+'x'+window.innerHeight});
+    }
+  }
+  window.addEventListener('resize',check);
+  setTimeout(check,2000);
+})();
+
+// ── 4. Errori JS non gestiti (utile per individuare bug in produzione) ──
+(function(){
+  var seen={}, count=0, MAXERR=15;
+  function report(msg,src,line,stack){
+    var key=msg+'|'+src+'|'+line;
+    if(seen[key]||count>=MAXERR) return;
+    seen[key]=1; count++;
+    window._bsiTelemetry('errore',{messaggio:String(msg).slice(0,300),sorgente:String(src||'').slice(0,200),riga:line||0,stack:String(stack||'').slice(0,500)});
+  }
+  window.addEventListener('error',function(e){
+    report(e.message,e.filename,e.lineno,e.error&&e.error.stack);
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;
+    report((r&&r.message)||String(r),'',0,r&&r.stack);
+  });
+})();
+
+console.log('BioSpecInfo v21 — Telemetria accessi/errori ✔');
+})();
+</script>
+
+<script>
+// ─── BioSpecInfo v21b · Sezione "stella" Questionario & Feedback ─────────────
+(function(){
+'use strict';
+
+var _st=document.createElement('style');
+_st.textContent=[
+'#bsi21-fb{position:fixed;inset:0;z-index:2147483642;display:none;align-items:center;',
+'justify-content:center;background:rgba(2,8,16,.9);backdrop-filter:blur(8px);padding:10px;}',
+'#bsi21-fb.open{display:flex;}',
+'#bsi21-fb-box{background:#0c1828;border:1px solid #1e3a52;border-radius:18px;',
+'max-width:520px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 16px 50px rgba(0,0,0,.7);}',
+'#bsi21-fb-hd{display:flex;align-items:center;justify-content:space-between;',
+'padding:14px 18px;border-bottom:1px solid #1e3a52;position:sticky;top:0;background:#0c1828;z-index:2;}',
+'#bsi21-fb-hd h3{margin:0;color:#1fd39a;font-size:1rem;font-weight:800;}',
+'#bsi21-fb-x{background:#16293f;border:none;color:#9fb8d0;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;}',
+'#bsi21-fb-body{padding:16px 18px;}',
+'.bsi21-fb-lbl{display:block;color:#9fb8d0;font-size:11.5px;font-weight:700;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em;}',
+'.bsi21-fb-lbl:first-child{margin-top:0;}',
+'#bsi21-fb-stars{font-size:30px;letter-spacing:6px;cursor:pointer;user-select:none;}',
+'.bsi21-fb-star{color:#2c4258;transition:color .15s;}',
+'.bsi21-fb-star.on{color:#ffc94d;}',
+'#bsi21-fb-cat{width:100%;padding:10px 12px;background:#060e1a;border:1.5px solid #1e3a52;',
+'border-radius:10px;color:#e8f4ff;font-size:13px;outline:none;box-sizing:border-box;}',
+'#bsi21-fb-cat:focus{border-color:#1fd39a;}',
+'#bsi21-fb-msg{width:100%;padding:12px 14px;background:#060e1a;border:1.5px solid #1e3a52;',
+'border-radius:10px;color:#e8f4ff;font-size:13px;outline:none;box-sizing:border-box;',
+'min-height:100px;resize:vertical;font-family:inherit;}',
+'#bsi21-fb-msg:focus{border-color:#1fd39a;}',
+'#bsi21-fb-email{width:100%;padding:10px 12px;background:#060e1a;border:1.5px solid #1e3a52;',
+'border-radius:10px;color:#e8f4ff;font-size:13px;outline:none;box-sizing:border-box;}',
+'#bsi21-fb-email:focus{border-color:#1fd39a;}',
+'#bsi21-fb-go{width:100%;padding:13px;background:linear-gradient(135deg,#1fd39a,#1aa97a);',
+'border:none;border-radius:10px;color:#fff;font-weight:800;font-size:14px;cursor:pointer;margin-top:18px;}',
+'#bsi21-fb-go:disabled{opacity:.5;cursor:default;}',
+'#bsi21-fb-out{margin-top:14px;text-align:center;font-size:13px;font-weight:700;display:none;}',
+'.bsi21-fb-hint{font-size:11px;color:#5a8aaa;line-height:1.6;margin-bottom:4px;}'
+].join('');
+document.head.appendChild(_st);
+
+var CATS=['Suggerimento','Segnalazione bug','Contenuto mancante/errato','Apprezzamento','Altro'];
+
+function _build(){
+  if(document.getElementById('bsi21-fb')) return;
+  var m=document.createElement('div'); m.id='bsi21-fb'; m.dataset.rating='0';
+  var starsHtml=''; for(var i=1;i<=5;i++) starsHtml+='<span class="bsi21-fb-star" data-v="'+i+'">★</span>';
+  m.innerHTML='<div id="bsi21-fb-box">'
+    +'<div id="bsi21-fb-hd"><h3>📋 Questionario & Feedback</h3><button id="bsi21-fb-x">✕</button></div>'
+    +'<div id="bsi21-fb-body">'
+    +'<div class="bsi21-fb-hint">Aiutaci a migliorare BioSpecInfo: il feedback è anonimo, a meno che tu non lasci un\'email.</div>'
+    +'<label class="bsi21-fb-lbl">Quanto ti piace l\'app?</label>'
+    +'<div id="bsi21-fb-stars">'+starsHtml+'</div>'
+    +'<label class="bsi21-fb-lbl">Tipo di feedback</label>'
+    +'<select id="bsi21-fb-cat">'+CATS.map(function(c){return '<option>'+c+'</option>';}).join('')+'</select>'
+    +'<label class="bsi21-fb-lbl">Il tuo commento</label>'
+    +'<textarea id="bsi21-fb-msg" placeholder="Scrivi qui cosa funziona, cosa no, o cosa vorresti vedere…"></textarea>'
+    +'<label class="bsi21-fb-lbl">Email (opzionale, per risposta)</label>'
+    +'<input id="bsi21-fb-email" type="email" placeholder="tuamail@esempio.it"/>'
+    +'<button id="bsi21-fb-go">📨 Invia feedback</button>'
+    +'<div id="bsi21-fb-out"></div>'
+    +'</div></div>';
+  document.body.appendChild(m);
+  document.getElementById('bsi21-fb-x').onclick=function(){ m.classList.remove('open'); };
+  m.addEventListener('click',function(e){ if(e.target===m) m.classList.remove('open'); });
+
+  m.querySelectorAll('.bsi21-fb-star').forEach(function(s){
+    s.onclick=function(){
+      var v=parseInt(this.getAttribute('data-v'),10);
+      m.dataset.rating=String(v);
+      m.querySelectorAll('.bsi21-fb-star').forEach(function(st){
+        st.classList.toggle('on',parseInt(st.getAttribute('data-v'),10)<=v);
+      });
+    };
+  });
+
+  document.getElementById('bsi21-fb-go').onclick=function(){
+    var rating=parseInt(m.dataset.rating||'0',10);
+    var msg=(document.getElementById('bsi21-fb-msg').value||'').trim();
+    var cat=document.getElementById('bsi21-fb-cat').value;
+    var email=(document.getElementById('bsi21-fb-email').value||'').trim();
+    var out=document.getElementById('bsi21-fb-out');
+    if(!rating && !msg){
+      out.style.display='block'; out.style.color='#ff8a80';
+      out.textContent='Aggiungi una valutazione o un commento prima di inviare.';
+      return;
+    }
+    if(typeof window._bsiTelemetry==='function'){
+      window._bsiTelemetry('feedback',{voto:rating,categoria:cat,messaggio:msg.slice(0,1000),email:email});
+    }
+    var btn=document.getElementById('bsi21-fb-go');
+    btn.disabled=true; btn.textContent='✓ Inviato';
+    out.style.display='block'; out.style.color='#1fd39a';
+    out.textContent='Grazie per il tuo feedback! 🙏';
+    setTimeout(function(){ m.classList.remove('open'); },1400);
+  };
+}
+
+window.openFeedback21=function(){
+  _build();
+  var m=document.getElementById('bsi21-fb');
+  m.classList.add('open');
+  m.dataset.rating='0';
+  m.querySelectorAll('.bsi21-fb-star').forEach(function(st){ st.classList.remove('on'); });
+  document.getElementById('bsi21-fb-msg').value='';
+  document.getElementById('bsi21-fb-email').value='';
+  document.getElementById('bsi21-fb-cat').selectedIndex=0;
+  var go=document.getElementById('bsi21-fb-go'); go.disabled=false; go.textContent='📨 Invia feedback';
+  var out=document.getElementById('bsi21-fb-out'); out.style.display='none';
+  setTimeout(function(){ var i=document.getElementById('bsi21-fb-msg'); if(i) i.focus(); },120);
+};
+
+console.log('BioSpecInfo v21b — Questionario & Feedback ✔');
+})();
+</script>
+
+
+<!-- ===== BSI QUANTUM LAB (integrato nel menu ✨ → "Lab Quantistico") ===== -->
+<style id="bsiQ-style">
+#bsiQ-ov{position:fixed;inset:0;width:100%;height:100%;z-index:99991;background:rgba(6,18,30,.97);display:none;flex-direction:column}
+#bsiQ-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(0,201,183,.22);flex-wrap:wrap}
+#bsiQ-bar .bsiQ-ttl{font-family:"Palatino Linotype",Palatino,Georgia,serif;color:#00c9b7;font-size:18px;margin-right:auto}
+#bsiQ-close{font-size:22px;background:none;border:none;color:#e9eef6;cursor:pointer;padding:4px 12px;border-radius:8px}
+#bsiQ-close:hover{background:rgba(255,255,255,.08)}
+#bsiQ-frame{flex:1 1 auto;width:100%;height:100%;min-height:0;border:none;background:#0a1b2e;display:block}
+</style>
+<div id="bsiQ-ov">
+  <div id="bsiQ-bar">
+    <span class="bsiQ-ttl">Chimica Quantistica &amp; Fisica</span>
+    <button id="bsiQ-close">✕</button>
+  </div>
+  <iframe id="bsiQ-frame" title="modulo"></iframe>
+</div>
+<script type="text/html" id="bsiQ-src-lab"><!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio Quantistico & Fisico — BioSpecInfo</title>
+<style>
+  :root{--bg:#0a1b2e;--bg2:#0d2238;--card:#102a44;--line:rgba(0,201,183,.18);
+    --teal:#00c9b7;--teal2:#05ad8a;--orange:#f77f00;--text:#e9eef6;--text2:#9fb3c8;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--ease:cubic-bezier(.22,.61,.36,1);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 800px at 70% -10%,#0e2740,#0a1b2e 60%);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:18px}
+  .wrap{max-width:1060px;margin:0 auto}
+  .brand{font-family:var(--serif);font-size:25px;color:var(--teal);letter-spacing:.3px}
+  .sub{font-size:13px;color:var(--text2);margin:2px 0 18px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{display:flex;align-items:center;gap:7px;padding:10px 14px;border:1px solid var(--line);background:var(--card);
+    border-radius:12px;cursor:pointer;font-size:13.5px;font-family:var(--serif);transition:all .25s var(--ease)}
+  .tab:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:0 6px 16px rgba(0,0,0,.25)}
+  .tab.on{background:linear-gradient(135deg,var(--teal2),var(--teal));color:#06222b;font-weight:700;border-color:var(--teal)}
+  .tab .ic{font-size:15px}
+  .mod{display:none;animation:fade .45s var(--ease)}.mod.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel{background:linear-gradient(180deg,var(--bg2),var(--bg));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 14px 36px rgba(0,0,0,.28)}
+  .mtitle{font-family:var(--serif);font-size:20px;margin-bottom:4px}
+  .mdesc{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.55}
+  canvas{width:100%;height:auto;aspect-ratio:1000/440;display:block;background:#070f1c;border-radius:14px;border:1px solid var(--line)}
+  .ctrls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+  .ctrls .lab{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text2)}
+  .chip{padding:8px 13px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:20px;cursor:pointer;font-size:14px;transition:all .2s var(--ease)}
+  .chip:hover{transform:translateY(-1px);border-color:var(--teal)}
+  .chip.on{background:linear-gradient(135deg,var(--teal2),var(--teal));color:#06222b;font-weight:700;border-color:var(--teal)}
+  .chiprow{display:flex;gap:7px;flex-wrap:wrap}
+  .ptbl{display:flex;gap:5px;flex-wrap:wrap}
+  .pcell{width:42px;height:42px;border:1px solid var(--line);background:var(--card);border-radius:8px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s var(--ease);line-height:1}
+  .pcell:hover{transform:translateY(-2px);border-color:var(--teal)}
+  .pcell.on{background:linear-gradient(135deg,var(--teal2),var(--teal));color:#06222b;border-color:var(--teal)}
+  .pcell .sym{font-weight:700;font-size:15px}.pcell .z{font-size:9px;opacity:.7}
+  select,input[type=range]{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:14px}
+  input[type=range]{padding:0;width:170px;accent-color:var(--teal)}
+  .info{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;font-size:13px;line-height:1.65;color:var(--text2);margin-top:13px}
+  .info b{color:var(--text)} .info .hl{color:var(--teal)} .info .hl2{color:var(--orange)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Laboratorio Quantistico &amp; Fisico</div>
+  <div class="sub">Dieci moduli interattivi a matematica esatta · BioSpecInfo</div>
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-m="orb"><span class="ic">🔮</span>Orbitali idrogeno 3D</div>
+    <div class="tab" data-m="hyd"><span class="ic">⚛️</span>Emissione idrogeno</div>
+    <div class="tab" data-m="mo"><span class="ic">🔗</span>Orbitali molecolari</div>
+    <div class="tab" data-m="vsepr"><span class="ic">🔷</span>Geometria VSEPR 3D</div>
+    <div class="tab" data-m="vib"><span class="ic">💧</span>Vibrazioni molecolari</div>
+    <div class="tab" data-m="ho"><span class="ic">〰️</span>Oscillatore armonico</div>
+    <div class="tab" data-m="box"><span class="ic">📦</span>Particella in scatola</div>
+    <div class="tab" data-m="spec"><span class="ic">🌈</span>Spettroscopie</div>
+    <div class="tab" data-m="kin"><span class="ic">⚗️</span>Cinetica chimica</div>
+    <div class="tab" data-m="mb"><span class="ic">🌡️</span>Maxwell–Boltzmann</div>
+  </div>
+
+  <div class="mod on" id="m-orb"><div class="panel">
+    <div class="mtitle">Orbitali dell'idrogeno · densità di probabilità 3D</div>
+    <div class="mdesc">La densità |ψ|² dell'elettrone al variare dei numeri quantici n, l, m. Ogni punto è un possibile esito di misura; i colori distinguono il segno della funzione d'onda.</div>
+    <canvas id="cOrb" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">n</span><div class="chiprow" id="orbN"></div></div>
+    <div class="ctrls"><span class="lab">l</span><div class="chiprow" id="orbL"></div>
+      <span class="lab" style="margin-left:8px">m</span><div class="chiprow" id="orbM"></div></div>
+    <div class="info" id="orbInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-hyd"><div class="panel">
+    <div class="mtitle">Emissione dell'idrogeno · atomo di Bohr animato</div>
+    <div class="mdesc">L'elettrone orbita lasciando una scia; alla transizione scelta ricade su un livello inferiore ed emette un fotone come onda elettromagnetica del colore corrispondente.</div>
+    <canvas id="cHyd" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">serie</span><div class="chiprow" id="hydSerie"></div></div>
+    <div class="ctrls"><span class="lab">transizione</span><div class="chiprow" id="hydTrans"></div></div>
+    <div class="info" id="hydInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-mo"><div class="panel">
+    <div class="mtitle">Diagrammi di orbitali molecolari</div>
+    <div class="mdesc">Scegli un elemento dalla tavola: si costruisce la molecola biatomica X₂ e il suo diagramma MO, con ordine di legame e magnetismo.</div>
+    <canvas id="cMO" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">elemento → X₂</span><div class="ptbl" id="moTbl"></div></div>
+    <div class="info" id="moInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-vsepr"><div class="panel">
+    <div class="mtitle">Geometria molecolare · teoria VSEPR</div>
+    <div class="mdesc">La forma di una molecola nasce dalla repulsione tra le coppie elettroniche attorno all'atomo centrale. Scegli una molecola e osservane la geometria 3D con gli angoli di legame reali.</div>
+    <canvas id="cVsepr" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">scrivi formula</span>
+      <input type="text" id="vseprInput" value="CH4" placeholder="es. XeF4, SF6, NH3" style="width:160px;text-transform:none">
+      <div class="chip" id="vseprGo">mostra</div></div>
+    <div class="ctrls"><span class="lab">esempi</span><div class="chiprow" id="vseprChips"></div></div>
+    <div class="info" id="vseprInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-vib"><div class="panel">
+    <div class="mtitle">Modi normali di vibrazione</div>
+    <div class="mdesc">Le molecole vibrano in modi caratteristici, ciascuno a una frequenza IR precisa. Solo i modi che variano il momento di dipolo sono attivi all'infrarosso.</div>
+    <canvas id="cVib" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">molecola</span><div class="chiprow" id="vibMol"></div>
+      <span class="lab" style="margin-left:8px">modo</span><div class="chiprow" id="vibMode"></div></div>
+    <div class="info" id="vibInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-ho"><div class="panel">
+    <div class="mtitle">Oscillatore armonico quantistico</div>
+    <div class="mdesc">Livelli equispaziati Eₙ = (n+½)ℏω e funzioni d'onda ψₙ. Base quantistica della spettroscopia IR.</div>
+    <canvas id="cHO" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">livello n</span><div class="chiprow" id="hoBtns"></div>
+      <span class="lab" style="margin-left:8px">mostra</span><div class="chip on" id="hoPsi">ψₙ</div><div class="chip" id="hoP2">|ψₙ|²</div></div>
+    <div class="info" id="hoInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-box"><div class="panel">
+    <div class="mtitle">Particella in una scatola 1D</div>
+    <div class="mdesc">Confinamento e quantizzazione: Eₙ ∝ n².</div>
+    <canvas id="cBox" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">livello n</span><div class="chiprow" id="boxBtns"></div>
+      <span class="lab" style="margin-left:8px">mostra</span><div class="chip on" id="boxPsi">ψₙ</div><div class="chip" id="boxP2">|ψₙ|²</div></div>
+    <div class="info" id="boxInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-spec"><div class="panel">
+    <div class="mtitle">Le spettroscopie · una molecola, tante radiazioni</div>
+    <div class="mdesc">Ogni regione dello spettro elettromagnetico interroga la materia in modo diverso: i nuclei (NMR), le rotazioni, le vibrazioni (IR e Raman), gli elettroni (UV-Vis). Scegli una tecnica e osserva cosa accade alla molecola.</div>
+    <canvas id="cSpec" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">tecnica</span><div class="chiprow" id="specBtns"></div></div>
+    <div class="info" id="specInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-kin"><div class="panel">
+    <div class="mtitle">Cinetica chimica · barriera di attivazione</div>
+    <div class="mdesc">Le molecole reagiscono solo se superano la barriera di energia Eₐ. La frazione che ci riesce segue Arrhenius: k = A·e^(−Eₐ/RT). Regola Eₐ e T e osserva le particelle tentare il valico.</div>
+    <canvas id="cKin" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">Eₐ</span><input type="range" id="kinEa" min="20" max="120" step="5" value="60"><span id="kinEaV" style="color:var(--teal)">60 kJ/mol</span>
+      <span class="lab">T</span><input type="range" id="kinT" min="250" max="600" step="10" value="300"><span id="kinTV" style="color:var(--teal)">300 K</span>
+      <div class="chip" id="kinCat">catalizzatore</div></div>
+    <div class="info" id="kinInfo"></div>
+  </div></div>
+
+  <div class="mod" id="m-mb"><div class="panel">
+    <div class="mtitle">Distribuzione di Maxwell–Boltzmann</div>
+    <div class="mdesc">La distribuzione delle velocità molecolari in un gas, in funzione di temperatura e massa.</div>
+    <canvas id="cMB" width="1000" height="440"></canvas>
+    <div class="ctrls"><span class="lab">gas</span>
+      <select id="mbGas"><option value="4">Elio (4)</option><option value="28" selected>Azoto N₂ (28)</option><option value="32">Ossigeno O₂ (32)</option><option value="44">CO₂ (44)</option></select>
+      <span class="lab">temperatura</span><input type="range" id="mbT" min="100" max="1000" step="10" value="300"><span id="mbTval" style="color:var(--teal)">300 K</span></div>
+    <div class="info" id="mbInfo"></div>
+  </div></div>
+
+  
+
+  
+</div>
+
+<script>
+function ctx2(id){const cv=document.getElementById(id);if(!cv)return null;
+  // RISOLUZIONE INTERNA FISSA: il canvas disegna sempre a 1000x440 px logici,
+  // indipendentemente da clientWidth (che in iframe può essere 0 all'avvio).
+  // Il CSS poi scala visivamente il canvas alla larghezza disponibile.
+  var LW=1000,LH=440;
+  if(cv.width!==LW){cv.width=LW;cv.height=LH;}
+  var x=cv.getContext&&cv.getContext('2d');if(!x)return null;
+  x.setTransform(1,0,0,1,0,0);
+  return {x:x,w:LW,h:LH};}
+function bg(x,w,h){x.fillStyle='#070f1c';x.fillRect(0,0,w,h);}
+function ax(x,L,R,T,B){x.strokeStyle='rgba(159,179,200,.35)';x.lineWidth=1;x.beginPath();x.moveTo(L,T);x.lineTo(L,B);x.lineTo(R,B);x.stroke();}
+function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+let rafId=null;function stopAnim(){if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
+function loop(fn){stopAnim();(function tick(){fn();rafId=requestAnimationFrame(tick);})();}
+
+/* ===== ORBITALI IDROGENO 3D (alta risoluzione) ===== */
+function factO(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
+function lag(k,a,x){if(k===0)return 1;if(k===1)return 1+a-x;let Lm=1,L=1+a-x;for(let i=1;i<k;i++){const Lp=((2*i+1+a-x)*L-(i+a)*Lm)/(i+1);Lm=L;L=Lp;}return L;}
+function Rnl(n,l,r){const a=Math.sqrt(Math.pow(2/n,3)*factO(n-l-1)/(2*n*factO(n+l)));const rho=2*r/n;return a*Math.exp(-r/n)*Math.pow(rho,l)*lag(n-l-1,2*l+1,rho);}
+function Ylm(l,m,x,y,z){const P=Math.PI;if(l===0)return 0.5/Math.sqrt(P);
+  if(l===1){if(m===-1)return Math.sqrt(3/(4*P))*y;if(m===0)return Math.sqrt(3/(4*P))*z;return Math.sqrt(3/(4*P))*x;}
+  if(l===2){if(m===-2)return 0.5*Math.sqrt(15/P)*x*y;if(m===-1)return 0.5*Math.sqrt(15/P)*y*z;if(m===0)return 0.25*Math.sqrt(5/P)*(3*z*z-1);if(m===1)return 0.5*Math.sqrt(15/P)*x*z;return 0.25*Math.sqrt(15/P)*(x*x-y*y);}
+  if(l===3){if(m===-3)return 0.25*Math.sqrt(35/(2*P))*y*(3*x*x-y*y);if(m===-2)return 0.5*Math.sqrt(105/P)*x*y*z;if(m===-1)return 0.25*Math.sqrt(21/(2*P))*y*(5*z*z-1);if(m===0)return 0.25*Math.sqrt(7/P)*z*(5*z*z-3);if(m===1)return 0.25*Math.sqrt(21/(2*P))*x*(5*z*z-1);if(m===2)return 0.25*Math.sqrt(105/P)*z*(x*x-y*y);return 0.25*Math.sqrt(35/(2*P))*x*(x*x-3*y*y);}return 0;}
+function psiO(n,l,m,x,y,z){const r=Math.sqrt(x*x+y*y+z*z)||1e-9;return Rnl(n,l,r)*Ylm(l,m,x/r,y/r,z/r);}
+let oN=2,oL=1,oM=0,oCloud=null,oYaw=0.6,oPitch=-0.35,oDrag=false,oLX=0,oLY=0,oFade=1,oOrder=null,oZ=null,oPX=null,oPY=null,oSC=null,oZoom=1,oZoomLum=1;
+const oMobile=(window.matchMedia?window.matchMedia('(max-width:760px)').matches:false), oNP=oMobile?9000:15000;
+function oSample(){oFade=0;const n=oN,l=oL,m=oM,L=2.2*n*n+6;let pmax=0;
+  for(let i=0;i<24000;i++){const x=(Math.random()*2-1)*L,y=(Math.random()*2-1)*L,z=(Math.random()*2-1)*L;const p=psiO(n,l,m,x,y,z);if(p*p>pmax)pmax=p*p;}pmax*=1.02;
+  const pts=new Float32Array(oNP*3),sgn=new Int8Array(oNP),den=new Float32Array(oNP);let g=0,t=0;
+  while(g<oNP&&t<oNP*400){t++;const x=(Math.random()*2-1)*L,y=(Math.random()*2-1)*L,z=(Math.random()*2-1)*L;const p=psiO(n,l,m,x,y,z),p2=p*p;
+    if(p2>Math.random()*pmax){pts[g*3]=x/L;pts[g*3+1]=y/L;pts[g*3+2]=z/L;sgn[g]=p>=0?1:-1;den[g]=Math.min(1,p2/pmax);g++;}}
+  oCloud={pts:pts.subarray(0,g*3),sgn:sgn.subarray(0,g),den:den.subarray(0,g),count:g};}
+const LET=['s','p','d','f'];
+function oName(){let suf='';if(oL===1)suf={'-1':'y','0':'z','1':'x'}[oM];else if(oL===2)suf={'-2':'xy','-1':'yz','0':'z²','1':'xz','2':'x²−y²'}[oM];else if(oL===3)suf=({'0':'z³','1':'xz²','-1':'yz²','2':'z(x²−y²)','-2':'xyz','3':'x(x²−3y²)','-3':'y(3x²−y²)'})[oM];return oN+LET[oL]+(suf||'');}
+function drawOrb(){const o=ctx2('cOrb');if(!o)return;const x=o.x,w=o.w,h=o.h;bg(x,w,h);
+  if(oFade<1)oFade=Math.min(1,oFade+0.05);
+  oYaw+=oDrag?0:0.004;
+  if(oCloud&&oCloud.count){
+    const cyA=Math.cos(oYaw),syA=Math.sin(oYaw),cp=Math.cos(oPitch),sp=Math.sin(oPitch);
+    const R=Math.min(w,h)*0.40*oZoom,focal=3.2,p=oCloud.pts,sg=oCloud.sgn,dn=oCloud.den,cx=w/2,cyy=h/2;
+    for(let i=0;i<oCloud.count;i++){
+      const X=p[i*3],Y=p[i*3+1],Z=p[i*3+2];
+      const x1=X*cyA-Z*syA,z1=X*syA+Z*cyA,y2=Y*cp-z1*sp,z2=Y*sp+z1*cp,sc=focal/(focal+z2);
+      const px=cx+x1*R*sc,py=cyy-y2*R*sc,depth=Math.max(0,Math.min(1,(z2+1.4)/2.8)),d=dn[i];
+      let rr,gg,bb;
+      if(sg[i]>0){rr=Math.round(20+200*d);gg=Math.round(150+90*d);bb=Math.round(110+60*d);} // teal->verde acceso
+      else{rr=Math.round(180+75*d);gg=Math.round(90+110*d);bb=Math.round(40+30*d);}           // arancio->giallo
+      const a=(0.10+0.40*depth)*oFade;
+      x.fillStyle='rgba('+rr+','+gg+','+bb+','+a.toFixed(3)+')';
+      const sz=1.2+depth*1.6;x.fillRect(px,py,sz,sz);
+    }
+  }
+  const rad=oN-oL-1;
+  document.getElementById('orbInfo').innerHTML='<b>Orbitale '+oName()+'</b> · n='+oN+' l='+oL+' m='+oM+'<br>Nodi radiali: <span class="hl">'+rad+'</span> · Nodi angolari: <span class="hl">'+oL+'</span> · Energia: <span class="hl">'+(-13.6/(oN*oN)).toFixed(2)+' eV</span><br><span style="color:#00c9b7">Teal/verde</span> = fase +, <span style="color:#f77f00">arancio/giallo</span> = fase −. Trascina per ruotare.';}
+function orbUI(){const HN=document.getElementById('orbN');HN.innerHTML='';[1,2,3,4].forEach(function(n){const b=document.createElement('div');b.className='chip'+(n===oN?' on':'');b.textContent=n;b.onclick=function(){oN=n;if(oL>oN-1)oL=oN-1;if(Math.abs(oM)>oL)oM=0;oSample();orbUI();};HN.appendChild(b);});
+  const HL=document.getElementById('orbL');HL.innerHTML='';for(let l=0;l<oN;l++){(function(l){const b=document.createElement('div');b.className='chip'+(l===oL?' on':'');b.textContent=l+' ('+LET[l]+')';b.onclick=function(){oL=l;if(Math.abs(oM)>oL)oM=0;oSample();orbUI();};HL.appendChild(b);})(l);}
+  const HM=document.getElementById('orbM');HM.innerHTML='';for(let m=-oL;m<=oL;m++){(function(m){const b=document.createElement('div');b.className='chip'+(m===oM?' on':'');b.textContent=m;b.onclick=function(){oM=m;oSample();orbUI();};HM.appendChild(b);})(m);}}
+(function(){const cv=document.getElementById('cOrb');
+  cv.addEventListener('mousedown',function(e){oDrag=true;oLX=e.clientX;oLY=e.clientY;});
+  window.addEventListener('mouseup',function(){oDrag=false;});
+  window.addEventListener('mousemove',function(e){if(!oDrag)return;oYaw+=(e.clientX-oLX)*0.01;oPitch+=(e.clientY-oLY)*0.01;oPitch=Math.max(-1.5,Math.min(1.5,oPitch));oLX=e.clientX;oLY=e.clientY;});
+  cv.addEventListener('touchstart',function(e){if(e.touches.length===1){oDrag=true;oLX=e.touches[0].clientX;oLY=e.touches[0].clientY;}},{passive:true});
+  cv.addEventListener('touchmove',function(e){if(oDrag&&e.touches.length===1){oYaw+=(e.touches[0].clientX-oLX)*0.01;oPitch+=(e.touches[0].clientY-oLY)*0.01;oPitch=Math.max(-1.5,Math.min(1.5,oPitch));oLX=e.touches[0].clientX;oLY=e.touches[0].clientY;}},{passive:true});
+  cv.addEventListener('touchend',function(){oDrag=false;});
+  cv.addEventListener('wheel',function(e){e.preventDefault();oZoom*=(e.deltaY<0?1.08:0.93);oZoom=Math.max(0.6,Math.min(3,oZoom));},{passive:false});
+  var _pd=0;
+  cv.addEventListener('touchmove',function(e){if(e.touches.length===2){var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.sqrt(dx*dx+dy*dy);if(_pd){oZoom*=d/_pd;oZoom=Math.max(0.6,Math.min(3,oZoom));}_pd=d;}},{passive:true});
+  cv.addEventListener('touchend',function(){_pd=0;});
+})();
+
+/* ===== EMISSIONE IDROGENO — animazione curata ===== */
+const Rinf=1.0967757e7;
+function lamNM(n1,n2){return 1/(Rinf*(1/(n1*n1)-1/(n2*n2)))*1e9;}
+function nm2rgb(nm){let r,g,b;if(nm<380)return[150,80,255];if(nm>750)return[150,30,30];
+  if(nm<440){r=-(nm-440)/60;g=0;b=1;}else if(nm<490){r=0;g=(nm-440)/50;b=1;}else if(nm<510){r=0;g=1;b=-(nm-510)/20;}
+  else if(nm<580){r=(nm-510)/70;g=1;b=0;}else if(nm<645){r=1;g=-(nm-645)/65;b=0;}else{r=1;g=0;b=0;}return [Math.round(r*255),Math.round(g*255),Math.round(b*255)];}
+const SERIE={1:{name:"Lyman (UV)"},2:{name:"Balmer (visibile)"},3:{name:"Paschen (IR)"}};
+let hN1=2,hN2=3,hAngle=0,hClock=0,hTrail=[],hWaves=[],hSpectrum={},hYaw=0.4,hPitch=-0.42;
+function hydSerieUI(){const Hh=document.getElementById('hydSerie');Hh.innerHTML='';[1,2,3].forEach(function(s){const b=document.createElement('div');b.className='chip'+(s===hN1?' on':'');b.textContent=SERIE[s].name;b.onclick=function(){hN1=s;hN2=s+1;hClock=0;hTrail=[];hWaves=[];hSpectrum={};hydSerieUI();hydTransUI();};Hh.appendChild(b);});}
+function hydTransUI(){const Hh=document.getElementById('hydTrans');Hh.innerHTML='';for(let n2=hN1+1;n2<=hN1+5;n2++){(function(n2){const b=document.createElement('div');b.className='chip'+(n2===hN2?' on':'');b.textContent=n2+'→'+hN1;b.onclick=function(){hN2=n2;hClock=0;hTrail=[];hWaves=[];hydTransUI();};Hh.appendChild(b);})(n2);}}
+function drawHyd(){const o=ctx2('cHyd');if(!o)return;const x=o.x,w=o.w,h=o.h;bg(x,w,h);
+  const lam=lamNM(hN1,hN2),rgb=hN1===2?nm2rgb(lam):(hN1===1?[150,90,255]:[210,70,60]);const col='rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
+  hAngle+=0.05;hClock+=0.01;if(hClock>2)hClock=0;
+  let rN,emitting=false;
+  if(hClock<0.9){rN=hN2;}
+  else if(hClock<1.2){const t=ease((hClock-0.9)/0.30);rN=hN2-(hN2-hN1)*t;emitting=true;}
+  else{rN=hN1;}
+  // --- atomo di Bohr 2D (a sinistra) ---
+  const cx=w*0.30,cy=h*0.50,rStep=Math.min(w*0.20,h*0.40)/5;
+  for(let n=1;n<=5;n++){x.strokeStyle=n===hN1?'rgba(0,201,183,.5)':(n===hN2?'rgba(247,127,0,.5)':'rgba(159,179,200,.15)');
+    x.lineWidth=(n===hN1||n===hN2)?1.6:1;x.beginPath();x.arc(cx,cy,n*rStep,0,2*Math.PI);x.stroke();
+    x.fillStyle='rgba(159,179,200,.55)';x.font='11px sans-serif';x.fillText('n='+n,cx+n*rStep-14,cy-3);}
+  // nucleo
+  x.fillStyle='#f77f00';x.shadowColor='#f77f00';x.shadowBlur=14;x.beginPath();x.arc(cx,cy,7,0,2*Math.PI);x.fill();x.shadowBlur=0;
+  // elettrone
+  const er=rN*rStep,ex=cx+er*Math.cos(hAngle),ey=cy+er*Math.sin(hAngle);
+  x.fillStyle=emitting?col:'#6bcfff';x.shadowColor=emitting?col:'#6bcfff';x.shadowBlur=14;x.beginPath();x.arc(ex,ey,6,0,2*Math.PI);x.fill();x.shadowBlur=0;
+  // freccia di transizione (raggio n2 -> n1) quando emette
+  if(emitting){x.strokeStyle=col;x.lineWidth=2;x.globalAlpha=0.7;x.beginPath();x.moveTo(cx,cy);
+    x.lineTo(cx+hN1*rStep*Math.cos(hAngle),cy+hN1*rStep*Math.sin(hAngle));x.stroke();x.globalAlpha=1;}
+  // --- spettro a righe (a destra) ---
+  const sx0=w*0.60,sx1=w-24,sy=h*0.74,sT=h*0.26;
+  x.fillStyle='#9fb3c8';x.font='12px serif';x.textAlign='left';x.fillText('spettro di emissione',sx0,sT-14);
+  x.strokeStyle='rgba(159,179,200,.3)';x.lineWidth=1;x.beginPath();x.moveTo(sx0,sy);x.lineTo(sx1,sy);x.stroke();
+  const rng={1:[90,140],2:[380,700],3:[820,1900]}[hN1],SX=function(nm){return sx0+(nm-rng[0])/(rng[1]-rng[0])*(sx1-sx0);};
+  for(let n2=hN1+1;n2<=hN1+5;n2++){const nm=lamNM(hN1,n2);if(nm<rng[0]||nm>rng[1])continue;const px=SX(nm);
+    const c2=hN1===2?nm2rgb(nm):(hN1===1?[150,90,255]:[210,70,60]);const cc='rgb('+c2[0]+','+c2[1]+','+c2[2]+')';const sel=n2===hN2;
+    x.strokeStyle=cc;x.lineWidth=sel?3:1.5;if(sel){x.shadowColor=cc;x.shadowBlur=12;}
+    x.beginPath();x.moveTo(px,sT);x.lineTo(px,sy);x.stroke();x.shadowBlur=0;
+    if(sel){x.fillStyle='#e9eef6';x.font='10px sans-serif';x.textAlign='center';x.fillText(nm.toFixed(0)+' nm',px,sT-2);}}
+  x.fillStyle='#9fb3c8';x.font='10px sans-serif';x.textAlign='center';
+  for(let st=0;st<=3;st++){const nm=rng[0]+(rng[1]-rng[0])*st/3;x.fillText(Math.round(nm),SX(nm),sy+15);}
+  x.textAlign='left';
+  document.getElementById('hydInfo').innerHTML='<b>Serie di '+SERIE[hN1].name+'</b> — transizione <span class="hl2">'+hN2+'→'+hN1+'</span><br>λ = <span class="hl">'+lam.toFixed(1)+' nm</span> · E = <span class="hl">'+(1240/lam).toFixed(2)+' eV</span> · ΔE = '+(13.6*(1/(hN1*hN1)-1/(hN2*hN2))).toFixed(2)+' eV<br>L\'elettrone salta dal livello n='+hN2+' al livello n='+hN1+', emettendo un fotone che accende la riga corrispondente nello spettro.';}
+
+/* ===== ORBITALI MOLECOLARI con tavola periodica ===== */
+const ELEM={1:['H',1],2:['He',2],3:['Li',1],4:['Be',2],5:['B',3],6:['C',4],7:['N',5],8:['O',6],9:['F',7],10:['Ne',8]};
+function moDiagram(Z){
+  // valenza (2s,2p) per Z>=3; per H/He solo 1s
+  const sym=ELEM[Z][0];
+  if(Z<=2){const e=Z*2;const levels=[{n:'σ1s',e:Math.min(2,e),b:1},{n:'σ*1s',e:Math.max(0,e-2),b:-1}];
+    const order=(levels[0].e-levels[1].e)/2;return {sym,levels,order,unp:levels.filter(l=>l.e===1).length};}
+  // periodo 2: ordine livelli dipende da Z (inversione s-p per Z<=7)
+  const sp=Z<=7;const names=sp?['σ2s','σ*2s','π2p','π2p','σ2p','π*2p','π*2p','σ*2p']:['σ2s','σ*2s','σ2p','π2p','π2p','π*2p','π*2p','σ*2p'];
+  const bnd=names.map(n=>n.indexOf('*')<0?1:-1);
+  let e=ELEM[Z][1]*2;const occ=names.map(()=>0);let i=0;
+  while(e>0){if(names[i]==='π2p'||names[i]==='π*2p'){const pr=[i,i+1];pr.forEach(k=>{if(e>0){occ[k]++;e--;}});pr.forEach(k=>{if(e>0){occ[k]++;e--;}});i+=2;}else{const a=Math.min(2,e);occ[i]+=a;e-=a;i++;}}
+  let bonding=0,anti=0;occ.forEach((o,k)=>{if(bnd[k]>0)bonding+=o;else anti+=o;});
+  const levels=names.map((n,k)=>({n,e:occ[k],b:bnd[k]}));
+  return {sym,levels,order:(bonding-anti)/2,unp:occ.filter(o=>o===1).length};}
+let moZ=8,moT=0;
+function arrow(x,px,y,dir,al){x.strokeStyle='rgba(233,238,246,'+al+')';x.lineWidth=1.6;x.beginPath();x.moveTo(px,y-9*dir);x.lineTo(px,y+9*dir);x.moveTo(px,y-9*dir);x.lineTo(px-3,y-9*dir+4*dir);x.moveTo(px,y-9*dir);x.lineTo(px+3,y-9*dir+4*dir);x.stroke();}
+function drawMO(){const _c=ctx2('cMO');if(!_c)return;const {x,w,h}=_c;bg(x,w,h);const D=moDiagram(moZ);
+  const cxM=w*0.5,T=46,B=h-26,N=D.levels.length,Y=function(i){return B-(i+1)/(N+1)*(B-T);};
+  moT=Math.min(moT+0.06,1);const rev=ease(moT);
+  x.fillStyle='#9fb3c8';x.font='13px serif';x.textAlign='center';x.fillText(D.sym,w*0.16,T-18);x.fillText(D.sym+'₂ (orbitali molecolari)',cxM,T-18);x.fillText(D.sym,w*0.84,T-18);
+  D.levels.forEach(function(lv,i){const y=Y(i),col=lv.b>0?'#00c9b7':'#f77f00';const aw=rev;
+    x.globalAlpha=aw;x.strokeStyle=col;x.lineWidth=2.5;x.beginPath();x.moveTo(cxM-70,y);x.lineTo(cxM+70,y);x.stroke();
+    x.fillStyle=col;x.textAlign='right';x.font='12px sans-serif';x.fillText(lv.n,cxM-80,y+4);x.textAlign='center';x.globalAlpha=1;
+    if(lv.e>=1)arrow(x,cxM-18,y,1,aw);if(lv.e>=2)arrow(x,cxM+18,y,-1,aw);});
+  [w*0.16,w*0.84].forEach(function(cc){x.strokeStyle='rgba(159,179,200,.4)';x.lineWidth=2;[0.34,0.6].forEach(function(f){const y=B-f*(B-T);x.beginPath();x.moveTo(cc-38,y);x.lineTo(cc+38,y);x.stroke();});});
+  const mag=D.unp>0?('paramagnetico ('+D.unp+' e⁻ spaiati)'):'diamagnetico';
+  document.getElementById('moInfo').innerHTML='<b>'+D.sym+'₂</b> · Ordine di legame = <span class="hl">'+D.order+'</span> · <b>'+(D.unp>0?'<span class="hl2">'+mag+'</span>':'<span class="hl">'+mag+'</span>')+'</b><br>Ordine = (elettroni leganti − antileganti)/2.'+(D.order===0?' Ordine 0 → la molecola <b>non si forma</b>.':'')+(moZ===8?' I due e⁻ spaiati nei π* spiegano il paramagnetismo di O₂.':'');}
+function moTblUI(){const H=document.getElementById('moTbl');H.innerHTML='';for(let Z=1;Z<=10;Z++){(function(Z){const c=document.createElement('div');c.className='pcell'+(Z===moZ?' on':'');
+  c.innerHTML='<span class="sym">'+ELEM[Z][0]+'</span><span class="z">'+Z+'</span>';c.onclick=function(){moZ=Z;moT=0;moTblUI();drawMO();};H.appendChild(c);})(Z);}}
+
+/* ===== VIBRAZIONI ===== */
+const VIB={
+ "H₂O":{atoms:[{p:[0,0.22,0],c:'#f77f00',r:13},{p:[-0.75,-0.42,0],c:'#cfe8ff',r:9},{p:[0.75,-0.42,0],c:'#cfe8ff',r:9}],bonds:[[0,1],[0,2]],geo:'angolare (104,5°)',
+   modes:[{n:"ν₁ stretch simmetrico",cm:3657,ir:true,d:[[0,0.06,0],[-0.5,-0.3,0],[0.5,-0.3,0]]},
+          {n:"ν₂ bending",cm:1595,ir:true,d:[[0,-0.12,0],[-0.4,0.42,0],[0.4,0.42,0]]},
+          {n:"ν₃ stretch asimmetrico",cm:3756,ir:true,d:[[0.1,0,0],[-0.5,-0.3,0],[-0.5,0.3,0]]}]},
+ "CO₂":{atoms:[{p:[-0.85,0,0],c:'#f77f00',r:12},{p:[0,0,0],c:'#5a5a5a',r:12},{p:[0.85,0,0],c:'#f77f00',r:12}],bonds:[[0,1],[1,2]],geo:'lineare (180°)',
+   modes:[{n:"ν₁ stretch simmetrico",cm:1388,ir:false,d:[[-0.5,0,0],[0,0,0],[0.5,0,0]]},
+          {n:"ν₂ bending",cm:667,ir:true,d:[[0,0.5,0],[0,-0.5,0],[0,0.5,0]]},
+          {n:"ν₃ stretch asimmetrico",cm:2349,ir:true,d:[[0.5,0,0],[-0.3,0,0],[0.5,0,0]]}]},
+ "SO₂":{atoms:[{p:[0,0.26,0],c:'#e8d44a',r:13},{p:[-0.78,-0.36,0],c:'#f77f00',r:11},{p:[0.78,-0.36,0],c:'#f77f00',r:11}],bonds:[[0,1],[0,2]],geo:'angolare (119°)',
+   modes:[{n:"ν₁ stretch simmetrico",cm:1151,ir:true,d:[[0,0.06,0],[-0.5,-0.3,0],[0.5,-0.3,0]]},
+          {n:"ν₂ bending",cm:518,ir:true,d:[[0,-0.12,0],[-0.4,0.42,0],[0.4,0.42,0]]},
+          {n:"ν₃ stretch asimmetrico",cm:1362,ir:true,d:[[0.1,0,0],[-0.5,-0.3,0],[-0.5,0.3,0]]}]},
+ "NH₃":{atoms:[{p:[0,0.34,0],c:'#6b8cff',r:12},{p:[0.82,-0.24,0],c:'#cfe8ff',r:9},{p:[-0.41,-0.24,0.71],c:'#cfe8ff',r:9},{p:[-0.41,-0.24,-0.71],c:'#cfe8ff',r:9}],bonds:[[0,1],[0,2],[0,3]],geo:'piramidale (107°)',
+   modes:[{n:"ν₂ a ombrello",cm:950,ir:true,d:[[0,0.5,0],[0.25,-0.35,0],[-0.12,-0.35,0.22],[-0.12,-0.35,-0.22]]},
+          {n:"ν₁ stretch simmetrico",cm:3337,ir:true,d:[[0,0.1,0],[0.4,-0.2,0],[-0.2,-0.2,0.35],[-0.2,-0.2,-0.35]]},
+          {n:"ν₄ bending degenere",cm:1627,ir:true,d:[[0.1,0,0],[-0.4,0.2,0],[0.2,-0.3,0.2],[0.2,0.1,-0.3]]}]},
+ "HCN":{atoms:[{p:[-1.0,0,0],c:'#cfe8ff',r:8},{p:[-0.18,0,0],c:'#5a5a5a',r:12},{p:[0.78,0,0],c:'#6b8cff',r:11}],bonds:[[0,1],[1,2]],geo:'lineare (180°)',
+   modes:[{n:"ν₁ stretch C–H",cm:3311,ir:true,d:[[0.6,0,0],[-0.15,0,0],[0,0,0]]},
+          {n:"ν₂ bending",cm:712,ir:true,d:[[0,0.55,0],[0,-0.3,0],[0,0.18,0]]},
+          {n:"ν₃ stretch C≡N",cm:2097,ir:true,d:[[0,0,0],[0.35,0,0],[-0.35,0,0]]}]},
+ "H₂CO":{atoms:[{p:[0,-0.1,0],c:'#5a5a5a',r:12},{p:[0,0.78,0],c:'#f77f00',r:12},{p:[-0.66,-0.62,0],c:'#cfe8ff',r:8},{p:[0.66,-0.62,0],c:'#cfe8ff',r:8}],bonds:[[0,1],[0,2],[0,3]],geo:'trigonale planare',
+   modes:[{n:"stretch C=O",cm:1746,ir:true,d:[[0,-0.3,0],[0,0.45,0],[0,-0.05,0],[0,-0.05,0]]},
+          {n:"scissoring CH₂",cm:1500,ir:true,d:[[0,0.05,0],[0,0,0],[0.4,0.3,0],[-0.4,0.3,0]]},
+          {n:"stretch sim. C–H",cm:2782,ir:true,d:[[0,-0.1,0],[0,0,0],[-0.4,-0.35,0],[0.4,-0.35,0]]}]}};
+let vibMolName="H₂O",vibIdx=0,vibT=0,vibYaw=0.4;
+function drawVib(){const o=ctx2('cVib');if(!o)return;const x=o.x,w=o.w,h=o.h;bg(x,w,h);
+  const cx=w/2,cy=h/2,S=Math.min(w,h)*0.30;const M=VIB[vibMolName],mode=M.modes[vibIdx];
+  vibT+=0.075;vibYaw+=0.006;const osc=Math.sin(vibT)*0.5;
+  const cyA=Math.cos(vibYaw),syA=Math.sin(vibYaw),cp=Math.cos(-0.32),sp=Math.sin(-0.32);
+  function proj(P){var X=P[0],Y=P[1],Z=P[2];var x1=X*cyA-Z*syA,z1=X*syA+Z*cyA,y2=Y*cp-z1*sp,z2=Y*sp+z1*cp;var sc=3.0/(3.0+z2);return{px:cx+x1*S*sc,py:cy-y2*S*sc,z:z2,sc:sc};}
+  function atomPos(i){const a=M.atoms[i],d=mode.d[i]||[0,0,0];return [a.p[0]+d[0]*osc,a.p[1]+d[1]*osc,a.p[2]+d[2]*osc];}
+  /* legami con gradiente */
+  M.bonds.forEach(function(b){const A=proj(atomPos(b[0])),B2=proj(atomPos(b[1]));
+    var grd=x.createLinearGradient(A.px,A.py,B2.px,B2.py);
+    grd.addColorStop(0,'rgba(159,179,200,.65)');grd.addColorStop(1,'rgba(159,179,200,.35)');
+    x.strokeStyle=grd;x.lineWidth=5*Math.min(A.sc,B2.sc);x.beginPath();x.moveTo(A.px,A.py);x.lineTo(B2.px,B2.py);x.stroke();});
+  /* atomi (painter, senza lettere, con riflesso) */
+  var pr=M.atoms.map(function(a,i){return {a:a,q:proj(atomPos(i))};});
+  pr.sort(function(u,v){return u.q.z-v.q.z;});
+  pr.forEach(function(o2){const q=o2.q,a=o2.a,r=a.r*q.sc;
+    var g=x.createRadialGradient(q.px-r*0.35,q.py-r*0.35,r*0.12,q.px,q.py,r);
+    g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.32,a.c);g.addColorStop(1,a.c);
+    x.fillStyle=g;x.shadowColor=a.c;x.shadowBlur=13*q.sc;x.beginPath();x.arc(q.px,q.py,r,0,2*Math.PI);x.fill();x.shadowBlur=0;});
+  document.getElementById('vibInfo').innerHTML='<b>'+vibMolName+' ('+M.geo+') — '+mode.n+'</b><br>Frequenza sperimentale: <span class="hl">'+mode.cm+' cm⁻¹</span> · IR: <b>'+(mode.ir?'<span class="hl">attiva</span>':'<span class="hl2">inattiva</span> (dipolo invariato)')+'</b><br>Gli spostamenti atomici sono <b>schematici</b> (qualitativi); le frequenze sono valori sperimentali di letteratura.';}
+function vibUI(){const HM=document.getElementById('vibMol');HM.innerHTML='';Object.keys(VIB).forEach(function(m){const b=document.createElement('div');b.className='chip'+(m===vibMolName?' on':'');b.textContent=m;b.onclick=function(){vibMolName=m;vibIdx=0;vibUI();};HM.appendChild(b);});const HD=document.getElementById('vibMode');HD.innerHTML='';VIB[vibMolName].modes.forEach(function(md,i){const b=document.createElement('div');b.className='chip'+(i===vibIdx?' on':'');b.textContent=md.n.split(' ')[0];b.onclick=function(){vibIdx=i;vibUI();};HD.appendChild(b);});}
+
+/* ===== OSCILLATORE / SCATOLA / MB ===== */
+function hermite(n,x){if(n===0)return 1;if(n===1)return 2*x;let Hm=1,H=2*x;for(let i=1;i<n;i++){const Hp=2*x*H-2*i*Hm;Hm=H;H=Hp;}return H;}
+function psiHO(n,x){const N=1/Math.sqrt(Math.pow(2,n)*factO(n)*Math.sqrt(Math.PI));return N*hermite(n,x)*Math.exp(-x*x/2);}
+let hoN=0,hoMode='psi';
+function drawHO(){const _c=ctx2('cHO');if(!_c)return;const {x,w,h}=_c;bg(x,w,h);const L=50,R=w-20,T=20,B=h-30,xm=5;const X=xi=>L+(xi+xm)/(2*xm)*(R-L),Emax=hoN+2,Y=e=>B-(e/Emax)*(B-T);
+  x.strokeStyle='rgba(247,127,0,.5)';x.lineWidth=2;x.beginPath();for(let xi=-xm;xi<=xm;xi+=0.05){const V=0.5*xi*xi;if(V<=Emax){const px=X(xi),py=Y(V);xi===-xm?x.moveTo(px,py):x.lineTo(px,py);}}x.stroke();ax(x,L,R,T,B);
+  for(let n=0;n<=Math.max(hoN,5);n++){const e=n+0.5;if(e>Emax)break;const py=Y(e),turn=Math.sqrt(2*e);x.strokeStyle=n===hoN?'rgba(0,201,183,.9)':'rgba(159,179,200,.22)';x.lineWidth=n===hoN?2:1;x.beginPath();x.moveTo(X(-turn),py);x.lineTo(X(turn),py);x.stroke();}
+  const py0=Y(hoN+0.5),amp=(B-T)/Emax*0.42;x.strokeStyle='#00c9b7';x.lineWidth=2.4;x.beginPath();for(let xi=-xm;xi<=xm;xi+=0.02){let v=psiHO(hoN,xi);if(hoMode==='p2')v=v*v*1.6;const px=X(xi),py=py0-v*amp;xi===-xm?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();
+  document.getElementById('hoInfo').innerHTML='<b>n = '+hoN+'</b> · E = <span class="hl">('+hoN+'+½) ℏω</span> · Nodi: <span class="hl">'+hoN+'</span><br>Livelli <b>equispaziati</b> (ΔE = ℏω).';}
+function hoUI(){const H=document.getElementById('hoBtns');H.innerHTML='';for(let n=0;n<=8;n++){(function(n){const b=document.createElement('div');b.className='chip'+(n===hoN?' on':'');b.textContent=n;b.onclick=function(){hoN=n;hoUI();drawHO();};H.appendChild(b);})(n);}}
+document.getElementById('hoPsi').onclick=function(){hoMode='psi';this.classList.add('on');document.getElementById('hoP2').classList.remove('on');drawHO();};
+document.getElementById('hoP2').onclick=function(){hoMode='p2';this.classList.add('on');document.getElementById('hoPsi').classList.remove('on');drawHO();};
+let boxN=1,boxMode='psi';
+function drawBox(){const _c=ctx2('cBox');if(!_c)return;const {x,w,h}=_c;bg(x,w,h);const L=50,R=w-20,T=20,B=h-30;x.strokeStyle='rgba(247,127,0,.6)';x.lineWidth=3;x.beginPath();x.moveTo(L,T);x.lineTo(L,B);x.moveTo(R,B);x.lineTo(R,T);x.stroke();ax(x,L,R,T,B);
+  const mid=(T+B)/2,amp=(B-T)*0.4;x.strokeStyle='#00c9b7';x.lineWidth=2.4;x.beginPath();for(let i=0;i<=600;i++){const xx=i/600;let v=Math.sqrt(2)*Math.sin(boxN*Math.PI*xx);if(boxMode==='p2')v=2*Math.sin(boxN*Math.PI*xx)*Math.sin(boxN*Math.PI*xx);const px=L+xx*(R-L),py=mid-v*amp*(boxMode==='p2'?0.6:0.5);i===0?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();
+  document.getElementById('boxInfo').innerHTML='<b>n = '+boxN+'</b> · E = <span class="hl">n²·E₁ = '+(boxN*boxN)+'·E₁</span> · Nodi interni: <span class="hl">'+(boxN-1)+'</span><br>L\'energia cresce con <b>n²</b>.';}
+function boxUI(){const H=document.getElementById('boxBtns');H.innerHTML='';for(let n=1;n<=8;n++){(function(n){const b=document.createElement('div');b.className='chip'+(n===boxN?' on':'');b.textContent=n;b.onclick=function(){boxN=n;boxUI();drawBox();};H.appendChild(b);})(n);}}
+document.getElementById('boxPsi').onclick=function(){boxMode='psi';this.classList.add('on');document.getElementById('boxP2').classList.remove('on');drawBox();};
+document.getElementById('boxP2').onclick=function(){boxMode='p2';this.classList.add('on');document.getElementById('boxPsi').classList.remove('on');drawBox();};
+const kB=1.380649e-23,u=1.66053907e-27;function fMB(v,m,T){return 4*Math.PI*Math.pow(m/(2*Math.PI*kB*T),1.5)*v*v*Math.exp(-m*v*v/(2*kB*T));}
+function drawMB(){const _c=ctx2('cMB');if(!_c)return;const {x,w,h}=_c;bg(x,w,h);const L=55,R=w-20,T=20,B=h-40;const mass=parseFloat(document.getElementById('mbGas').value)*u,Tk=parseFloat(document.getElementById('mbT').value);document.getElementById('mbTval').textContent=Tk+' K';const vmax=2500;
+  let fmax=0;for(let v=1;v<vmax;v+=2){const f=fMB(v,mass,Tk);if(f>fmax)fmax=f;}ax(x,L,R,T,B);
+  [[Tk-100,'rgba(159,179,200,.35)'],[Tk+200,'rgba(247,127,0,.5)']].forEach(function(p){const tt=p[0],col=p[1];if(tt<50)return;x.strokeStyle=col;x.lineWidth=1.4;x.beginPath();for(let i=0;i<=600;i++){const v=i/600*vmax,f=fMB(v,mass,tt);const px=L+(v/vmax)*(R-L),py=B-(f/fmax)*(B-T)*0.92;i===0?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();});
+  x.strokeStyle='#00c9b7';x.lineWidth=2.6;x.beginPath();for(let i=0;i<=600;i++){const v=i/600*vmax,f=fMB(v,mass,Tk);const px=L+(v/vmax)*(R-L),py=B-(f/fmax)*(B-T)*0.92;i===0?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();
+  x.fillStyle='#9fb3c8';x.font='11px sans-serif';x.textAlign='center';for(let s=0;s<=5;s++){const v=vmax*s/5;x.fillText(Math.round(v),L+(v/vmax)*(R-L),B+16);}x.fillText("velocità (m/s)",(L+R)/2,h-4);
+  const vmp=Math.sqrt(2*kB*Tk/mass),vavg=Math.sqrt(8*kB*Tk/(Math.PI*mass)),vrms=Math.sqrt(3*kB*Tk/mass);
+  document.getElementById('mbInfo').innerHTML='A <span class="hl">'+Tk+' K</span>: v più probabile = <span class="hl">'+vmp.toFixed(0)+' m/s</span> · v media = '+vavg.toFixed(0)+' · v rms = '+vrms.toFixed(0)+' m/s<br>Alzando T la curva si <b>abbassa e allarga</b>; i gas più leggeri sono più veloci.';}
+
+
+/* ===== GEOMETRIA VSEPR 3D (motore da formula) ===== */
+var VAL={H:1,B:3,C:4,N:5,O:6,F:7,Si:4,P:5,S:6,Cl:7,As:5,Se:6,Br:7,Te:6,I:7,Xe:8,Kr:8,Be:2,Al:3,Ga:3,Ge:4,Sn:4,Sb:5};
+var ENEG={H:2.20,B:2.04,C:2.55,N:3.04,O:3.44,F:3.98,Si:1.90,P:2.19,S:2.58,Cl:3.16,As:2.18,Se:2.55,Br:2.96,Te:2.1,I:2.66,Xe:2.6,Kr:3.0,Be:1.57,Al:1.61};
+var ECOL={H:'#cfe8ff',C:'#5a5a5a',N:'#6b8cff',O:'#f77f00',F:'#a0ffb0',Cl:'#7CFC8A',Br:'#c0703a',I:'#a060d0',S:'#e8d44a',P:'#ffa050',B:'#ffb1a0',Si:'#d0b088',Be:'#c9ffea',Xe:'#39c7d6',Se:'#e0b040',Te:'#d0a060',default:'#bcd'};
+function eColor(el){return ECOL[el]||ECOL.default;}
+var VOVR={"CO2":{c:'C',x:2,e:0},"SO2":{c:'S',x:2,e:1},"SO3":{c:'S',x:3,e:0},"NO2":{c:'N',x:2,e:1},"O3":{c:'O',x:2,e:1},"HCN":{c:'C',x:2,e:0},"N2O":{c:'N',x:2,e:0}};
+function vseprParse(f){var re=/([A-Z][a-z]?)(\d*)/g,m,a=[];while((m=re.exec(f))!==null){if(!m[1])continue;a.push([m[1],m[2]?parseInt(m[2]):1]);}return a.filter(z=>z[0]);}
+function vseprCompute(formula){var f=(formula||'').replace(/\s/g,'');if(!f)return{ok:false,msg:'Scrivi una formula'};
+  if(VOVR[f]){var o=VOVR[f];return{ok:true,central:o.c,lig:null,X:o.x,E:o.e,note:'legami multipli'};}
+  var atoms=vseprParse(f);if(atoms.length<2)return{ok:false,msg:'Servono almeno due elementi (es. NH3)'};
+  var cand=atoms.filter(a=>a[0]!=='H');if(!cand.length)return{ok:false,msg:'Atomo centrale non trovato'};
+  var central=cand.filter(a=>a[1]===1).sort((a,b)=>(ENEG[a[0]]||9)-(ENEG[b[0]]||9))[0]||cand[0];
+  var C=central[0];if(VAL[C]===undefined)return{ok:false,msg:'Elemento '+C+' non supportato'};
+  var X=0,ligEl=null;atoms.forEach(a=>{if(a!==central){X+=a[1];if(!ligEl)ligEl=a[0];}});
+  if(X<1)return{ok:false,msg:'Nessun legante'};
+  var E=Math.round((VAL[C]-X)/2);if(E<0)E=0;
+  return{ok:true,central:C,lig:ligEl,X:X,E:E,note:''};}
+function vseprGeom(X,E){var k=X+'_'+E;var G={'2_0':['lineare',180],'2_1':['angolare',119],'2_2':['angolare',104.5],'2_3':['lineare',180],'3_0':['trigonale planare',120],'3_1':['piramidale trigonale',107],'3_2':['a T',90],'4_0':['tetraedrica',109.5],'4_1':['altalena (seesaw)',102],'4_2':['quadrata planare',90],'5_0':['bipiramidale trigonale',90],'5_1':['piramidale quadrata',90],'6_0':['ottaedrica',90]};return G[k]||['SN='+(X+E)+' (oltre tabella)',0];}
+/* posizioni 3D dei leganti (X) e delle coppie solitarie (E) per ciascun AXE */
+function vseprPositions(X,E){
+  var k=X+'_'+E;
+  var T=[[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]].map(p=>{var n=Math.sqrt(3);return [p[0]/n,p[1]/n,p[2]/n];});
+  var TBP=[[0,1,0],[0,-1,0],[1,0,0],[-0.5,0,0.866],[-0.5,0,-0.866]];
+  var OCT=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  var TRIG=[[1,0,0],[-0.5,0,0.866],[-0.5,0,-0.866]];
+  var map={
+   '2_0':{X:[[1,0,0],[-1,0,0]],E:[]},
+   '2_1':{X:[[0.79,0.61,0],[-0.79,0.61,0]],E:[[0,-1,0]]},
+   '2_2':{X:[[0.79,0.61,0],[-0.79,0.61,0]],E:[[0,-0.7,0.7],[0,-0.7,-0.7]]},
+   '2_3':{X:[[0,1,0],[0,-1,0]],E:[[1,0,0],[-0.5,0,0.866],[-0.5,0,-0.866]]},
+   '3_0':{X:TRIG,E:[]},
+   '3_1':{X:[[0.94,-0.33,0],[-0.47,-0.33,0.82],[-0.47,-0.33,-0.82]],E:[[0,1,0]]},
+   '3_2':{X:[[0,1,0],[0,-1,0],[1,0,0]],E:[[-0.5,0,0.866],[-0.5,0,-0.866]]},
+   '4_0':{X:T,E:[]},
+   '4_1':{X:[[0,1,0],[0,-1,0],[1,0,0],[-0.5,0,0.866]],E:[[-0.5,0,-0.866]]},
+   '4_2':{X:[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]],E:[[0,1,0],[0,-1,0]]},
+   '5_0':{X:TBP,E:[]},
+   '5_1':{X:[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1],[0,-1,0]],E:[[0,1,0]]},
+   '6_0':{X:OCT,E:[]}
+  };
+  return map[k]||{X:T.slice(0,X),E:[]};
+}
+var vseprFormula="CH4",vseprYaw=0.5,vseprPitch=-0.3,vseprData=null;
+function vseprBuild(){var r=vseprCompute(vseprFormula);
+  if(!r.ok){vseprData=null;document.getElementById('vseprInfo').innerHTML='<span class="hl2">⚠ '+r.msg+'</span><br>Prova con formule come CH4, NH3, H2O, SF6, XeF4, ClF3, PCl5, BF3, CO2, SF4, IF5.';return;}
+  var g=vseprGeom(r.X,r.E),pos=vseprPositions(r.X,r.E);
+  vseprData={central:r.central,lig:r.lig,X:r.X,E:r.E,geo:g[0],ang:g[1],pos:pos,note:r.note};}
+function drawVsepr(){const o=ctx2('cVsepr');if(!o)return;const x=o.x,w=o.w,h=o.h;bg(x,w,h);
+  vseprYaw+=0.007;vseprPitch=-0.3+0.07*Math.sin(vseprYaw*0.7);if(!vseprData){return;}
+  var M=vseprData,cx=w/2,cy=h/2,S=Math.min(w,h)*0.30,tNow=vseprYaw*3;
+  var cyA=Math.cos(vseprYaw),syA=Math.sin(vseprYaw),cp=Math.cos(vseprPitch),sp=Math.sin(vseprPitch);
+  function proj(P){var X=P[0],Y=P[1],Z=P[2];var x1=X*cyA-Z*syA,z1=X*syA+Z*cyA,y2=Y*cp-z1*sp,z2=Y*sp+z1*cp;var sc=3.0/(3.0+z2);return{px:cx+x1*S*sc,py:cy-y2*S*sc,z:z2,sc:sc};}
+  var c0=proj([0,0,0]);
+  var colC=eColor(M.central),colL=eColor(M.lig||'H');
+  /* legami: filo sottile + flusso di particelle elettroniche */
+  M.pos.X.forEach(function(p,bi){var q=proj(p);
+    x.strokeStyle='rgba(159,179,200,.28)';x.lineWidth=3.5*q.sc;x.beginPath();x.moveTo(c0.px,c0.py);x.lineTo(q.px,q.py);x.stroke();
+    for(var k2=0;k2<6;k2++){var f=( (tNow*0.25)+(k2/6)+(bi*0.13) )%1;
+      var bx=c0.px+(q.px-c0.px)*f,by=c0.py+(q.py-c0.py)*f;
+      var pr2=2.2*q.sc*(0.7+0.5*Math.sin(f*Math.PI));
+      x.fillStyle='rgba(0,201,183,'+(0.25+0.45*Math.sin(f*Math.PI)).toFixed(3)+')';
+      x.beginPath();x.arc(bx,by,pr2,0,2*Math.PI);x.fill();}});
+  /* lobi delle coppie solitarie: gocce traslucide pulsanti */
+  (M.pos.E||[]).forEach(function(p){var q=proj(p);var L=18*q.sc*(1+0.06*Math.sin(tNow*1.4));
+    var gl=x.createRadialGradient(q.px,q.py,0,q.px,q.py,L);
+    gl.addColorStop(0,'rgba(0,201,183,.40)');gl.addColorStop(.6,'rgba(0,201,183,.16)');gl.addColorStop(1,'rgba(0,201,183,0)');
+    x.fillStyle=gl;x.beginPath();x.ellipse(q.px,q.py,L,L*0.72,Math.atan2(q.py-c0.py,q.px-c0.px),0,2*Math.PI);x.fill();});
+  /* atomi: sfere con riflesso, alone respirante, SENZA lettere */
+  var items=[{P:[0,0,0],col:colC,r:21}].concat(M.pos.X.map(function(p){return {P:p,col:colL,r:14};}));
+  var pr=items.map(function(it){return {it:it,q:proj(it.P)};});pr.sort(function(a,b){return a.q.z-b.q.z;});
+  pr.forEach(function(o2){var q=o2.q,it=o2.it,r=it.r*q.sc*(1+0.03*Math.sin(tNow*1.8+q.z*3));
+    var g=x.createRadialGradient(q.px-r*0.35,q.py-r*0.35,r*0.12,q.px,q.py,r);
+    g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.3,it.col);g.addColorStop(1,it.col);
+    x.fillStyle=g;x.shadowColor=it.col;x.shadowBlur=(13+4*Math.sin(tNow*1.8))*q.sc;
+    x.beginPath();x.arc(q.px,q.py,r,0,2*Math.PI);x.fill();x.shadowBlur=0;});
+  document.getElementById('vseprInfo').innerHTML='<b>'+vseprFormula+' — geometria '+M.geo+'</b> · <span class="hl">AX'+M.pos.X.length+'E'+(M.pos.E?M.pos.E.length:0)+'</span>'+(M.ang?' · angolo <span class="hl">'+M.ang+'°</span>':'')+'<br>Sfera grande = <b style="color:'+colC+'">'+M.central+'</b> (centrale) · sfere piccole = <b style="color:'+colL+'">'+(M.lig||'leganti')+'</b> · aloni <span style="color:#00c9b7">teal</span> = coppie solitarie. Il flusso di particelle lungo i legami rappresenta la densità elettronica condivisa.';}
+function vseprUI(){var H=document.getElementById('vseprChips');H.innerHTML='';['CH4','NH3','H2O','CO2','BF3','SF6','PCl5','XeF4','ClF3','SF4'].forEach(function(m){var b=document.createElement('div');b.className='chip'+(m===vseprFormula?' on':'');b.textContent=m;b.onclick=function(){vseprFormula=m;document.getElementById('vseprInput').value=m;vseprBuild();vseprUI();};H.appendChild(b);});}
+
+
+/* ===== SPETTROSCOPIE: spettro EM interattivo ===== */
+var SPEC=[
+ {k:'NMR',col:'#6bcfff',reg:'Radiofrequenze',what:'spin dei nuclei (¹H, ¹³C) in campo magnetico',detail:'I nuclei con spin si allineano al campo B₀ e assorbono radiofrequenze: lo spostamento chimico rivela l\'intorno elettronico. È la spettroscopia che identifica lo scheletro molecolare.',f:'ν = γB₀/2π (Larmor) — ¹H a 9,4 T → 400 MHz'},
+ {k:'Rotazionale',col:'#9b8cff',reg:'Microonde',what:'rotazioni della molecola',detail:'Le molecole con momento di dipolo assorbono microonde passando tra livelli rotazionali quantizzati: rivela distanze e angoli di legame.',f:'E_J = B·J(J+1), ΔJ = ±1'},
+ {k:'IR',col:'#f77f00',reg:'Infrarosso',what:'vibrazioni dei legami',detail:'Ogni legame vibra a una frequenza caratteristica (400–4000 cm⁻¹). Attiva se la vibrazione varia il momento di dipolo: è l\'impronta digitale dei gruppi funzionali.',f:'ν̃ = (1/2πc)·√(k/μ)'},
+ {k:'Raman',col:'#00c9b7',reg:'Visibile (diffusione)',what:'vibrazioni via polarizzabilità',detail:'La luce diffusa cambia energia se la vibrazione varia la polarizzabilità. Complementare all\'IR: i modi simmetrici (inattivi IR) sono spesso attivi Raman.',f:'Δν̃ = ν̃₀ − ν̃_Stokes'},
+ {k:'UV-Vis',col:'#ff6b9d',reg:'Ultravioletto–Visibile',what:'transizioni elettroniche',detail:'I fotoni UV-Vis promuovono elettroni tra orbitali (π→π*, n→π*). Responsabile del colore e usato per quantificare concentrazioni (Lambert-Beer).',f:'ΔE = hc/λ · Lambert-Beer: A = ε·l·c'}
+];
+var specIdx=2,specT=0;
+function drawSpec(){var o=ctx2('cSpec');if(!o)return;var x=o.x,w=o.w,h=o.h;bg(x,w,h);specT+=0.03;
+  var S=SPEC[specIdx];
+  /* nastro dello spettro EM in alto */
+  var bx0=40,bx1=w-40,by=54,bh=26;
+  var grad=x.createLinearGradient(bx0,0,bx1,0);
+  grad.addColorStop(0,'#6bcfff');grad.addColorStop(0.25,'#9b8cff');grad.addColorStop(0.5,'#f77f00');grad.addColorStop(0.72,'#00c9b7');grad.addColorStop(1,'#ff6b9d');
+  x.fillStyle=grad;x.globalAlpha=0.35;x.fillRect(bx0,by,bx1-bx0,bh);x.globalAlpha=1;
+  /* marcatore tecnica attiva */
+  var frac=[0.08,0.27,0.5,0.71,0.92][specIdx],mx=bx0+(bx1-bx0)*frac;
+  x.fillStyle=S.col;x.shadowColor=S.col;x.shadowBlur=14;x.beginPath();x.moveTo(mx,by-8);x.lineTo(mx-7,by-18);x.lineTo(mx+7,by-18);x.closePath();x.fill();x.shadowBlur=0;
+  x.fillStyle='#9fb3c8';x.font='10px sans-serif';x.textAlign='left';x.fillText('radio',bx0,by+bh+14);x.textAlign='right';x.fillText('raggi γ',bx1,by+bh+14);
+  x.textAlign='center';x.fillStyle=S.col;x.font='13px serif';x.fillText(S.reg,mx,by-24);
+  /* scena centrale: onda incidente + molecola che risponde */
+  var cx=w*0.30,cy=h*0.62,lam=[120,80,46,40,26][specIdx];
+  x.strokeStyle=S.col;x.lineWidth=2.5;x.shadowColor=S.col;x.shadowBlur=8;x.beginPath();
+  for(var px=bx0;px<cx-40;px+=2){var yy=cy+Math.sin((px-specT*40)/lam*6.28)*16;px===bx0?x.moveTo(px,yy):x.lineTo(px,yy);}
+  x.stroke();x.shadowBlur=0;
+  /* molecola schematica al centro che "risponde" secondo la tecnica */
+  var resp=Math.sin(specT*2);
+  if(S.k==='NMR'){ /* nucleo che precede (spin) */
+    x.strokeStyle='rgba(107,207,255,.4)';x.lineWidth=1;x.beginPath();x.ellipse(cx,cy,40,14,0,0,6.28);x.stroke();
+    var sxp=cx+Math.cos(specT*3)*40,syp=cy+Math.sin(specT*3)*14;
+    x.fillStyle='#6bcfff';x.shadowColor='#6bcfff';x.shadowBlur=14;x.beginPath();x.arc(sxp,syp,9,0,6.28);x.fill();x.shadowBlur=0;
+    x.strokeStyle='#6bcfff';x.lineWidth=2;x.beginPath();x.moveTo(cx,cy+22);x.lineTo(cx,cy-22);x.stroke();
+    x.beginPath();x.moveTo(cx,cy-22);x.lineTo(cx-4,cy-15);x.moveTo(cx,cy-22);x.lineTo(cx+4,cy-15);x.stroke();
+  } else if(S.k==='IR'||S.k==='Raman'){ /* due atomi che vibrano */
+    var d=20+resp*8*(S.k==='IR'?1:0.6);
+    [[-1,'#f77f00'],[1,'#cfe8ff']].forEach(function(p){x.fillStyle=p[1];x.shadowColor=p[1];x.shadowBlur=12;x.beginPath();x.arc(cx+p[0]*d,cy,12,0,6.28);x.fill();x.shadowBlur=0;});
+    x.strokeStyle='rgba(159,179,200,.5)';x.lineWidth=4;x.beginPath();x.moveTo(cx-d,cy);x.lineTo(cx+d,cy);x.stroke();
+  } else if(S.k==='Rotazionale'){ /* molecola biatomica che ruota */
+    var ang=specT*1.5;[[-1,'#f77f00'],[1,'#6b8cff']].forEach(function(p){var ax2=cx+Math.cos(ang)*p[0]*26,ay=cy+Math.sin(ang)*p[0]*26;x.fillStyle=p[1];x.shadowColor=p[1];x.shadowBlur=12;x.beginPath();x.arc(ax2,ay,11,0,6.28);x.fill();x.shadowBlur=0;});
+    x.strokeStyle='rgba(159,179,200,.5)';x.lineWidth=4;x.beginPath();x.moveTo(cx+Math.cos(ang)*-26,cy+Math.sin(ang)*-26);x.lineTo(cx+Math.cos(ang)*26,cy+Math.sin(ang)*26);x.stroke();
+  } else { /* UV-Vis: elettrone che salta tra due orbitali */
+    x.strokeStyle='rgba(159,179,200,.3)';x.lineWidth=1.5;
+    x.beginPath();x.ellipse(cx,cy+18,46,16,0,0,6.28);x.stroke();x.beginPath();x.ellipse(cx,cy-18,30,11,0,0,6.28);x.stroke();
+    var up=(Math.sin(specT*2)+1)/2;var ey=cy+18-(36)*up;
+    x.fillStyle='#ff6b9d';x.shadowColor='#ff6b9d';x.shadowBlur=14;x.beginPath();x.arc(cx,ey,8,0,6.28);x.fill();x.shadowBlur=0;
+  }
+  /* pannello descrizione a destra */
+  var tx=w*0.56,tw=w-tx-30;
+  x.fillStyle='#e9eef6';x.font='16px serif';x.textAlign='left';x.fillText('Spettroscopia '+S.k,tx,h*0.36);
+  x.fillStyle=S.col;x.font='12px sans-serif';x.fillText('sonda: '+S.what,tx,h*0.36+24);
+  document.getElementById('specInfo').innerHTML='<b>'+S.k+' — '+S.reg+'</b><br>'+S.detail+(S.f?'<br>Formula chiave: <span class="hl">'+S.f+'</span>':'');}
+function specUI(){var H=document.getElementById('specBtns');H.innerHTML='';SPEC.forEach(function(sp,i){var b=document.createElement('div');b.className='chip'+(i===specIdx?' on':'');b.textContent=sp.k;b.onclick=function(){specIdx=i;specUI();};H.appendChild(b);});}
+
+/* ===== CINETICA CHIMICA: Arrhenius + profilo energetico ===== */
+var kinParticles=[],kinCat=false;
+function kinInit(){kinParticles=[];for(var i=0;i<26;i++)kinParticles.push({x:Math.random(),v:0,phase:Math.random()*6.28});}
+function drawKin(){var o=ctx2('cKin');if(!o)return;var x=o.x,w=o.w,h=o.h;bg(x,w,h);
+  var Ea=parseFloat(document.getElementById('kinEa').value),T=parseFloat(document.getElementById('kinT').value);
+  var EaEff=kinCat?Ea*0.6:Ea;
+  document.getElementById('kinEaV').textContent=Ea+' kJ/mol';document.getElementById('kinTV').textContent=T+' K';
+  var R=8.314,frac=Math.exp(-EaEff*1000/(R*T)),k=1e13*frac;
+  /* profilo energetico (curva) */
+  var L=50,Rr=w-50,T0=40,B=h-90,mid=(L+Rr)/2;
+  var peakH=(EaEff/120)*(B-T0)*0.85;
+  function prof(px){var t=(px-L)/(Rr-L);
+    var reag=B-10, prod=B-10-(B-T0)*0.18; /* prodotti più bassi (esotermica) */
+    var barr=Math.exp(-Math.pow((t-0.5)*6,2))*peakH;
+    var base=reag+(prod-reag)*t;
+    return base-barr;}
+  x.strokeStyle='rgba(0,201,183,.85)';x.lineWidth=2.5;x.beginPath();
+  for(var px=L;px<=Rr;px+=2){var py=prof(px);px===L?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();
+  /* se catalizzatore: curva fantasma originale */
+  if(kinCat){var ph=(Ea/120)*(B-T0)*0.85;x.strokeStyle='rgba(247,127,0,.4)';x.lineWidth=1.5;x.setLineDash([5,5]);x.beginPath();
+    for(var px2=L;px2<=Rr;px2+=2){var t=(px2-L)/(Rr-L);var reag=B-10,prod=B-10-(B-T0)*0.18;var py2=reag+(prod-reag)*t-Math.exp(-Math.pow((t-0.5)*6,2))*ph;px2===L?x.moveTo(px2,py2):x.lineTo(px2,py2);}x.stroke();x.setLineDash([]);}
+  /* etichette */
+  x.fillStyle='#9fb3c8';x.font='11px sans-serif';x.textAlign='center';
+  x.fillText('reagenti',L+40,B+6);x.fillText('prodotti',Rr-40,B+6);
+  x.fillStyle='#00c9b7';x.fillText('Eₐ'+(kinCat?' (catalizzata)':''),mid,prof(mid)-10);
+  /* particelle che tentano la barriera */
+  kinParticles.forEach(function(p){
+    /* probabilità di passaggio ~ frac, scalata per visibilità */
+    var pass=Math.min(0.5,frac*5e7+0.002);
+    p.x+=(0.004+0.002*Math.sin(p.phase))*(p.dir||1);if(p.dir===undefined)p.dir=1;
+    if(p.x>0.5&&p.x<0.52&&!p.decided){p.decided=true;if(Math.random()<pass){p.over=true;}else{p.dir=-1;}}
+    if(p.x>1){p.x=1;p.dir=-1;p.decided=false;p.over=false;}
+    if(p.x<0){p.x=0;p.dir=1;p.decided=false;}
+    var px=L+(Rr-L)*p.x,py=prof(px)-7;
+    x.fillStyle=p.over?'#f77f00':'#6bcfff';x.globalAlpha=0.85;x.beginPath();x.arc(px,py,4,0,6.28);x.fill();x.globalAlpha=1;});
+  /* riquadro Arrhenius */
+  x.fillStyle='#e9eef6';x.font='13px serif';x.textAlign='left';
+  x.fillText('k = A·e^(−Eₐ/RT) = '+k.toExponential(2)+' s⁻¹',L,28);
+  document.getElementById('kinInfo').innerHTML='A <span class="hl">'+T+' K</span> con Eₐ = <span class="hl">'+(kinCat?EaEff.toFixed(0)+' (catalizzata da '+Ea:Ea)+'</span> kJ/mol, la frazione di molecole che supera la barriera è <span class="hl2">'+(frac*100).toExponential(2)+'%</span>.<br>Alza T o abbassa Eₐ (catalizzatore) per accelerare: la costante k cresce <b>esponenzialmente</b>.<br>Formule: <span class="hl">k = A·e^(−Eₐ/RT)</span> (Arrhenius) · <span class="hl">v = k[A]ⁿ</span> · <span class="hl">t½ = ln2/k</span> (1º ordine). Le particelle <span style="color:#f77f00">arancio</span> hanno superato la barriera.';}
+
+
+/* ===== SPETTROSCOPIE ANIMATE ===== */
+
+var specName="IR",specT=0;
+
+function drawWave(x,col,x0,y0,x1,y1,phase,amp,label){var len=x1-x0;x.strokeStyle=col;x.lineWidth=2;x.shadowColor=col;x.shadowBlur=8;x.beginPath();
+  for(var s=0;s<=len;s+=3){var wv=Math.sin(s*0.16-phase)*amp;s===0?x.moveTo(x0+s,y0+wv):x.lineTo(x0+s,y0+wv);}x.stroke();x.shadowBlur=0;
+  if(label){x.fillStyle='#9fb3c8';x.font='10px sans-serif';x.textAlign='left';x.fillText(label,x0,y0-amp-6);}}
+
+
+/* ===== CINETICA CHIMICA ===== */
+var kinView="orders",kinK=0.12,kinEa=50,kinTemp=298,kinT=0;
+
+
+
+/* ===== navigazione (un solo loop attivo) ===== */
+
+var vseprBound=false;
+function bindVsepr(){if(vseprBound)return;vseprBound=true;
+  var inp=document.getElementById('vseprInput'),go=document.getElementById('vseprGo');
+  function apply(){vseprFormula=(inp.value||'').trim();vseprBuild();vseprUI();}
+  go.addEventListener('click',apply);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')apply();});
+  var cv=document.getElementById('cVsepr');var dg=false,lx=0,ly=0;
+  cv.addEventListener('mousedown',function(e){dg=true;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('mouseup',function(){dg=false;});
+  window.addEventListener('mousemove',function(e){if(!dg)return;vseprYaw+=(e.clientX-lx)*0.01;vseprPitch+=(e.clientY-ly)*0.01;vseprPitch=Math.max(-1.4,Math.min(1.4,vseprPitch));lx=e.clientX;ly=e.clientY;});
+  cv.addEventListener('touchstart',function(e){if(e.touches.length===1){dg=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}},{passive:true});
+  cv.addEventListener('touchmove',function(e){if(dg&&e.touches.length===1){vseprYaw+=(e.touches[0].clientX-lx)*0.01;vseprPitch+=(e.touches[0].clientY-ly)*0.01;vseprPitch=Math.max(-1.4,Math.min(1.4,vseprPitch));lx=e.touches[0].clientX;ly=e.touches[0].clientY;}},{passive:true});
+  cv.addEventListener('touchend',function(){dg=false;});}
+
+function setModule(m){stopAnim();document.querySelectorAll('.mod').forEach(function(z){z.classList.remove('on');});document.getElementById('m-'+m).classList.add('on');
+  if(m==='orb'){orbUI();if(!oCloud)oSample();loop(drawOrb);}
+  else if(m==='hyd'){hydSerieUI();hydTransUI();loop(drawHyd);}
+  else if(m==='mo'){moTblUI();moT=0;loop(drawMO);}
+  else if(m==='vsepr'){vseprUI();vseprBuild();bindVsepr();loop(drawVsepr);}
+  else if(m==='vib'){vibUI();loop(drawVib);}
+  else if(m==='ho'){hoUI();drawHO();}else if(m==='box'){boxUI();drawBox();}else if(m==='mb')drawMB();
+  else if(m==='spec'){specUI();loop(drawSpec);}
+  else if(m==='kin'){if(typeof kinParticles!=='undefined'&&!kinParticles.length&&typeof kinInit==='function')kinInit();loop(drawKin);}}
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){document.querySelectorAll('.tab').forEach(function(z){z.classList.remove('on');});this.classList.add('on');setModule(this.dataset.m);};});
+document.getElementById('mbGas').onchange=drawMB;document.getElementById('mbT').oninput=drawMB;
+window.addEventListener('resize',function(){const on=document.querySelector('.mod.on').id.slice(2);if(on==='ho')drawHO();else if(on==='box')drawBox();else if(on==='mb')drawMB();});
+
+/* avvio robusto: parte solo quando il canvas ha dimensioni reali (es. iframe mostrato) */
+function bsiStart(){
+  orbUI();if(!oCloud)oSample();
+  loop(drawOrb);
+}
+// se il documento è già pronto parto subito, altrimenti aspetto il load
+if(document.readyState!=='loading'){bsiStart();}else{window.addEventListener('DOMContentLoaded',bsiStart);}
+// ridisegno anche quando la finestra/iframe cambia dimensione o torna visibile
+window.addEventListener('resize',function(){var on=document.querySelector('.mod.on');if(on){var id=on.id.slice(2);
+  if(id==='ho')drawHO();else if(id==='box')drawBox();else if(id==='mb')drawMB();}});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){var on=document.querySelector('.mod.on');if(on)setModule(on.id.slice(2));}});
+</SCRIPTBSIQ>
+</body>
+</html>
+</script>
+<script>
+(function(){try{
+  var ov=document.getElementById('bsiQ-ov'),fr=document.getElementById('bsiQ-frame');
+  window.openQuantumLab=function(){
+    ov.style.display='flex';
+    var node=document.getElementById('bsiQ-src-lab');
+    fr.srcdoc=node.textContent.replace(/<\/SCRIPTBSIQ>/g,'<\/script>');
+  };
+  document.getElementById('bsiQ-close').addEventListener('click',function(){ov.style.display='none';fr.srcdoc='';});
+}catch(e){}})();
+console.log('BioSpecInfo — Lab Quantistico ✔');
+</script>
+<!-- ===== /BSI QUANTUM LAB ===== -->
 
 </body>
 </html>
