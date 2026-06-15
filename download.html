@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scarica BioSpecInfo</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1B5E20">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(160deg,#0a1f12,#143d22);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{max-width:440px;width:100%;text-align:center}
+  .logo{width:96px;height:96px;border-radius:24px;background:linear-gradient(135deg,#2e7d32,#66bb6a);display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 18px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+  h1{font-size:1.7rem;font-weight:900;margin-bottom:4px}
+  .sub{color:#a5d6a7;font-size:.95rem;margin-bottom:26px}
+  .btn{display:block;width:100%;padding:16px;border-radius:14px;border:none;font-size:1.05rem;font-weight:800;cursor:pointer;margin-bottom:12px;text-decoration:none;transition:.15s}
+  .btn-primary{background:#fff;color:#1b5e20}
+  .btn-primary:active{transform:scale(.98)}
+  .btn-secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
+  .hint{background:rgba(255,255,255,.08);border-radius:12px;padding:14px;margin-top:10px;font-size:.85rem;line-height:1.55;color:#c8e6c9;text-align:left;display:none}
+  .hint.show{display:block}
+  .hint b{color:#fff}
+  .step{display:flex;gap:8px;margin-bottom:6px}
+  .step span{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#66bb6a;color:#0a1f12;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center}
+  .foot{margin-top:22px;font-size:.78rem;color:#81c784}
+  .os{display:inline-block;background:rgba(255,255,255,.12);border-radius:20px;padding:4px 14px;font-size:.8rem;margin-bottom:18px;color:#a5d6a7}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">&#129514;</div>
+  <h1>BioSpecInfo</h1>
+  <div class="sub">Chimica, biochimica e spettroscopia in un'app</div>
+  <div class="os" id="osLabel">Rilevamento dispositivo...</div>
+
+  <a class="btn btn-primary" id="mainBtn" href="./index.html">Apri l'app</a>
+  <button class="btn btn-secondary" id="installBtn">Installa come App</button>
+  <a class="btn btn-secondary" id="apkBtn" href="./index.html" style="display:none">Scarica APK (Android)</a>
+
+  <div class="hint" id="hintIOS">
+    <b>Per installare su iPhone/iPad:</b>
+    <div class="step"><span>1</span><div>Tocca il pulsante <b>Condividi</b> (quadrato con freccia in basso)</div></div>
+    <div class="step"><span>2</span><div>Scorri e tocca <b>"Aggiungi a Home"</b></div></div>
+    <div class="step"><span>3</span><div>Tocca <b>"Aggiungi"</b>: l'icona comparira sulla schermata Home</div></div>
+  </div>
+  <div class="hint" id="hintAndroid">
+    <b>Per installare su Android:</b>
+    <div class="step"><span>1</span><div>Tocca <b>"Installa come App"</b> qui sopra (oppure il menu &#8942; del browser)</div></div>
+    <div class="step"><span>2</span><div>Scegli <b>"Installa app"</b> o <b>"Aggiungi a schermata Home"</b></div></div>
+    <div class="step"><span>3</span><div>L'app comparira tra le tue applicazioni</div></div>
+  </div>
+  <div class="hint" id="hintDesktop">
+    <b>Per installare su PC:</b>
+    <div class="step"><span>1</span><div>Clicca l'icona <b>installa</b> nella barra degli indirizzi (a destra)</div></div>
+    <div class="step"><span>2</span><div>Oppure menu del browser &rarr; <b>"Installa BioSpecInfo"</b></div></div>
+  </div>
+
+  <div class="foot">Funziona su Android, iPhone, iPad e PC &middot; gratis &middot; offline</div>
+</div>
+
+<script>
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  var isAndroid = /Android/.test(ua);
+  var osLabel = document.getElementById('osLabel');
+  var mainBtn = document.getElementById('mainBtn');
+
+  function showHint(idShow){ ['hintIOS','hintAndroid','hintDesktop'].forEach(function(h){ document.getElementById(h).classList.toggle('show', h===idShow); }); }
+
+  if(isIOS){ osLabel.textContent = '\uD83D\uDCF1 iPhone / iPad'; showHint('hintIOS'); }
+  else if(isAndroid){ osLabel.textContent = '\uD83E\uDD16 Android'; showHint('hintAndroid'); }
+  else { osLabel.textContent = '\uD83D\uDCBB Computer'; showHint('hintDesktop'); }
+
+  // PWA install prompt (Android/Chrome/Edge)
+  var deferredPrompt = null;
+  var installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; installBtn.style.display='block'; });
+  installBtn.onclick = function(){
+    if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; }); }
+    else { var h = isIOS?'hintIOS':(isAndroid?'hintAndroid':'hintDesktop'); document.getElementById(h).classList.add('show'); document.getElementById(h).scrollIntoView({behavior:'smooth'}); }
+  };
+
+  // Se in futuro carichi l'APK su GitHub Releases, imposta qui il link e mostra il bottone:
+  var APK_URL = ''; // es: 'https://github.com/USER/REPO/releases/download/v1.0/BioSpecInfo.apk'
+  if(isAndroid && APK_URL){ var apkBtn=document.getElementById('apkBtn'); apkBtn.href=APK_URL; apkBtn.style.display='block'; }
+
+  // Registra il service worker (per uso offline)
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(function(){}); }
+</script>
+</body>
+</html>
