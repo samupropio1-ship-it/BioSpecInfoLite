@@ -8,6 +8,7 @@ const API_CACHE = CACHE_VERSION + '-api';
 const STATIC_FILES = [
   './',
   './index.html',
+  './download.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
