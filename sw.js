@@ -9,6 +9,7 @@ const STATIC_FILES = [
   './',
   './index.html',
   './download.html',
+  './guidabio.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
