@@ -664,7 +664,7 @@ input::placeholder, textarea::placeholder { color: #888888; }
 </style>
 </head>
 <body>
-<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v98-2026-06';
+<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v99-2026-06';
 // URL Web App di Google Apps Script per telemetria accessi/errori/feedback (vedi tools/telemetria-feedback.gs).
 // Lasciare vuoto disabilita l'invio remoto: i dati restano solo in coda locale (bsi_telemetry_queue).
 window.BSI_TELEMETRY_URL='';</script>
@@ -31765,6 +31765,9 @@ window.openSR14=function(){
 var _ITEMS=[
   {sec:'🔬 Funzioni chimiche'},
   {ic:'⚗️',nm:'Sintesi & Retrosintesi',ds:'Qualsiasi molecola via PubChem',key:'sr',hl:true},
+  {ic:'📋',nm:'Guida Retrosintesi',ds:'98 esercizi + 24 percorso essenziale',key:'guidaret',hl:true},
+  {ic:'⚗️',nm:'Chimica Organica 1+2',ds:'14 moduli interattivi, meccanismi, stereochimica, named reactions',key:'chimorga',hl:true},
+  {ic:'🧪',nm:'RDKit Cheminformatics Lab',ds:'Visualizzatore SVG, descrittori, drug-likeness, similarità Tanimoto, libreria molecole',key:'rdkitlab',hl:true},
   {ic:'⚛️',nm:'Lab Quantistico',ds:'Orbitali 3D, spettroscopie, cinetica e altre 10 simulazioni',key:'qlab',hl:true},
   {ic:'🌈',nm:'Centro Spettri',ds:'IR · ¹H/¹³C-NMR · 3D · mappa · confronto · guida',key:'scentro',hl:true},
   {ic:'📋',nm:'Questionario & Feedback',ds:'Vota l\'app, segnala bug o idee',key:'feedback',hl:true},
@@ -31807,6 +31810,9 @@ function _act(key){
   setTimeout(function(){
     _closeAllSpecial();
     if(key==='sr')       { window.openSR14(); return; }
+    if(key==='guidaret'){ window.openGuidaRet(); return; }
+    if(key==='chimorga'){ window.openChimOrga(); return; }
+    if(key==='rdkitlab'){ window.openRDKitLab(); return; }
     if(key==='qlab')     { if(typeof window.openQuantumLab==='function') window.openQuantumLab(); return; }
     if(key==='scentro')  { var b=document.querySelector('[data-s=scentro]'); if(b){b.click();} else if(typeof window.initCentro==='function'){var sec=document.getElementById('scentro');if(sec){document.querySelectorAll('.section').forEach(function(x){x.classList.remove('on');});sec.classList.add('on');setTimeout(window.initCentro,40);}} return; }
     if(key==='feedback') { if(typeof window.openFeedback21==='function') window.openFeedback21(); return; }
@@ -36961,5 +36967,50 @@ window.bsiLoadRDKit=function(cb){
   sc.onerror=function(){ window.__rdkitFailed=true; cb(null); };
   document.head.appendChild(sc);
 };
-</script></body>
+</script>
+<script>
+// BioSpecInfo v99 — Overlay tools ported from Pro
+window.openRDKitLab=function(){
+  var ov=document.getElementById('bsi-rdkitlab-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-rdkitlab-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
+    var tb=document.createElement('div');
+    tb.style.cssText='display:flex;align-items:center;background:#071221;border-bottom:1px solid #1c3a57;height:42px;padding:0 10px;flex-shrink:0';
+    tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🧪 RDKit Cheminformatics Lab</span><button onclick="document.getElementById('bsi-rdkitlab-ov').style.display='none'" style="background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer">✕ Chiudi</button>';
+    var fr=document.createElement('iframe');
+    fr.src='rdkit_lab.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    ov.appendChild(tb);ov.appendChild(fr);document.body.appendChild(ov);
+  }else{ov.style.display='flex';}
+};
+window.openChimOrga=function(){
+  var ov=document.getElementById('bsi-chimorga-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-chimorga-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
+    var tb=document.createElement('div');
+    tb.style.cssText='display:flex;align-items:center;background:#071221;border-bottom:1px solid #1c3a57;height:42px;padding:0 10px;flex-shrink:0';
+    tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">⚗️ Chimica Organica 1+2</span><button onclick="document.getElementById('bsi-chimorga-ov').style.display='none'" style="background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer">✕ Chiudi</button>';
+    var fr=document.createElement('iframe');
+    fr.id='bsi-chimorga-fr';fr.src='chimorga.html';
+    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    ov.appendChild(tb);ov.appendChild(fr);document.body.appendChild(ov);
+  }else{ov.style.display='flex';}
+};
+window.openGuidaRet=function(){
+  var ov=document.getElementById('bsi-guidaret-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-guidaret-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
+    var fr=document.createElement('iframe');
+    fr.id='bsi-guidaret-fr';fr.src='guidaret.html';
+    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    ov.appendChild(fr);document.body.appendChild(ov);
+    window.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='BSI_GUIDARET_CLOSE'){ov.style.display='none';}
+    });
+  }else{ov.style.display='flex';}
+};
+</script>
+</body>
 </html>

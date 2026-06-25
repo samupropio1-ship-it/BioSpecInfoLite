@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chimica Organica 1+2 — BioSpecInfo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0a1b2e;color:#d4e0ec;line-height:1.55}
+a{color:#00c9b7;text-decoration:none}
+h1{color:#e8eef4;font-size:1.45rem;margin-bottom:.3em}
+h2{color:#e8eef4;font-size:1.1rem;margin:1em 0 .45em;border-left:3px solid #00c9b7;padding-left:8px}
+h3{color:#9fb3c8;font-size:.95rem;margin:.7em 0 .3em}
+p{margin:.4em 0;color:#d4e0ec}
+ul,ol{margin:.4em 0 .4em 1.4em}li{margin:.2em 0}
+strong{color:#e8eef4}
+code{background:#071221;border:1px solid #1c3a57;border-radius:3px;padding:1px 5px;font-size:.88em;color:#00c9b7;font-family:monospace}
+table{border-collapse:collapse;width:100%;margin:.5em 0;font-size:.86em}
+th{background:#071221;color:#00c9b7;padding:5px 9px;text-align:left;border:1px solid #1c3a57}
+td{padding:4px 9px;border:1px solid #1c3a57;color:#d4e0ec;vertical-align:top}
+tr:nth-child(even) td{background:rgba(7,18,33,.4)}
+#layout{display:flex;min-height:100vh}
+#sidenav{width:210px;flex-shrink:0;background:#071221;border-right:1px solid #1c3a57;position:sticky;top:0;height:100vh;overflow-y:auto;padding:8px 0}
+#sidenav .logo{color:#00c9b7;font-weight:800;font-size:.88rem;padding:9px 12px 7px;border-bottom:1px solid #1c3a57;margin-bottom:4px}
+.nav-s{display:block;padding:5px 12px;color:#9fb3c8;font-size:.8rem;cursor:pointer;border-left:2px solid transparent;transition:all .15s}
+.nav-s:hover{color:#e2e8f0;background:rgba(0,201,183,.06)}
+.nav-s.active{color:#00c9b7;border-left-color:#00c9b7;background:rgba(0,201,183,.08)}
+.nav-num{display:inline-block;width:20px;color:#1c3a57;font-size:.73rem;font-weight:700}
+#main{flex:1;padding:16px 22px;max-width:850px}
+.sec{margin-bottom:24px}
+.card{background:#0d2236;border:1px solid #1c3a57;border-radius:7px;padding:12px 14px;margin:.6em 0}
+.tip{background:#071c2e;border-left:3px solid #00c9b7;padding:7px 11px;border-radius:0 5px 5px 0;margin:.5em 0;font-size:.88rem}
+.warn{background:#1c1000;border-left:3px solid #ffb454;padding:7px 11px;border-radius:0 5px 5px 0;margin:.5em 0;font-size:.88rem}
+.formula{background:#071221;border:1px solid #1c3a57;border-radius:5px;padding:9px 12px;margin:.5em 0;font-family:monospace;color:#e8eef4;font-size:.9rem;line-height:1.75;overflow-x:auto}
+.rxn{background:#071221;border:1px solid #1c3a57;border-radius:5px;padding:8px 12px;margin:.45em 0;font-size:.86rem}
+.rxn .cond{color:#ffb454;font-size:.76rem;display:block;margin-top:2px}
+.badge{display:inline-block;background:rgba(0,201,183,.15);color:#00c9b7;border-radius:10px;padding:1px 7px;font-size:.73rem;font-weight:700}
+.badge-r{background:rgba(255,100,100,.15);color:#ff6b6b}
+.badge-a{background:rgba(255,180,84,.15);color:#ffb454}
+.flow{display:flex;flex-direction:column;align-items:center;gap:3px;margin:.7em 0}
+.fbox{background:#071221;border:1px solid #1c3a57;border-radius:5px;padding:6px 12px;text-align:center;font-size:.83rem;color:#e8eef4;min-width:180px;max-width:320px}
+.fbox.y{border-color:#00c9b7;background:rgba(0,201,183,.07)}
+.fbox.n{border-color:#ffb454;background:rgba(255,180,84,.07)}
+.fbox.r{border-color:#4caf80;background:rgba(76,175,128,.09);color:#4caf80;font-weight:700}
+.flow-row{display:flex;gap:16px;justify-content:center;align-items:flex-start}
+.flow-col{display:flex;flex-direction:column;align-items:center;gap:3px}
+.fa{color:#9fb3c8;font-size:1rem;line-height:1}
+.fl{font-size:.73rem;color:#9fb3c8}
+.widget{background:#071221;border:1px solid #1c3a57;border-radius:7px;padding:12px;margin:.7em 0}
+.wt{color:#00c9b7;font-weight:700;font-size:.88rem;margin-bottom:8px}
+canvas{display:block;margin:0 auto;background:#0a1b2e;border-radius:5px}
+.cr{display:flex;align-items:center;gap:9px;margin-top:9px;flex-wrap:wrap}
+.cr label{color:#9fb3c8;font-size:.8rem}
+input[type=range]{-webkit-appearance:none;height:4px;background:#1c3a57;border-radius:2px;flex:1;min-width:100px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#00c9b7;cursor:pointer}
+select{background:#0d2236;color:#e8eef4;border:1px solid #1c3a57;border-radius:4px;padding:3px 7px;font-size:.8rem}
+.vd{color:#00c9b7;font-weight:700;font-size:.83rem;min-width:38px}
+@media(max-width:640px){#sidenav{display:none}#main{padding:10px 12px}canvas{max-width:100%}}
+</style>
+</head>
+<body>
+<div id="layout">
+<nav id="sidenav">
+  <div class="logo">⚗️ Chimica Organica</div>
+  <a class="nav-s active" onclick="goS('s1')"><span class="nav-num">1</span>Fondamenti</a>
+  <a class="nav-s" onclick="goS('s2')"><span class="nav-num">2</span>Alcani &amp; Cicloalcani</a>
+  <a class="nav-s" onclick="goS('s3')"><span class="nav-num">3</span>Stereochimica</a>
+  <a class="nav-s" onclick="goS('s4')"><span class="nav-num">4</span>Alcheni &amp; Alchini</a>
+  <a class="nav-s" onclick="goS('s5')"><span class="nav-num">5</span>Aromatici &amp; SEA</a>
+  <a class="nav-s" onclick="goS('s6')"><span class="nav-num">6</span>Alogenuri &amp; SN/E</a>
+  <a class="nav-s" onclick="goS('s7')"><span class="nav-num">7</span>Alcoli, Eteri, Epossidi</a>
+  <a class="nav-s" onclick="goS('s8')"><span class="nav-num">8</span>Aldeidi &amp; Chetoni</a>
+  <a class="nav-s" onclick="goS('s9')"><span class="nav-num">9</span>Acidi Carbossilici</a>
+  <a class="nav-s" onclick="goS('s10')"><span class="nav-num">10</span>Ammine &amp; Diazo</a>
+  <a class="nav-s" onclick="goS('s11')"><span class="nav-num">11</span>Reazioni C–C</a>
+  <a class="nav-s" onclick="goS('s12')"><span class="nav-num">12</span>Ossidaz. &amp; Riduz.</a>
+  <a class="nav-s" onclick="goS('s13')"><span class="nav-num">13</span>Carboidrati</a>
+  <a class="nav-s" onclick="goS('s14')"><span class="nav-num">14</span>Riepilogo</a>
+  <a class="nav-s" onclick="goS('s15')"><span class="nav-num">15</span>Amminoacidi &amp; Proteine</a>
+  <a class="nav-s" onclick="goS('s16')"><span class="nav-num">16</span>Lipidi</a>
+  <a class="nav-s" onclick="goS('s17')"><span class="nav-num">17</span>Nucleosidi &amp; Nucleotidi</a>
+</nav>
+<div id="main">
+<h1>⚗️ Chimica Organica 1 + 2</h1>
+<p style="color:#9fb3c8;font-size:.85rem;margin-bottom:16px">Guida completa · 17 moduli · meccanismi interattivi · stereochimica · molecole biologiche</p>
+
+<!-- S1 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s1">
+<h2>1 · Fondamenti della Chimica Organica</h2>
+<h3>1.1 Orbitali ibridi e geometria</h3>
+<div class="card">
+<table>
+<tr><th>Ibridazione</th><th>Geometria</th><th>Angolo</th><th>Esempi</th></tr>
+<tr><td><strong>sp³</strong></td><td>Tetraedrica</td><td>109.5°</td><td>CH₄, alcani, alcoli</td></tr>
+<tr><td><strong>sp²</strong></td><td>Planare trigonale</td><td>120°</td><td>C=C, C=O, benzene</td></tr>
+<tr><td><strong>sp</strong></td><td>Lineare</td><td>180°</td><td>C≡C, nitrili, CO₂</td></tr>
+</table>
+<div class="tip">sp³ → 4σ. sp² → 3σ + 1π. sp → 2σ + 2π. Più carattere s → legame più corto e forte, H più acido.</div>
+</div>
+<h3>1.2 Effetti elettronici</h3>
+<div class="card">
+<p><strong>Induttivo (I):</strong> si trasmette attraverso legami σ, decade con la distanza. –F, –Cl, –OH, –NO₂ = <span class="badge badge-r">–I</span>. –CH₃, alchili = <span class="badge">+I</span>.</p>
+<p><strong>Mesomerico / risonanza (M):</strong> delocalizzazione su sistema π. –OR, –NR₂, –OH = <span class="badge">+M</span>. –NO₂, –CN, –CHO, –COOR = <span class="badge badge-r">–M</span>.</p>
+<p><strong>Iperconiugazione:</strong> orbitali C–H σ leggermente donatori verso orbitali p (stabilizza carbocationi/radicali alchilici).</p>
+</div>
+<h3>1.3 Scala pKₐ in chimica organica</h3>
+<div class="card">
+<table>
+<tr><th>Acido</th><th>pKₐ</th><th>Perché</th></tr>
+<tr><td>HCl</td><td>−7</td><td>Acido forte</td></tr>
+<tr><td>Acido carbossilico –COOH</td><td>4–5</td><td>Base coniugata stabilizzata per risonanza</td></tr>
+<tr><td>Fenolo (ArOH)</td><td>~10</td><td>Risonanza con anello</td></tr>
+<tr><td>H₂O</td><td>15.7</td><td>Riferimento</td></tr>
+<tr><td>Alcol (–OH)</td><td>~16</td><td>Poco acido</td></tr>
+<tr><td>Alchino terminale ≡C–H</td><td>~25</td><td>C sp, alta s-character</td></tr>
+<tr><td>Alcano C–H</td><td>~50</td><td>Quasi non acido</td></tr>
+</table>
+<div class="tip">Reazione acido-base favorita verso l'acido più debole. Se pKₐ(reagente) &gt; pKₐ(prodotto) → equilibrio favorito a sinistra.</div>
+</div>
+<h3>1.4 Intermedi reattivi</h3>
+<div class="card">
+<table>
+<tr><th>Specie</th><th>Geometria</th><th>Stabilità crescente</th></tr>
+<tr><td>Carbocatione C⁺</td><td>Planare sp²</td><td>CH₃⁺ &lt; 1° &lt; 2° &lt; 3° &lt; allilico/benzilico</td></tr>
+<tr><td>Carbanione C⁻</td><td>Piramidale sp³</td><td>3° &lt; 2° &lt; 1° (–I e –M aumentano stabilità)</td></tr>
+<tr><td>Radicale C•</td><td>Planare sp²</td><td>CH₃• &lt; 1° &lt; 2° &lt; 3°</td></tr>
+</table>
+</div>
+</section>
+
+<!-- S2 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s2">
+<h2>2 · Alcani e Cicloalcani</h2>
+<h3>2.1 Nomenclatura IUPAC</h3>
+<div class="card">
+<ol><li>Catena più lunga = nome base (metano→decano)</li>
+<li>Numerazione dall'estremità più vicina al primo sostituente</li>
+<li>Sostituenti in ordine alfabetico con numero di posizione</li>
+<li>di-/tri-/tetra- per gruppi identici (ignorati nell'ordinamento alfabetico)</li></ol>
+<div class="formula">CH₃–CH(CH₃)–CH₂–CH₃  →  2-metilbutano
+CH₃–C(CH₃)₂–CH₂–CH₃  →  2,2-dimetilbutano</div>
+</div>
+<h3>2.2 Proiezione di Newman — Interattiva</h3>
+<div class="widget">
+  <div class="wt">📐 Proiezione di Newman</div>
+  <canvas id="nmC" width="480" height="210"></canvas>
+  <div class="cr">
+    <label>Molecola:</label>
+    <select id="nmMol" onchange="drawNm()"><option value="eth">Etano</option><option value="but">Butano C2–C3</option></select>
+    <label>φ:</label>
+    <input type="range" id="nmPhi" min="0" max="360" value="60" oninput="drawNm()">
+    <span class="vd" id="nmPhiV">60°</span>
+  </div>
+  <canvas id="nmEn" width="480" height="120"></canvas>
+  <p style="text-align:center;font-size:.76rem;color:#9fb3c8;margin-top:3px">Energia vs φ — punto giallo = conformazione attuale</p>
+</div>
+<div class="card">
+<table>
+<tr><th>Conformazione (butano)</th><th>φ</th><th>ΔE (kJ/mol)</th></tr>
+<tr><td>Anti (sfalsata)</td><td>180°</td><td>0 (minimo globale)</td></tr>
+<tr><td>Gauche (sfalsata)</td><td>60° / 300°</td><td>+3.8</td></tr>
+<tr><td>Eclissata (CH₃ opp.)</td><td>0° / 360°</td><td>+19</td></tr>
+<tr><td>Eclissata (CH₃ vicini)</td><td>120° / 240°</td><td>+15.5</td></tr>
+</table>
+</div>
+<h3>2.3 Cicloesano a sedia — Interattivo</h3>
+<div class="widget">
+  <div class="wt">💺 Conformazioni del Cicloesano</div>
+  <canvas id="chC" width="480" height="190"></canvas>
+  <div class="cr">
+    <label>Visualizza:</label>
+    <select id="chMode" onchange="drawCh()">
+      <option value="plain">Sedia semplice</option>
+      <option value="ae">Assiale / Equatoriale</option>
+      <option value="meq">Metilcicloesano — Me equatoriale</option>
+      <option value="max">Metilcicloesano — Me assiale</option>
+    </select>
+  </div>
+  <p style="text-align:center;font-size:.76rem;color:#9fb3c8;margin-top:5px"><span style="color:#ff6b6b">■</span> Assiale &nbsp; <span style="color:#4caf80">■</span> Equatoriale</p>
+</div>
+<div class="card">
+<table>
+<tr><th>Gruppo</th><th>Valore A (kJ/mol)</th><th>% Equatoriale</th></tr>
+<tr><td>–CH₃</td><td>7.3</td><td>~95%</td></tr>
+<tr><td>–C₂H₅</td><td>7.5</td><td>~95%</td></tr>
+<tr><td>–i-Pr</td><td>9.2</td><td>~97%</td></tr>
+<tr><td>–t-Bu</td><td>22.8</td><td>≫99% (bloccato)</td></tr>
+<tr><td>–OH</td><td>4.2</td><td>~83%</td></tr>
+<tr><td>–F</td><td>1.0</td><td>~59%</td></tr>
+<tr><td>–Cl</td><td>2.0</td><td>~70%</td></tr>
+</table>
+<div class="tip">Valore A = ΔG(assiale→equatoriale). Maggiore il valore A, più il sostituente predilige la posizione equatoriale. Il –t-Bu blocca praticamente la molecola in una sola conformazione.</div>
+</div>
+<h3>2.4 Alogenazione radicalica</h3>
+<div class="card">
+<div class="formula">R–H + X₂  →[hν o Δ]→  R–X + HX</div>
+<p><strong>Meccanismo a catena:</strong> Iniziazione → Propagazione (×10⁴) → Terminazione.</p>
+<p><strong>Selettività:</strong> Cl• poco selettivo (1°:2°:3° ≈ 1:3.9:5.1 a 25°C); Br• molto selettivo (1:82:1640 a 77°C).</p>
+</div>
+</section>
+
+<!-- S3 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s3">
+<h2>3 · Stereochimica</h2>
+<h3>3.1 Chiralità e centri stereogenici</h3>
+<div class="card">
+<p>Un C è <strong>stereogenico</strong> se ha 4 sostituenti tutti diversi. <strong>Enantiomeri</strong>: immagini speculari non sovrapponibili — stesse proprietà fisiche in ambienti achirale ma opposta rotazione ottica. <strong>Diastereomeri</strong>: stereoisomeri non enantiomeri — proprietà fisiche diverse.</p>
+<p><strong>Miscela racemica:</strong> 50:50 R+S → [α]mix = 0. <strong>ee (eccesso enantiomerico):</strong> ee = |R–S|/(R+S) × 100%.</p>
+</div>
+<h3>3.2 Regole CIP — Assegnazione R/S</h3>
+<div class="flow">
+  <div class="fbox">Identifica C stereocentrico (4 sostituenti diversi)</div>
+  <div class="fa">▼</div>
+  <div class="fbox">Assegna priorità 1→4 per numero atomico; in caso di parità, espandi fino alla prima differenza</div>
+  <div class="fa">▼</div>
+  <div class="fbox">Posiziona il gruppo con priorità più bassa (4) lontano da te</div>
+  <div class="fa">▼</div>
+  <div class="flow-row">
+    <div class="flow-col"><div class="fl">Senso orario (1→2→3)</div><div class="fbox y">R (Rectus)</div></div>
+    <div class="flow-col"><div class="fl">Senso antiorario</div><div class="fbox n">S (Sinister)</div></div>
+  </div>
+</div>
+<div class="tip"><strong>Regola del doppio legame CIP:</strong> C=O → C "legato" a (O,O); O "legato" a (C,C). Quindi O &gt; C in priorità. Per C=C, ogni C conta come se fosse legato al C dell'altro lato.</div>
+<div class="card">
+<p><strong>Con n centri stereogenici:</strong> massimo 2ⁿ stereoisomeri, ridotti da simmetria interna (forma <strong>meso</strong>: piano di simmetria interno → otticamente inattiva).</p>
+<p>Acido tartarico: 2R,3R / 2S,3S (enantiomeri) + meso-2R,3S (achiral). = 3 stereoisomeri, non 4.</p>
+</div>
+<h3>3.3 Proiezione di Fischer</h3>
+<div class="card">
+<p>Catena verticale, C1 in alto. Linee <strong>orizzontali</strong> = legami verso l'osservatore; verticali = lontano. Scambio di 2 coppie → stessa conf.; scambio di 1 coppia → inverte conf.</p>
+<div class="formula">  COOH
+   |
+H–C–OH   →  D-gliceraldeide (R)
+   |
+  CH₂OH</div>
+</div>
+</section>
+
+<!-- S4 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s4">
+<h2>4 · Alcheni e Alchini</h2>
+<h3>4.1 Isomeria E/Z e Markovnikov</h3>
+<div class="card">
+<p><strong>E/Z</strong>: priorità CIP; E = gruppi ad alta priorità su lati opposti; Z = stesso lato.</p>
+<p><strong>Regola di Markovnikov:</strong> in addizione di HX, il H va sul C meno sostituito (più povero di H). Spiega via stabilità del carbocatione intermedio.</p>
+<p><strong>Anti-Markovnikov (Kharasch):</strong> HBr + ROOR → Br sul C meno sostituito, meccanismo radicalico.</p>
+</div>
+<h3>4.2 Addizioni agli alcheni</h3>
+<div class="card">
+<table>
+<tr><th>Reagente</th><th>Prodotto</th><th>Stereochimica</th></tr>
+<tr><td>HX</td><td>Alogenuro (Markovnikov)</td><td>Non stereospecifica (via C⁺)</td></tr>
+<tr><td>Br₂ / CCl₄</td><td>trans-dibromo</td><td>Anti (via ione bromo-nium)</td></tr>
+<tr><td>H₂O / H⁺</td><td>Alcol (Markovnikov)</td><td>Via C⁺ → possibile riarrangiamento</td></tr>
+<tr><td>H₂ / Pd-C</td><td>Alcano</td><td>Syn (cis)</td></tr>
+<tr><td>9-BBN poi H₂O₂/OH⁻</td><td>Alcol anti-Markovnikov</td><td>Syn</td></tr>
+<tr><td>Hg(OAc)₂ poi NaBH₄</td><td>Alcol Markovnikov</td><td>No riarrangiamento</td></tr>
+<tr><td>mCPBA</td><td>Epossido</td><td>Syn (ritenzione geometria)</td></tr>
+<tr><td>OsO₄(cat.)/NMO</td><td>Diolo vicinale</td><td>Syn</td></tr>
+<tr><td>O₃ poi DMS</td><td>Aldeidi + chetoni</td><td>Ozonolisi riduttiva</td></tr>
+<tr><td>O₃ poi H₂O₂</td><td>Acidi carbossilici</td><td>Ozonolisi ossidativa</td></tr>
+</table>
+</div>
+<h3>4.3 Alchini — acidità e reazioni</h3>
+<div class="card">
+<p><strong>pKₐ ~25</strong> degli alchini terminali: C sp ha alta s-character → lega l'elettrone più vicino al nucleo → H più acido degli alcani.</p>
+<div class="formula">R–C≡C–H + NaNH₂  →  R–C≡C⁻ Na⁺ + NH₃
+R–C≡C⁻ + R'–X (1°)  →  R–C≡C–R'  (allungamento catena)</div>
+<p><strong>Riduzione selettiva:</strong> Lindlar → cis-alchene; Na/NH₃ liquida → trans-alchene; H₂/Pd-C → alcano.</p>
+<p><strong>Idratazione:</strong> H₂O/H₂SO₄/HgSO₄ → chetone (Markovnikov) via enolo intermedio.</p>
+</div>
+</section>
+
+<!-- S5 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s5">
+<h2>5 · Aromatici e Sostituzione Elettrofila (SEA)</h2>
+<h3>5.1 Regola di Hückel</h3>
+<div class="card">
+<p>Aromatico se: ciclico + planare + sistema π continuo + <strong>4n+2 elettroni π</strong> (n=0,1,2,…).</p>
+<table>
+<tr><th>Composto</th><th>e⁻ π</th><th>n</th><th>?</th></tr>
+<tr><td>Benzene C₆H₆</td><td>6</td><td>1</td><td>✔ aromatico</td></tr>
+<tr><td>Ciclopentadienile⁻</td><td>6</td><td>1</td><td>✔ anione aromatico</td></tr>
+<tr><td>Pirrolo (N–H incluso)</td><td>6</td><td>1</td><td>✔ eteroaromatico</td></tr>
+<tr><td>Piridina (N in π)</td><td>6</td><td>1</td><td>✔ eteroaromatico</td></tr>
+<tr><td>Cicloottatetraene</td><td>8</td><td>—</td><td>✘ antiaromatico (4n)</td></tr>
+</table>
+</div>
+<h3>5.2 Meccanismo SEA</h3>
+<div class="flow">
+  <div class="fbox">Generazione elettrofilo E⁺ (catalisi acida di Lewis)</div>
+  <div class="fa">▼</div>
+  <div class="fbox">Attacco E⁺ su π dell'arene → σ-complesso (arenio, C⁺)</div>
+  <div class="fa">▼</div>
+  <div class="fbox">Perdita H⁺ al catalizzatore → ristabilisce aromaticità</div>
+  <div class="fa">▼</div>
+  <div class="fbox r">Ar–E + H–X (prodotto monosostituito)</div>
+</div>
+<h3>5.3 Effetto dei sostituenti su velocità e orientazione</h3>
+<div class="card">
+<table>
+<tr><th>Tipo</th><th>Velocità SEA</th><th>Orientaz.</th><th>Esempi</th></tr>
+<tr><td>EDG per risonanza</td><td>Attivante forte</td><td>orto/para</td><td>–OH, –OR, –NH₂, –NR₂</td></tr>
+<tr><td>EDG per induzione</td><td>Attivante moderato</td><td>orto/para</td><td>–CH₃, –alkil</td></tr>
+<tr><td>EWG per risonanza</td><td>Disattivante</td><td>meta</td><td>–NO₂, –CN, –CHO, –COOR, –SO₃H</td></tr>
+<tr><td>Alogeni –X</td><td>Liev. disattivante (–I ma +M)</td><td>orto/para</td><td>–F, –Cl, –Br, –I</td></tr>
+</table>
+<div class="warn">Alogeni = caso anomalo: disattivano il benzene (via –I) ma orientano orto/para (via +M). La velocità SEA è inferiore al benzene ma superiore a composti con EWG forti.</div>
+</div>
+<h3>5.4 Reazioni SEA principali</h3>
+<div class="card">
+<div class="rxn"><strong>Nitrazione:</strong> ArH + HNO₃/H₂SO₄ → Ar–NO₂<span class="cond">E⁺ = NO₂⁺; H₂SO₄ protonaziona HNO₃ → NO₂⁺ + HSO₄⁻ + H₂O</span></div>
+<div class="rxn"><strong>Solfonazione:</strong> ArH + SO₃/H₂SO₄ → Ar–SO₃H<span class="cond">Reversibile! Desulfonazione con H₂O/Δ (utile per blocco temporaneo posizione)</span></div>
+<div class="rxn"><strong>Alchilazione F-C:</strong> ArH + R–X/AlCl₃ → Ar–R<span class="cond">Limiti: riarrangiamento del C⁺, polialkylation, non funziona su Ar disattivato</span></div>
+<div class="rxn"><strong>Acilazione F-C:</strong> ArH + RCOCl/AlCl₃ → Ar–CO–R<span class="cond">Nessun riarrangiamento; il chetone è EWG → monosostituzione selettiva</span></div>
+<div class="rxn"><strong>Alogenazione:</strong> ArH + Br₂/FeBr₃ → Ar–Br + HBr<span class="cond">Lewis acid attiva l'alogeno: FeBr₃ + Br₂ → [FeBr₄]⁻ + Br⁺</span></div>
+</div>
+</section>
+
+<!-- S6 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s6">
+<h2>6 · Alogenuri Alchilici — SN1, SN2, E1, E2</h2>
+<h3>6.1 Profilo energetico interattivo SN1 / SN2</h3>
+<div class="widget">
+  <div class="wt">⚡ Profilo Energetico — SN1 vs SN2</div>
+  <div class="cr" style="margin-bottom:9px">
+    <label>Meccanismo:</label>
+    <select id="snM" onchange="drawSN()"><option value="sn2">SN2 — un passaggio</option><option value="sn1">SN1 — due stadi</option></select>
+    <label>Substrato:</label>
+    <select id="snS" onchange="drawSN()"><option value="p">1° (primario)</option><option value="s">2° (secondario)</option><option value="t">3° (terziario)</option></select>
+  </div>
+  <canvas id="snC" width="480" height="200"></canvas>
+</div>
+<h3>6.2 SN2 — Sostituzione Nucleofila Bimolecolare</h3>
+<div class="card">
+<ul>
+<li><strong>v = k[RX][Nu⁻]</strong> — cinetica 2° ordine</li>
+<li>Inversione di Walden (meccanismo ad ombrello)</li>
+<li>Favorito da substrati <strong>1°</strong> (no impedimento sterico)</li>
+<li>Solventi aprotici polari (DMSO, DMF, acetone) → nucleofilo libero, più reattivo</li>
+<li>Nucleofilia in aprotici: I⁻ &gt; Br⁻ &gt; Cl⁻ &gt; F⁻ (polarizzabilità domina)</li>
+<li>Nucleofilia in protici: F⁻ &gt; Cl⁻ &gt; Br⁻ &gt; I⁻ (solvatazione domina)</li>
+</ul>
+</div>
+<h3>6.3 SN1 — Sostituzione Nucleofila Unimolecolare</h3>
+<div class="card">
+<ul>
+<li><strong>v = k[RX]</strong> — cinetica 1° ordine; ionizzazione = stadio lento</li>
+<li>C⁺ planare sp² → attacco da entrambe le facce → racemizzazione parziale/totale</li>
+<li>Favorito da substrati <strong>3°</strong>, allilici, benzilici</li>
+<li>Solventi protici polari (H₂O, EtOH) stabilizzano anioni e cationi per solvatazione</li>
+<li>Possibile riarrangiamento del C⁺ (shift 1,2 o espansione d'anello)</li>
+</ul>
+</div>
+<h3>6.4 Eliminazioni E1 / E2</h3>
+<div class="card">
+<table>
+<tr><th></th><th>E2</th><th>E1</th></tr>
+<tr><td>Cinetica</td><td>v = k[RX][Base] — 2° ordine</td><td>v = k[RX] — 1° ordine</td></tr>
+<tr><td>Geometria</td><td>Antiperiplanare richiesta (H e X coplanari 180°)</td><td>Non stereospecifica</td></tr>
+<tr><td>Base</td><td>Forte, spesso ingombrata (t-BuO⁻, LDA)</td><td>Debole (H₂O, ROH)</td></tr>
+<tr><td>Regiosel.</td><td>Zaitsev (più sost.) o Hofmann (base ingombrata)</td><td>Zaitsev</td></tr>
+</table>
+<div class="tip"><strong>Zaitsev:</strong> alchene più sostituito (termodin.). <strong>Hofmann:</strong> meno sostituito (base si avvicina a H più accessibile). Con KOtBu/tBuOH → prevalentemente Hofmann.</div>
+</div>
+<h3>6.5 Reattivi di Grignard</h3>
+<div class="card">
+<div class="formula">R–X + Mg/THF anidro → R–MgX   (carbanione equivalente)</div>
+<table>
+<tr><th>Elettrofilo</th><th>Prodotto (dopo H₃O⁺)</th></tr>
+<tr><td>HCHO</td><td>Alcol 1°</td></tr>
+<tr><td>R'CHO (aldeide)</td><td>Alcol 2°</td></tr>
+<tr><td>R'COR'' (chetone)</td><td>Alcol 3°</td></tr>
+<tr><td>CO₂</td><td>Acido carbossilico (+1C)</td></tr>
+<tr><td>Ossido di etilene</td><td>Alcol 1° (+2C)</td></tr>
+</table>
+<div class="warn">Assoluta anidria richiesta! RMgX reagisce immediatamente con H₂O, ROH, R₂NH, CO₂ atmosferica.</div>
+</div>
+</section>
+
+<!-- S7 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s7">
+<h2>7 · Alcoli, Eteri ed Epossidi</h2>
+<h3>7.1 Proprietà e reazioni degli alcoli</h3>
+<div class="card">
+<p><strong>Legami H:</strong> punti di ebollizione molto più alti degli alcani analoghi. Solubilità decresce con la catena (C1–C3 miscibili, &gt;C4 parzialmente, &gt;C6 immiscibili).</p>
+<div class="rxn"><strong>Ossidazione 1° → Aldeide:</strong> PCC, Swern (DMSO/oxalilcloruro), DMP (Dess-Martin)<span class="cond">Selettivi: si fermano all'aldeide</span></div>
+<div class="rxn"><strong>Ossidazione 1° → Acido:</strong> KMnO₄/H⁺, Jones (CrO₃/H₂SO₄aq)</div>
+<div class="rxn"><strong>Ossidazione 2° → Chetone:</strong> qualsiasi Cr(VI), Swern, DMP</div>
+<div class="rxn"><strong>Alcol 3°:</strong> non ossidabile (nessun H su C–OH)</div>
+<div class="rxn"><strong>→ Alogenuro:</strong> HX (HI&gt;HBr&gt;HCl); SOCl₂/py → RCl con ritenzione; PBr₃ → RBr con inversione</div>
+<div class="rxn"><strong>Disidratazione:</strong> H₂SO₄ conc./Δ → alchene (Zaitsev) via C⁺<span class="cond">3° &gt; 2° &gt; 1°; 1° richiede T alta (170°C)</span></div>
+</div>
+<h3>7.2 Sintesi di Williamson degli eteri</h3>
+<div class="card">
+<div class="formula">R–OH + NaH → R–O⁻ Na⁺ + H₂↑
+R–O⁻ + R'–X (1°) → R–O–R' + X⁻   (SN2)</div>
+<div class="tip">Usa come nucleofilo l'alcossido dell'alcol meno ingombrato; come elettrofilo l'alogenuro primario. Alogenuri 3° danno eliminazione.</div>
+</div>
+<h3>7.3 Epossidi — sintesi e apertura</h3>
+<div class="card">
+<div class="rxn"><strong>Sintesi:</strong> alchene + mCPBA → epossido (stereospecifica, ritenzione geometria doppio legame)</div>
+<div class="rxn"><strong>Apertura basica (Nu⁻, OH⁻):</strong> attacco SN2 sul C meno sostituito → prodotto anti
+<span class="cond">Prodotto = trans-diolo o trans-β-idrossiNu</span></div>
+<div class="rxn"><strong>Apertura acida (H⁺/Nu):</strong> protonazione O⁻ → carica + più sul C più sostituito → Nu attacca il C più sostituito → anti
+<span class="cond">H₂O/H⁺ → diolo trans; HBr/H⁺ → bromoalcol trans</span></div>
+</div>
+</section>
+
+<!-- S8 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s8">
+<h2>8 · Aldeidi e Chetoni</h2>
+<h3>8.1 Addizioni nucleofile al C=O</h3>
+<div class="card">
+<table>
+<tr><th>Nucleofilo</th><th>Prodotto</th><th>Reagenti</th></tr>
+<tr><td>H⁻ (NaBH₄)</td><td>Alcol 1° (da aldeide) / 2° (da chetone)</td><td>NaBH₄/MeOH o LiAlH₄/THF</td></tr>
+<tr><td>R–MgX (Grignard)</td><td>Alcol 2° o 3°</td><td>THF anidro poi H₃O⁺</td></tr>
+<tr><td>HCN</td><td>Cianidrina (α-OH nitrile)</td><td>HCN / base cat.; pot. nuovo C chirale</td></tr>
+<tr><td>R–NH₂ (amm. 1°)</td><td>Immine = R₂C=NR' (base di Schiff)</td><td>pH 4–5, disidratazione</td></tr>
+<tr><td>R₂NH (amm. 2°)</td><td>Enammina</td><td>Rimozione H₂O</td></tr>
+<tr><td>ROH (2 eq.)</td><td>Acetale R₂C(OR')₂</td><td>H⁺ cat., rimozione H₂O (protezione C=O)</td></tr>
+<tr><td>Ph₃P=CHR' (Wittig)</td><td>Alchene R₂C=CHR'</td><td>Vedi sezione 11</td></tr>
+</table>
+</div>
+<h3>8.2 Tautomeria cheto-enolica</h3>
+<div class="card">
+<div class="formula">R–CH₂–C=O  ⇌  R–CH=C–OH   (keto ⇌ enolo)
+                     base/acido
+pKₐ(α-H chetone) ~ 20   pKₐ(α-H estere) ~ 25</div>
+<p>β-Dicarbonili (acetilacetone): ~80% enolo per stabilizzazione per risonanza e legame H intramolecolare.</p>
+<div class="tip">Enolati con LDA (−78°C, THF) → formazione regioselettiva dell'enolato cinetico. Con NaOEt → enolato termodinamico.</div>
+</div>
+<h3>8.3 Condensazione aldolica</h3>
+<div class="card">
+<div class="formula">2 CH₃CHO →[NaOH]→ CH₃CH(OH)CH₂CHO   (aldolo = β-idrossicarbonile)
+             →[Δ]→   CH₃CH=CHCHO + H₂O   (enone α,β-insaturo)</div>
+<ol>
+<li>Base rimuove α-H → enolato</li>
+<li>Enolato attacca carbonile di 2ª molecola</li>
+<li>Protonazione → β-idrossicarbonile</li>
+<li>Disidratazione con Δ → enone</li>
+</ol>
+<div class="tip"><strong>Aldolo incrociato:</strong> efficace se uno dei due carbonili non ha α-H (formaldeide, benzaldeide) → no auto-condensazione competitiva.</div>
+</div>
+<h3>8.4 Test per aldeidi</h3>
+<div class="card">
+<div class="rxn"><strong>Tollens (specchio d'argento):</strong> RCHO + [Ag(NH₃)₂]⁺ → RCOO⁻ + Ag↓
+<span class="cond">Diagnosi aldeide. Falso positivo: fenoli, glucosio.</span></div>
+<div class="rxn"><strong>Fehling/Benedict:</strong> RCHO + Cu²⁺ → RCOO⁻ + Cu₂O↓ (rosso)
+<span class="cond">Zuccheri riducenti positivi. Chetoni (eccetto α-idrossichetoni) negativi.</span></div>
+</div>
+</section>
+
+<!-- S9 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s9">
+<h2>9 · Acidi Carbossilici e Derivati</h2>
+<h3>9.1 Scala di reattività</h3>
+<div class="card">
+<div class="formula">Alogenuri acilici &gt; Anidridi &gt; Esteri ≈ Acidi &gt; Ammidi &gt;&gt; Carbossilato⁻
+(+ reattivo → – reattivo)
+Un derivato più reattivo può formare uno meno reattivo, NON viceversa direttamente.</div>
+</div>
+<h3>9.2 Reazioni principali</h3>
+<div class="card">
+<div class="rxn"><strong>Esterificazione di Fischer:</strong> RCOOH + R'OH ⇌[H⁺] RCOOR' + H₂O
+<span class="cond">Reversibile; spostare equilibrio con eccesso ROH o rimozione H₂O (Dean-Stark)</span></div>
+<div class="rxn"><strong>Saponificazione:</strong> RCOOR' + NaOH → RCOO⁻ Na⁺ + R'OH
+<span class="cond">Irreversibile (base forte). Usato industrialmente per saponificazione dei grassi.</span></div>
+<div class="rxn"><strong>Riduzione LiAlH₄:</strong> RCOOH, RCOOR', RCONH₂ → R–CH₂OH (alcol primario)</div>
+<div class="rxn"><strong>DIBAL-H (1 eq., −78°C):</strong> RCOOR' → R–CHO (aldeide, selettivo)</div>
+<div class="rxn"><strong>Ammide da alogenuro acilico:</strong> RCOCl + R'NH₂ → RCONHR' + HCl</div>
+</div>
+<h3>9.3 Hell–Volhard–Zelinskij (HVZ)</h3>
+<div class="card">
+<div class="formula">R–CH₂COOH + Br₂/P → R–CHBr–COOH + HBr
+(α-bromo acido — nucleo per SN2/E2 successivi)</div>
+</div>
+<h3>9.4 Decarbossilazione β-chetoacidi</h3>
+<div class="card">
+<div class="formula">R–CO–CH₂–COOH →[Δ]→ R–CO–CH₃ + CO₂
+(via TS ciclico a 6 atomi — stato di transizione per-ciclic)</div>
+</div>
+</section>
+
+<!-- S10 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s10">
+<h2>10 · Ammine e Diazotazione</h2>
+<h3>10.1 Basicità delle ammine</h3>
+<div class="card">
+<table>
+<tr><th>Tipo</th><th>pKₐ (sale NH)</th><th>Note</th></tr>
+<tr><td>Alchilammina (R–NH₂)</td><td>~10.6</td><td>+I alchilico aumenta densità su N</td></tr>
+<tr><td>Dialchilammina (R₂NH)</td><td>~11.0</td><td>Massima basicità acquosa (2 × +I)</td></tr>
+<tr><td>Trialchilammina (R₃N)</td><td>~9.8</td><td>Ingombro riduce idratazione del catione</td></tr>
+<tr><td>Arilammine Ar–NH₂</td><td>~4.6</td><td>Lone pair delocalizzato nell'anello aromatico</td></tr>
+<tr><td>Ammidi –CONH₂</td><td>~0</td><td>Lone pair delocalizzato su C=O</td></tr>
+</table>
+</div>
+<h3>10.2 Sintesi delle ammine</h3>
+<div class="card">
+<div class="rxn"><strong>Riduzione nitrili:</strong> R–CN + LiAlH₄/THF → R–CH₂–NH₂</div>
+<div class="rxn"><strong>Riduzione nitroaromati:</strong> Ar–NO₂ + Fe/HCl o H₂/Pd → Ar–NH₂</div>
+<div class="rxn"><strong>Sintesi di Gabriel:</strong> ftalimmide → K₂CO₃ → N-alchil → N₂H₄/Δ → R–NH₂ (pura, no polialchilazione)</div>
+<div class="rxn"><strong>Amminazione riduttiva:</strong> R–CHO + R'NH₂ + NaBH₃CN → R–CH(NHR')</div>
+</div>
+<h3>10.3 Diazotazione e sali di diazonio</h3>
+<div class="card">
+<div class="formula">Ar–NH₂ + NaNO₂ + HCl (0–5°C) → [Ar–N≡N]⁺ Cl⁻ + 2H₂O</div>
+<div class="tip">Sali arilici stabili a 0–5°C. Sali alchilici instabili anche a basse temperature.</div>
+</div>
+<div class="flow">
+  <div class="fbox" style="background:#0a7a71;color:#fff;border-color:#00c9b7">Ar–N₂⁺ — Sali di diazonio</div>
+  <div class="fa">▼ Sandmeyer e reazioni correlate</div>
+  <div class="flow-row" style="flex-wrap:wrap">
+    <div class="flow-col"><div class="fbox y">CuCl → Ar–Cl</div></div>
+    <div class="flow-col"><div class="fbox y">CuBr → Ar–Br</div></div>
+    <div class="flow-col"><div class="fbox y">CuCN → Ar–CN</div></div>
+    <div class="flow-col"><div class="fbox y">KI → Ar–I</div></div>
+    <div class="flow-col"><div class="fbox y">HBF₄/Δ → Ar–F (Balz-Schiemann)</div></div>
+    <div class="flow-col"><div class="fbox y">H₂O/H⁺/Δ → Ar–OH</div></div>
+    <div class="flow-col"><div class="fbox y">H₃PO₂ → Ar–H (deamminazione)</div></div>
+    <div class="flow-col"><div class="fbox y">ArH → Ar–N=N–Ar' (azo-coupling, coloranti)</div></div>
+  </div>
+</div>
+</section>
+
+<!-- S11 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s11">
+<h2>11 · Reazioni di formazione C–C</h2>
+<h3>11.1 Condensazione di Claisen</h3>
+<div class="card">
+<div class="formula">2 CH₃COOEt →[NaOEt]→ CH₃COCH₂COOEt + EtOH   (acetoacetato di etile)</div>
+<ol>
+<li>NaOEt rimuove α-H → enolato estere</li>
+<li>Enolato attacca C=O di un secondo estere</li>
+<li>Espulsione EtO⁻ → β-chetoestere</li>
+<li>Il β-chetoestere è abbastanza acido (pKₐ ~11) da essere deprotonato → guida l'equilibrio</li>
+</ol>
+<p><strong>Claisen incrociato:</strong> usa un estere senza α-H (es. PhCOOEt, EtOOCCOOEt) per evitare auto-condensazione.</p>
+</div>
+<h3>11.2 Reazione di Diels–Alder</h3>
+<div class="card">
+<div class="formula">Diene (s-cis) + Dienofilo → Cicloesene
+Es: butadiene + etilene → cicloesene
+    butadiene + AN (acrylonitrile) → 4-cianocicloes-2-ene</div>
+<ul>
+<li>Addizione [4+2] concertata (periodica): syn sulle due componenti</li>
+<li>Il diene <strong>deve essere s-cis</strong> (o vincolato in sella)</li>
+<li>Endo vs exo: endo prevalente (interazioni secondarie HOMO–LUMO)</li>
+<li><strong>FMO:</strong> HOMO(diene) + LUMO(dienofilo). EDG su diene alzano HOMO; EWG su dienofilo abbassano LUMO → gap ↓ → reazione più veloce e selettiva</li>
+<li><strong>Regiochemistry endo:</strong> "orto" e "para" (regola delle componenti equivalenti)</li>
+</ul>
+</div>
+<h3>11.3 Reazione di Wittig</h3>
+<div class="card">
+<div class="formula">Ph₃P + R–X → [Ph₃P⁺–R] X⁻   (sale fosfonio)
+[Ph₃P⁺–CHR'] + n-BuLi → Ph₃P=CHR'   (ilide)
+Ph₃P=CHR' + R''CHO → R''CH=CHR' + Ph₃P=O</div>
+<ul>
+<li>Posizione doppio legame definita (no isomeri di posizione)</li>
+<li>Ilidi <strong>non stabilizzate</strong> (alchile) → Z (cis) prevalente</li>
+<li>Ilidi <strong>stabilizzate</strong> (EWG vicino a C carbanoide) → E (trans) prevalente</li>
+<li>HWE (Horner-Wadsworth-Emmons) usa fosfonati → più reattivo, E selettivo</li>
+</ul>
+</div>
+<h3>11.4 Sintesi malononica e acetacetica</h3>
+<div class="card">
+<div class="formula">Sintesi malononica:
+  malonato di dietile + NaOEt + R–X → R–CH(COOEt)₂
+  → [1)NaOH; 2)H⁺; 3)Δ] → R–CH₂–COOH  (+1C rispetto a R–X)
+
+Sintesi acetacetica:
+  acetoacetato di etile + NaOEt + R–X → R–CH(COCH₃)(COOEt)
+  → [1)NaOH; 2)H⁺; 3)Δ] → R–CH₂–COCH₃  (metilchetone)</div>
+</div>
+<h3>11.5 Michael e Robinson</h3>
+<div class="card">
+<div class="formula">Addizione di Michael: enolato + sistema α,β-insaturo → addotto 1,4
+
+Annellazione di Robinson = Addizione di Michael + Condensazione aldolica + Deidratazione
+→ Anello 6 cicloesenonico nuovo</div>
+</div>
+</section>
+
+<!-- S12 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s12">
+<h2>12 · Ossidazioni e Riduzioni</h2>
+<h3>12.1 Ossidanti principali</h3>
+<div class="card">
+<table>
+<tr><th>Reagente</th><th>Substrato</th><th>Prodotto</th><th>Note</th></tr>
+<tr><td>PCC</td><td>Alcol 1°</td><td>Aldeide</td><td>Selettivo — non oltre</td></tr>
+<tr><td>Swern</td><td>Alcol 1°,2°</td><td>Aldeide, chetone</td><td>Blando, −78°C</td></tr>
+<tr><td>DMP (Dess-Martin)</td><td>Alcol 1°,2°</td><td>Aldeide, chetone</td><td>Neutro, tolera gruppi sensibili</td></tr>
+<tr><td>Jones (CrO₃/H₂SO₄)</td><td>Alcol 1°,2°</td><td>Acido, chetone</td><td>Forte, ossida fino ad acido da 1°</td></tr>
+<tr><td>KMnO₄ dil./freddo</td><td>Alcheni</td><td>Diolo syn</td><td>Blanda ossidazione</td></tr>
+<tr><td>KMnO₄ conc./caldo</td><td>Alcheni, aldeidi</td><td>Chetoni + acidi (rottura)</td></tr>
+<tr><td>OsO₄ (cat.)/NMO</td><td>Alcheni</td><td>Diolo syn</td><td>Stereospecifica, catalitica</td></tr>
+<tr><td>mCPBA</td><td>Alcheni</td><td>Epossido</td><td>Stereospecifica</td></tr>
+<tr><td>O₃ / DMS</td><td>Alcheni</td><td>Aldeidi + chetoni</td><td>Ozonolisi riduttiva</td></tr>
+</table>
+</div>
+<h3>12.2 Riducenti principali</h3>
+<div class="card">
+<table>
+<tr><th>Reagente</th><th>Riduce</th><th>Non riduce</th></tr>
+<tr><td>NaBH₄</td><td>Aldeidi, chetoni</td><td>Esteri, acidi, C=C isolato</td></tr>
+<tr><td>LiAlH₄</td><td>Aldeidi, chetoni, esteri→2alcoli, acidi→1°alcol, ammidi→ammine</td><td>C=C isolato</td></tr>
+<tr><td>DIBAL-H (1eq,−78°C)</td><td>Estere → aldeide</td><td>Non va oltre aldeide</td></tr>
+<tr><td>H₂/Pd-C</td><td>C=C, C≡C, ArNO₂, ArX (idrogenolisi)</td><td>C=O, COOR semplici</td></tr>
+<tr><td>H₂/Lindlar</td><td>C≡C → cis-alchene</td><td>Non riduce oltre</td></tr>
+<tr><td>Na/NH₃(l)</td><td>C≡C → trans-alchene; areni → cicloesadieni (Birch)</td><td>—</td></tr>
+</table>
+</div>
+<h3>12.3 Riduzione di Birch</h3>
+<div class="card">
+<div class="formula">Ar–H + Na/NH₃(l)/t-BuOH → 1,4-cicloesadiene</div>
+<ul>
+<li><strong>EDG</strong> (–OH, –OR): doppi legami nel prodotto <em>con</em> il sostituente</li>
+<li><strong>EWG</strong> (–COOH, –COOR): doppi legami nel prodotto <em>lontano</em> dal sostituente</li>
+</ul>
+</div>
+</section>
+
+<!-- S13 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s13">
+<h2>13 · Carboidrati</h2>
+<h3>13.1 Classificazione e serie D/L</h3>
+<div class="card">
+<p><strong>Formula generale:</strong> (CH₂O)ₙ. Aldosi: gruppo aldeidico in C1. Chetosi: chetone in C2. La serie D/L dipende dalla configurazione del centro chirale più lontano dal carbonile (confronto con D/L-gliceraldeide).</p>
+<table>
+<tr><th>Scheletro C</th><th>Aldoso</th><th>Chetoso</th><th>Esempi D-serie</th></tr>
+<tr><td>C3 (triosi)</td><td>Gliceraldeide</td><td>Diidrossiacetone</td><td>D-Gliceraldeide</td></tr>
+<tr><td>C4 (tetrosi)</td><td>Eritrosio, Treosio</td><td>Eritrulosio</td><td>D-Eritrosio</td></tr>
+<tr><td>C5 (pentosi)</td><td>Ribosio, Arabinosio, Xilosio, Lixosio</td><td>Ribulosio, Xilulosio</td><td>D-Ribosio (RNA)</td></tr>
+<tr><td>C6 (esosi)</td><td>Glucosio, Mannosio, Galattosio, Idrosio…</td><td>Fruttosio, Sorbosio</td><td>D-Glucosio (più abbondante)</td></tr>
+</table>
+<div class="tip">Proiezione di Fischer: OH a destra = configurazione D (come D-gliceraldeide). Nella rappresentazione verticale il carbonio più ossidato è in cima (C1 negli aldosi).</div>
+<div class="formula">D-Glucosio (proiezione Fischer):
+     CHO
+     |
+H ── C ── OH    ← C2 (R)
+     |
+HO ── C ── H    ← C3 (S)
+     |
+H ── C ── OH    ← C4 (R)
+     |
+H ── C ── OH    ← C5 (R) → OH a destra = serie D
+     |
+    CH₂OH</div>
+</div>
+
+<h3>13.2 Forme cicliche e anomeria</h3>
+<div class="card">
+<p>Il gruppo OH in C5 (aldoesosi) o C4 (aldopentosi) attacca il carbonile per formare un <strong>emiacetale intramolecolare</strong> → anello piranosico (6 atomi) o furanosico (5 atomi). Si genera un nuovo stereocentro in C1: il <strong>carbonio anomerico</strong>.</p>
+<table>
+<tr><th>Anomero</th><th>OH-1 (Haworth)</th><th>OH-1 (sedia 4C₁)</th><th>Equilibrio H₂O 25°C</th><th>[α]D</th></tr>
+<tr><td><strong>α-D-glucopiranosio</strong></td><td>sotto il piano</td><td>Assiale</td><td>36%</td><td>+112°</td></tr>
+<tr><td><strong>β-D-glucopiranosio</strong></td><td>sopra il piano</td><td>Equatoriale</td><td>64%</td><td>+19°</td></tr>
+</table>
+<div class="tip">β più stabile: OH equatoriale evita le interazioni 1,3-diassiali. Il β-D-glucopiranosio (conformazione ⁴C₁) ha tutti i sostituenti equatoriali → conformazione più stabile possibile.</div>
+<p style="margin-top:6px"><strong>Proiezione di Haworth (β-D-glucopiranosio):</strong></p>
+<div class="formula">        CH₂OH
+         |
+    6    O     1
+    /   /  \   \
+   5  OH    OH   2
+   |   \   /    |
+   4    3
+  OH  OH  H   (tutti OH cis con C6 = β)</div>
+</div>
+
+<h3>13.3 Mutarotazione</h3>
+<div class="card">
+<p>In soluzione acquosa α ⇌ forma aperta ⇌ β, catalizzato da H⁺ o OH⁻. L'equilibrio si raggiunte a <strong>[α]eq = +52.7°</strong> (36% α + 64% β).</p>
+<div class="flow">
+  <div class="fbox y">α-D-glucopiranosio<br><span style="color:#9fb3c8;font-size:.78rem">[α] = +112° (36%)</span></div>
+  <div class="fa">⇌ H₂O, H⁺/OH⁻</div>
+  <div class="fbox">Forma aperta (aldeide)<br><span style="color:#9fb3c8;font-size:.78rem">~0.003% in equilibrio</span></div>
+  <div class="fa">⇌</div>
+  <div class="fbox y">β-D-glucopiranosio<br><span style="color:#9fb3c8;font-size:.78rem">[α] = +19° (64%)</span></div>
+</div>
+<p>La velocità dipende dal pH: massima a pH neutro (contributo sia H₃O⁺ sia OH⁻). Alla fine: [α]eq = 0.36×112 + 0.64×19 ≈ <strong>+52.7°</strong>.</p>
+</div>
+
+<h3>13.4 Reazioni dei monosaccaridi</h3>
+<div class="card">
+<p><strong>1 · Riduzione → Alditoli</strong></p>
+<div class="rxn">Glucosio <span style="color:#00c9b7">──NaBH₄──▶</span> Glucitolo (sorbitolo) (C6 → CH₂OH)<span class="cond">Tutti i centri chirali mantenuti tranne C1: CH=O → CH₂OH</span></div>
+<p style="margin-top:8px"><strong>2 · Ossidazioni</strong></p>
+<table>
+<tr><th>Reagente</th><th>Prodotto</th><th>Selettività</th></tr>
+<tr><td>Tollens (Ag⁺/NH₃) o Fehling/Benedict (Cu²⁺)</td><td>Acido gluconico (gluconato)</td><td>Solo zuccheri riducenti (libero C anomerico)</td></tr>
+<tr><td>Br₂/H₂O (pH 5–7)</td><td>Acido aldonico (es. gluconico)</td><td>Selettiva: solo CHO, non ossida C6</td></tr>
+<tr><td>HNO₃ dil. caldo</td><td>Acido aldarico (es. glucarico)</td><td>Ossida CHO e CH₂OH → entrambi COOH</td></tr>
+<tr><td>HIO₄ (periodato)</td><td>Clivaggio dioli vicinali → aldeidi/chetoni</td><td>Conta i carboni ossidati (stoichiometria)</td></tr>
+</table>
+<p style="margin-top:8px"><strong>3 · Formazione di osazoni (Ph-NH-NH₂)</strong></p>
+<div class="rxn">Glucosio + 3 PhNHNH₂ <span style="color:#00c9b7">──▶</span> Glucoosazone (C1=N-NHPh, C2=N-NHPh)<span class="cond">C3–C6 invariati. Il glucoosazone = mannoosazone (stesso fino a C3) → usato per distinguere epimeri</span></div>
+<p style="margin-top:8px"><strong>4 · Formazione di glicosidi</strong></p>
+<div class="rxn">Glucosio + R-OH <span style="color:#00c9b7">──H⁺──▶</span> α/β-Glucoside (acetale) + H₂O<span class="cond">Glicosidi non mutarotano, non sono riducenti. Si formano α o β a seconda delle condizioni.</span></div>
+</div>
+
+<h3>13.5 Sintesi di Kiliani-Fischer e Degradazione di Wohl</h3>
+<div class="card">
+<p><strong>Sintesi Kiliani-Fischer</strong> (allungamento di 1 C al carbonile):</p>
+<div class="flow">
+  <div class="fbox">Aldoso (Cn)<br><span style="color:#9fb3c8;font-size:.78rem">CHO–CHOH…CH₂OH</span></div>
+  <div class="fa">+ HCN</div>
+  <div class="fbox">Cianoidrina (Cn+1)<br><span style="color:#9fb3c8;font-size:.78rem">CN-CHOH…CH₂OH (coppia epimerica)</span></div>
+  <div class="fa">1) H₂/Pd (riduz. parziale) 2) H₂O/H⁺</div>
+  <div class="fbox r">Due aldosi epimeri in C2 (Cn+1)<br><span style="font-weight:400;color:#9fb3c8;font-size:.78rem">es. D-arabinosio → D-glucosio + D-mannosio</span></div>
+</div>
+<p style="margin-top:8px"><strong>Degradazione di Wohl</strong> (opposta, accorcia di 1 C):</p>
+<div class="flow">
+  <div class="fbox">Aldoso (Cn)</div>
+  <div class="fa">+ NH₂OH → ossima → Ac₂O → nitrile di acetato</div>
+  <div class="fbox">Nitrile (Cn)</div>
+  <div class="fa">+ Ag₂O/NH₃ → eliminazione HCN</div>
+  <div class="fbox r">Aldoso (Cn−1)</div>
+</div>
+<div class="tip">Insieme, Kiliani-Fischer e Wohl permettono di costruire o dimostrare la struttura relativa di tutti gli aldosi dalla D-gliceraldeide (dimostrazione di Fischer, Premio Nobel 1902).</div>
+</div>
+
+<h3>13.6 Disaccaridi</h3>
+<div class="card">
+<table>
+<tr><th>Disaccaride</th><th>Legame</th><th>Componenti</th><th>Riducente?</th><th>Note</th></tr>
+<tr><td><strong>Maltosio</strong></td><td>α(1→4)</td><td>Glc + Glc</td><td>Sì</td><td>Da idrolisi amido (maltasi); sciroppo di malto</td></tr>
+<tr><td><strong>Cellobiosio</strong></td><td>β(1→4)</td><td>Glc + Glc</td><td>Sì</td><td>Da idrolisi cellulosa; non digerito dai mammiferi</td></tr>
+<tr><td><strong>Lattosio</strong></td><td>β(1→4)</td><td>Gal + Glc</td><td>Sì</td><td>Latte dei mammiferi; intolleranza (mancanza lattasi)</td></tr>
+<tr><td><strong>Saccarosio</strong></td><td>α(1↔2)β</td><td>Glc + Fru</td><td><strong>No</strong></td><td>Entrambi C anomerico legato → nessun OH libero</td></tr>
+<tr><td><strong>Trealosio</strong></td><td>α(1↔1)α</td><td>Glc + Glc</td><td><strong>No</strong></td><td>Crioprotettore in insetti e funghi</td></tr>
+</table>
+<div class="warn">Zucchero riducente = ha OH al C anomerico libero → riduce Fehling/Benedict/Tollens e forma osazoni. Il saccarosio NON è riducente (legame 1↔2 blocca entrambi gli anomerici).</div>
+</div>
+
+<h3>13.7 Polisaccaridi</h3>
+<div class="card">
+<table>
+<tr><th>Polisaccaride</th><th>Monomero</th><th>Legame</th><th>Struttura</th><th>Funzione</th></tr>
+<tr><td><strong>Amilosio</strong></td><td>D-Glc</td><td>α(1→4)</td><td>Elicoidale, lineare</td><td>Riserva energetica (piante); ~20% dell'amido</td></tr>
+<tr><td><strong>Amilopectina</strong></td><td>D-Glc</td><td>α(1→4) + ramif. α(1→6)</td><td>Ramificata ogni 24–30 unità</td><td>~80% dell'amido; più solubile</td></tr>
+<tr><td><strong>Glicogeno</strong></td><td>D-Glc</td><td>α(1→4) + ramif. α(1→6)</td><td>Molto ramificata ogni 8–12 unità</td><td>Riserva animale (fegato, muscolo)</td></tr>
+<tr><td><strong>Cellulosa</strong></td><td>D-Glc</td><td>β(1→4)</td><td>Lineare, fibre, legami H inter/intra</td><td>Struttura parete cellulare piante</td></tr>
+<tr><td><strong>Chitina</strong></td><td>N-acetil-D-glucosamina</td><td>β(1→4)</td><td>Fibrosa, legami H</td><td>Esoscheletro artropodi, parete funghi</td></tr>
+</table>
+<div class="tip">La cellulosa ha legami β(1→4) → ogni glucosio ruotato di 180° → struttura planare estesa → legami H forti tra catene → fibra insolubile ad alta resistenza. I mammiferi non possono digerir la (assenza di β-glucosidasi specifiche).</div>
+</div>
+</section>
+
+<!-- S14 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s14">
+<h2>14 · Riepilogo Generale</h2>
+<h3>14.1 Reattività per classe funzionale</h3>
+<div class="card">
+<table>
+<tr><th>Classe</th><th>Gruppo</th><th>Reaz. tipiche</th><th>Prodotti chiave</th></tr>
+<tr><td>Alcani</td><td>C–H</td><td>Alogen. rad.</td><td>R–X</td></tr>
+<tr><td>Alcheni</td><td>C=C</td><td>Add. elettrofila, ossid., idrob.</td><td>R–X, dioli, epossidi, alcoli</td></tr>
+<tr><td>Alchini</td><td>C≡C</td><td>Add. selettiva, alchilazione</td><td>cis/trans-alcheni, chetoni, R–C≡C–R'</td></tr>
+<tr><td>Areni</td><td>Ar–H</td><td>SEA</td><td>Ar–NO₂, Ar–X, Ar–R, Ar–COR</td></tr>
+<tr><td>Alogenuri</td><td>R–X</td><td>SN1, SN2, E1, E2, Grignard</td><td>R–Nu, alcheni, R–MgX</td></tr>
+<tr><td>Alcoli</td><td>R–OH</td><td>Ossid., sos., elim., Williamson</td><td>Aldeidi, chetoni, acidi, eteri, alcheni</td></tr>
+<tr><td>Aldeid./Chetoni</td><td>C=O</td><td>Add. nucleofila, aldol, Wittig</td><td>Alcoli, imine, acetali, alcheni</td></tr>
+<tr><td>Acidi/Derivati</td><td>–COOH,–COX,–COOR,–CONH₂</td><td>Sos. acilica, riduz.</td><td>Esteri, ammidi, alcoli</td></tr>
+<tr><td>Ammine</td><td>R–NH₂</td><td>Alchil., acil., diazo</td><td>Ammidi, sali diazo, Ar–X</td></tr>
+</table>
+</div>
+<h3>14.2 Trasformazioni e reagenti chiave</h3>
+<div class="card">
+<table>
+<tr><th>Trasformazione</th><th>Reagenti</th></tr>
+<tr><td>Alcol 1° → Aldeide</td><td>PCC, Swern, DMP</td></tr>
+<tr><td>Alcol 1° → Acido</td><td>KMnO₄/H⁺, Jones</td></tr>
+<tr><td>Alcol 2° → Chetone</td><td>PCC, Swern, DMP, Jones</td></tr>
+<tr><td>Aldeid./Chet. → Alcol</td><td>NaBH₄/MeOH o LiAlH₄/THF</td></tr>
+<tr><td>Estere → Aldeide</td><td>DIBAL-H (1 eq., −78°C)</td></tr>
+<tr><td>Estere → Alcol 1°</td><td>LiAlH₄</td></tr>
+<tr><td>Alchino → cis-Alchene</td><td>H₂/Lindlar</td></tr>
+<tr><td>Alchino → trans-Alchene</td><td>Na/NH₃(l)</td></tr>
+<tr><td>Alchene → Epossido</td><td>mCPBA</td></tr>
+<tr><td>Alchene → Diolo syn</td><td>OsO₄(cat.)/NMO o KMnO₄ dil./freddo</td></tr>
+<tr><td>Alchene → Diolo anti</td><td>1)mCPBA; 2)H₂O/H⁺</td></tr>
+<tr><td>Ar–NH₂ → Ar–X (Sandmeyer)</td><td>NaNO₂/HX (0°C) + CuX</td></tr>
+<tr><td>R–CHO/R₂C=O → alchene</td><td>Wittig (Ph₃P=CR₂) o HWE</td></tr>
+<tr><td>Ar–H → Ar–NO₂</td><td>HNO₃/H₂SO₄</td></tr>
+</table>
+</div>
+<div class="card" style="text-align:center;background:#071221;padding:16px">
+  <p style="color:#00c9b7;font-weight:700;font-size:1rem">⚗️ BioSpecInfo · Chimica Organica 1+2</p>
+  <p style="color:#9fb3c8;font-size:.83rem;margin-top:5px">17 moduli · meccanismi interattivi · stereochimica · molecole biologiche</p>
+</div>
+</section>
+
+
+<!-- S15 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s15">
+<h2>15 · Amminoacidi &amp; Proteine</h2>
+<h3>15.1 I 20 amminoacidi proteinogenici</h3>
+<div class="card">
+<p>Tutti gli α-amminoacidi hanno la struttura generale H₂N–CHR–COOH. Sono in serie <strong>L</strong> (equivalente alla configurazione <em>S</em> tranne Cys che è <em>R</em> per priorità del gruppo tiolico).</p>
+<table>
+<tr><th>Nome</th><th>3-let.</th><th>1-let.</th><th>Classe</th><th>Catena laterale (R)</th></tr>
+<tr><td>Glicina</td><td>Gly</td><td>G</td><td>Alifatico</td><td>–H (achiral)</td></tr>
+<tr><td>Alanina</td><td>Ala</td><td>A</td><td>Alifatico</td><td>–CH₃</td></tr>
+<tr><td>Valina</td><td>Val</td><td>V</td><td>Alifatico</td><td>–CH(CH₃)₂</td></tr>
+<tr><td>Leucina</td><td>Leu</td><td>L</td><td>Alifatico</td><td>–CH₂CH(CH₃)₂</td></tr>
+<tr><td>Isoleucina</td><td>Ile</td><td>I</td><td>Alifatico</td><td>–CH(CH₃)CH₂CH₃ (2 centri chirali)</td></tr>
+<tr><td>Prolina</td><td>Pro</td><td>P</td><td>Ciclico (iminoacido)</td><td>–(CH₂)₃– forma anello con N (pirrolidina)</td></tr>
+<tr><td>Fenilalanina</td><td>Phe</td><td>F</td><td>Aromatico</td><td>–CH₂–C₆H₅</td></tr>
+<tr><td>Triptofano</td><td>Trp</td><td>W</td><td>Aromatico</td><td>–CH₂–indolil (bicyclico)</td></tr>
+<tr><td>Tirosina</td><td>Tyr</td><td>Y</td><td>Aromatico, polare</td><td>–CH₂–C₆H₄–OH</td></tr>
+<tr><td>Serina</td><td>Ser</td><td>S</td><td>Idrossilato</td><td>–CH₂OH</td></tr>
+<tr><td>Treonina</td><td>Thr</td><td>T</td><td>Idrossilato</td><td>–CH(OH)CH₃</td></tr>
+<tr><td>Cisteina</td><td>Cys</td><td>C</td><td>Con zolfo</td><td>–CH₂SH (pKa ~8.3, forma ponti –S–S–)</td></tr>
+<tr><td>Metionina</td><td>Met</td><td>M</td><td>Con zolfo</td><td>–CH₂CH₂SCH₃</td></tr>
+<tr><td>Asparagina</td><td>Asn</td><td>N</td><td>Ammidico</td><td>–CH₂CONH₂</td></tr>
+<tr><td>Glutammina</td><td>Gln</td><td>Q</td><td>Ammidico</td><td>–CH₂CH₂CONH₂</td></tr>
+<tr><td>Acido aspartico</td><td>Asp</td><td>D</td><td>Acido</td><td>–CH₂COOH (pKa 3.65)</td></tr>
+<tr><td>Acido glutammico</td><td>Glu</td><td>E</td><td>Acido</td><td>–CH₂CH₂COOH (pKa 4.25)</td></tr>
+<tr><td>Lisina</td><td>Lys</td><td>K</td><td>Basico</td><td>–(CH₂)₄NH₂ (pKa 10.53)</td></tr>
+<tr><td>Arginina</td><td>Arg</td><td>R</td><td>Basico</td><td>–(CH₂)₃–NH–C(=NH)–NH₂ (guanidinio, pKa 12.48)</td></tr>
+<tr><td>Istidina</td><td>His</td><td>H</td><td>Basico</td><td>–CH₂–imidazolil (pKa 6.00)</td></tr>
+</table>
+</div>
+
+<h3>15.2 Proprietà acido-base e punto isoelettrico</h3>
+<div class="card">
+<table>
+<tr><th>Gruppo</th><th>pKa tipico</th><th>Forma acida</th><th>Forma basica</th></tr>
+<tr><td>α-COOH</td><td>1.8–2.4</td><td>–COOH</td><td>–COO⁻</td></tr>
+<tr><td>α-NH₃⁺</td><td>9.0–10.8</td><td>–NH₃⁺</td><td>–NH₂</td></tr>
+<tr><td>Asp/Glu (catena)</td><td>3.65 / 4.25</td><td>–COOH</td><td>–COO⁻</td></tr>
+<tr><td>His (imidazolil)</td><td>6.00</td><td>imidazolio⁺</td><td>imidazolo</td></tr>
+<tr><td>Cys (–SH)</td><td>8.37</td><td>–SH</td><td>–S⁻</td></tr>
+<tr><td>Tyr (–OH)</td><td>10.46</td><td>–OH</td><td>–O⁻</td></tr>
+<tr><td>Lys (ε-NH₃⁺)</td><td>10.53</td><td>–NH₃⁺</td><td>–NH₂</td></tr>
+<tr><td>Arg (guanidinio)</td><td>12.48</td><td>–C(NH₂)₂⁺</td><td>–C(NH)(NH₂)</td></tr>
+</table>
+<div class="tip"><strong>pI (punto isoelettrico):</strong> pH in cui la specie netta è neutra (zwitterione). Per AA senza catena ionizzabile: pI = (pKa₁ + pKa₂)/2. Per AA basici: pI = (pKa₂ + pKa₃)/2. Per AA acidi: pI = (pKa₁ + pKa₂)/2 dove pKa₁ è catena acida.</div>
+</div>
+
+<h3>15.3 Sintesi degli amminoacidi</h3>
+<div class="card">
+<p><strong>1 · Hell-Volhard-Zelinski (HVZ) → α-alogenazione</strong></p>
+<div class="rxn">R–CH₂–COOH <span style="color:#00c9b7">──Br₂ / PBr₃──▶</span> R–CHBr–COOH <span style="color:#00c9b7">──NH₃ (eccesso)──▶</span> R–CH(NH₂)–COOH<span class="cond">Meccanismo: PBr₃ forma R–CH₂–COBr (cloruro d'acile) che bromura all'α (più acido). Prodotto: α-AA racemo.</span></div>
+<p style="margin-top:10px"><strong>2 · Sintesi di Strecker</strong></p>
+<div class="rxn">RCHO <span style="color:#00c9b7">──NH₃ + HCN──▶</span> R–CH(NH₂)–CN <span style="color:#00c9b7">──H₃O⁺ / H₂O──▶</span> R–CH(NH₂)–COOH<span class="cond">Passaggi: RCHO + NH₃ → aldimine; + HCN → α-amminonitrile; idrolisi → α-AA. Prodotto racemo.</span></div>
+<p style="margin-top:10px"><strong>3 · Sintesi ftalimmidica (Gabriel modificata)</strong></p>
+<div class="rxn">Ftalimmide <span style="color:#00c9b7">──K₂CO₃──▶</span> K-ftalimmide <span style="color:#00c9b7">──R–X (SN2)──▶</span> N-alchil-ftalimmide <span style="color:#00c9b7">──H₂NNH₂──▶</span> R–CH₂NH₂<span class="cond">Variante per AA: si usa bromo-malonato di dietile, alchilazione, idrolisi, decarbossilazione → α-AA racemo. Utile per AA primari puri senza over-alchilazione.</span></div>
+<p style="margin-top:10px"><strong>4 · Sintesi enantioselettiva (Corey-Lygo, ausiliare chirale)</strong></p>
+<div class="rxn">Glicinato + Base chirale (es. glicole chirale di Corey) <span style="color:#00c9b7">──alkyl-X──▶</span> α-AA ee &gt;95%<span class="cond">Il reattivo di fase-transfer chirale induce stereocontrollo all'α. Prodotto enantiomericamente puro senza cromatografia chirale.</span></div>
+</div>
+
+<h3>15.4 Legame peptidico</h3>
+<div class="card">
+<p>Formazione per condensazione del –COOH di un AA con –NH₂ del successivo con eliminazione di H₂O:</p>
+<div class="formula">H₂N–CHR₁–CO–OH  +  H–NH–CHR₂–COOH
+         ↓  –H₂O
+H₂N–CHR₁–CO–NH–CHR₂–COOH
+         ↑
+    legame peptidico</div>
+<div class="tip"><strong>Proprietà del legame peptidico:</strong> risonanza tra C=O e C–N → <em>parziale carattere di doppio legame</em> (45%). Rotazione intorno a C–N impedita → il piano peptidico è <strong>planare</strong>. Configurazione prevalente <strong>trans</strong> (ω ≈ 180°) per minimizzare repulsioni stanche; cis solo in Pro (~10%).</div>
+<table style="margin-top:8px">
+<tr><th>Parametro</th><th>α-elica</th><th>β-foglietto (antiparallelo)</th></tr>
+<tr><td>φ (C–N–Cα–C)</td><td>−57°</td><td>−139°</td></tr>
+<tr><td>ψ (N–Cα–C–N)</td><td>−47°</td><td>+135°</td></tr>
+<tr><td>Legami H</td><td>i → i+4 (intracatena)</td><td>tra catene parallele/antiparallele</td></tr>
+<tr><td>Residui/giro</td><td>3.6</td><td>—</td></tr>
+<tr><td>Avanzam./residuo</td><td>1.5 Å</td><td>3.4 Å</td></tr>
+</table>
+</div>
+
+<h3>15.5 Sintesi peptidica in fase solida (Merrifield)</h3>
+<div class="card">
+<p>Strategia: elongazione <strong>C→N</strong> con il C-terminale ancorato alla resina (Merrifield, Nobel 1984).</p>
+<div class="flow">
+  <div class="fbox y">Resina (Cl-CH₂–polistirene)<br><span style="color:#9fb3c8;font-size:.78rem">supporto insolubile in DCM/DMF</span></div>
+  <div class="fa">+ Boc-AA₁-OH (DCC, DMAP) → Boc-AA₁-Resina</div>
+  <div class="fbox">Deprotezione Boc: TFA/DCM<br><span style="color:#9fb3c8;font-size:.78rem">H-AA₁-Resina + CO₂ + isobutene</span></div>
+  <div class="fa">+ Boc-AA₂-OH (DCC) → Boc-AA₂-AA₁-Resina</div>
+  <div class="fbox">Ripetere deprotezione e accoppiamento<br><span style="color:#9fb3c8;font-size:.78rem">n cicli per n residui</span></div>
+  <div class="fa">HF anidro o TFA forte</div>
+  <div class="fbox r">Peptide H-AA_n…AA₁-OH libero<br><span style="font-weight:400;color:#9fb3c8;font-size:.78rem">+ purificazione HPLC</span></div>
+</div>
+<table style="margin-top:8px">
+<tr><th>Reagente</th><th>Ruolo</th></tr>
+<tr><td>Boc (tert-butossicarbonile)</td><td>Protezione α-ammino; rimosso da TFA</td></tr>
+<tr><td>DCC (dicicloesilcarbodiimmide)</td><td>Attiva –COOH → O-acilisourea → reagisce con –NH₂ senza racemizzazione</td></tr>
+<tr><td>HOBt (idrossibenzotriazolo)</td><td>Coattivatore con DCC → riduce epimerizzazione ed effetti collaterali</td></tr>
+<tr><td>Fmoc (alternativa a Boc)</td><td>Rimosso da piperidina/DMF (più mite); usato nella sintesi moderna SPPS</td></tr>
+</table>
+</div>
+</section>
+
+<!-- S16 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s16">
+<h2>16 · Lipidi</h2>
+<h3>16.1 Acidi grassi: classificazione e struttura</h3>
+<div class="card">
+<p>Gli acidi grassi (AG) sono acidi carbossilici a catena lineare con numero pari di carboni. Nomenclatura: <code>Cn:m Δa,b…</code> (n = C totali, m = n° doppi legami, Δa = posizione dal C1).</p>
+<table>
+<tr><th>Nome comune</th><th>Sigla</th><th>Nomenclatura sistematica</th><th>Stato (25°C)</th><th>Fonte</th></tr>
+<tr><td>Laurico</td><td>C12:0</td><td>Acido dodecanóico</td><td>Solido</td><td>Olio di cocco, palma</td></tr>
+<tr><td>Miristico</td><td>C14:0</td><td>Acido tetradecanóico</td><td>Solido</td><td>Noce moscata, latticini</td></tr>
+<tr><td>Palmitico</td><td>C16:0</td><td>Acido esadecanóico</td><td>Solido</td><td>Palma, carne</td></tr>
+<tr><td>Stearico</td><td>C18:0</td><td>Acido ottadecanóico</td><td>Solido</td><td>Sego, burro di cacao</td></tr>
+<tr><td>Oleico</td><td>C18:1 Δ9<em>cis</em></td><td>Acido cis-9-ottadecenoico</td><td>Liquido</td><td>Olio d'oliva (ω-9)</td></tr>
+<tr><td>Linoleico*</td><td>C18:2 Δ9,12<em>cis</em></td><td>Acido cis,cis-9,12-ottadecadienoico</td><td>Liquido</td><td>Olio di girasole (ω-6)</td></tr>
+<tr><td>α-Linolenico*</td><td>C18:3 Δ9,12,15<em>cis</em></td><td>Acido all-cis-9,12,15-ottadecatrienoico</td><td>Liquido</td><td>Olio di lino (ω-3)</td></tr>
+<tr><td>Arachidonico</td><td>C20:4 Δ5,8,11,14</td><td>Acido all-cis-eicosatetraenoico</td><td>Liquido</td><td>Fosfolipidi animali (ω-6)</td></tr>
+<tr><td>EPA</td><td>C20:5 Δ5,8,11,14,17</td><td>Acido eicosapentaenoico</td><td>Liquido</td><td>Olio di pesce (ω-3)</td></tr>
+<tr><td>DHA</td><td>C22:6 Δ4,7,10,13,16,19</td><td>Acido docosaesaenoico</td><td>Liquido</td><td>Cervello, pesce (ω-3)</td></tr>
+</table>
+<div class="tip">* = essenziali: non sintetizzabili dai mammiferi, devono essere introdotti con la dieta. I doppi legami cis creano una curvatura ("kink") che abbassa Tm e mantiene le membrane fluide.</div>
+</div>
+
+<h3>16.2 Trigliceridi, cere e reazioni</h3>
+<div class="card">
+<p><strong>Trigliceridi (triacilgliceroli):</strong> estere del glicerolo con 3 acidi grassi (possono essere misti).</p>
+<div class="formula">CH₂–OOC–R₁      CH₂OH          3 R–COO⁻Na⁺
+|                   |           (sapone)
+CH –OOC–R₂  + 3NaOH → CHOH  +
+|                   |
+CH₂–OOC–R₃      CH₂OH
+(trigliceride)   (glicerolo)       saponificazione</div>
+<table style="margin-top:8px">
+<tr><th>Reazione</th><th>Reagenti</th><th>Prodotti</th><th>Applicazione</th></tr>
+<tr><td>Saponificazione</td><td>NaOH o KOH / H₂O, Δ</td><td>Sapone (sali RCOONa) + glicerolo</td><td>Detergente; KOH → sapone molle</td></tr>
+<tr><td>Transesterificazione (biodiesel)</td><td>CH₃OH / KOH cat.</td><td>3 RCOOCH₃ (FAME) + glicerolo</td><td>Biocarburante</td></tr>
+<tr><td>Idrogenazione parziale</td><td>H₂ / Ni, Δ</td><td>AG saturi parziali (margarina)</td><td>Solidificazione oli; rischio AG trans</td></tr>
+<tr><td>Ossidazione (rancidità)</td><td>O₂ atmosferico</td><td>Idroperossidi, aldeidi, chetoni</td><td>Degradazione indesiderata; antiossidanti (E306)</td></tr>
+</table>
+<p style="margin-top:8px"><strong>Cere:</strong> estere tra un AG a lunga catena (C16–C36) e un alcol a lunga catena. Es. cera d'api: palmitico C16 + miricilico C30. Impermeabili, punto di fusione elevato.</p>
+</div>
+
+<h3>16.3 Fosfolipidi, micelle e membrane biologiche</h3>
+<div class="card">
+<p><strong>Fosfatidilcolina (lecitina):</strong> struttura più abbondante nelle membrane.</p>
+<div class="formula">CH₂–OOC–R₁  (sn-1, satura)
+|
+CH –OOC–R₂  (sn-2, insatura cis, spesso C18:2 o C20:4)
+|
+CH₂–O–PO₃⁻–O–CH₂CH₂N⁺(CH₃)₃
+              ↑
+        testa polare (colina)</div>
+<div class="tip">La testa polare è idrofilica; le code degli AG sono idrofobiche. In acqua i fosfolipidi si auto-organizzano in <strong>doppio strato</strong> (bilayer, ~4 nm) con le code rivolte verso l'interno. Le micelle si formano con detergenti (un solo "tail").</div>
+<table style="margin-top:8px">
+<tr><th>Struttura</th><th>Componenti</th><th>Caratteristica</th></tr>
+<tr><td>Micella</td><td>Tensioattivi (saponi, SDS)</td><td>Sferoide ~5 nm, code al centro</td></tr>
+<tr><td>Liposoma</td><td>Fosfolipidi</td><td>Doppio strato chiuso; trasporto farmaci</td></tr>
+<tr><td>Membrana biologica</td><td>Fosfolipidi + colesterolo + glicoproteine</td><td>Fluidità modulata da colesterolo e AG insaturi</td></tr>
+</table>
+<p style="margin-top:8px"><strong>Colesterolo:</strong> steride, regola fluidità della membrana (rigidità a T alta, fluidità a T bassa). Precursore di ormoni steroidei, acidi biliari, vitamina D.</p>
+</div>
+
+<h3>16.4 Terpenoidi e steroidi</h3>
+<div class="card">
+<p>I terpenoidi seguono la <strong>regola dell'isoprene</strong>: assemblaggio di unità C₅ (IPP/DMAPP → isoprene).</p>
+<table>
+<tr><th>Classe</th><th>Unità C₅</th><th>C tot.</th><th>Esempi</th></tr>
+<tr><td>Monoterpeni</td><td>2</td><td>10</td><td>Mentolo, limonene, canfora, geranolo</td></tr>
+<tr><td>Sesquiterpeni</td><td>3</td><td>15</td><td>Farnesolo, artemisinina, bisabololo</td></tr>
+<tr><td>Diterpeni</td><td>4</td><td>20</td><td>Retinolo (vit. A), fitolo, Taxolo</td></tr>
+<tr><td>Sesterterpeni</td><td>5</td><td>25</td><td>Scalarina, manoalide</td></tr>
+<tr><td>Triterpeni</td><td>6</td><td>30</td><td>Squalene → lanosterolo → colesterolo</td></tr>
+<tr><td>Tetraterpeni</td><td>8</td><td>40</td><td>β-Carotene, licopene, xantofille</td></tr>
+</table>
+<div class="tip"><strong>Steroidi:</strong> nucleo a 4 anelli fusi (A/B/C/D, ciclopentanoperidrofenantrenyl). Biosintesi: squalene → lanosterolo → colesterolo (19 passaggi enzimatici). Da colesterolo: cortisolo, aldosterone, testosterone, estradiolo, vitamina D₃.</div>
+</div>
+</section>
+
+<!-- S17 ─────────────────────────────────────────────────────── -->
+<section class="sec" id="s17">
+<h2>17 · Nucleosidi &amp; Nucleotidi</h2>
+<h3>17.1 Basi azotate</h3>
+<div class="card">
+<table>
+<tr><th>Base</th><th>Tipo</th><th>In</th><th>Struttura</th><th>pKa</th></tr>
+<tr><td><strong>Adenina (A)</strong></td><td>Purina</td><td>DNA, RNA</td><td>6-aminopurina (biciclo pirimi + imidazolo)</td><td>4.1 (N1)</td></tr>
+<tr><td><strong>Guanina (G)</strong></td><td>Purina</td><td>DNA, RNA</td><td>2-amino-6-ossipurina</td><td>3.3 (N7)</td></tr>
+<tr><td><strong>Citosina (C)</strong></td><td>Pirimidina</td><td>DNA, RNA</td><td>4-aminouracile → 4-amino-2-ossopirimidina</td><td>4.5 (N3)</td></tr>
+<tr><td><strong>Timina (T)</strong></td><td>Pirimidina</td><td>solo DNA</td><td>5-metiluracile</td><td>9.9 (N3)</td></tr>
+<tr><td><strong>Uracile (U)</strong></td><td>Pirimidina</td><td>solo RNA</td><td>2,4-diossopurimidina</td><td>9.4 (N3)</td></tr>
+</table>
+<div class="tip">Purine: anello a 9 atomi (pirimidina fusa con imidazolo), N9 lega lo zucchero. Pirimidine: anello a 6 atomi, N1 lega lo zucchero. La sostituzione T→U (da DNA a RNA) rimuove il gruppo metilico; il riconoscimento è praticamente equivalente (Watson-Crick).</div>
+</div>
+
+<h3>17.2 Nucleosidi e nucleotidi</h3>
+<div class="card">
+<p><strong>Nucleoside</strong> = base + zucchero (legame N-glicosidico β da N9 delle purine o N1 delle pirimidine a C1' dello zucchero).</p>
+<p><strong>Nucleotide</strong> = nucleoside + 1–3 gruppi fosfato al C5'.</p>
+<table>
+<tr><th>Base</th><th>Ribonucleoside (RNA)</th><th>Desossiribonucleoside (DNA)</th><th>Mono-fosfato</th></tr>
+<tr><td>Adenina</td><td>Adenosina</td><td>Desossiadenosina (dA)</td><td>AMP / dAMP</td></tr>
+<tr><td>Guanina</td><td>Guanosina</td><td>Desossiguanosina (dG)</td><td>GMP / dGMP</td></tr>
+<tr><td>Citosina</td><td>Citidina</td><td>Desossicitidina (dC)</td><td>CMP / dCMP</td></tr>
+<tr><td>Uracile</td><td>Uridina</td><td>— (solo RNA)</td><td>UMP</td></tr>
+<tr><td>Timina</td><td>— (solo DNA)</td><td>Desossitimidina (dT)</td><td>dTMP</td></tr>
+</table>
+<div class="tip">Lo zucchero è β-D-ribofuranosio (RNA) o β-2'-desossi-D-ribofuranosio (DNA, manca OH in C2'). Il legame N-glicosidico è sempre β (base sopra il piano del ribosio nella proiezione Haworth).</div>
+</div>
+
+<h3>17.3 ATP e trasporto energetico</h3>
+<div class="card">
+<div class="formula">Adenosina–5'–O–PO₂⁻–O–PO₂⁻–O–PO₃²⁻
+                    α         β         γ
+                    ↑ legami fosfo-anidridici ad alta energia</div>
+<table>
+<tr><th>Idrolisi</th><th>ΔG°' (kJ/mol)</th><th>Prodotti</th></tr>
+<tr><td>ATP → ADP + Pᵢ</td><td>−30.5</td><td>Adenosina-5'-difosfato + fosfato</td></tr>
+<tr><td>ATP → AMP + PPᵢ</td><td>−45.6</td><td>Adenilato + pirofosfato</td></tr>
+<tr><td>PPᵢ → 2Pᵢ</td><td>−33.5</td><td>Guida molte biosintesi (PPᵢ idrolasi)</td></tr>
+</table>
+<div class="tip">L'alto ΔG° negativo dell'idrolisi ATP deriva da: (1) repulsione cariche negative nei polifosfati; (2) maggiore risonanza di ADP e Pᵢ rispetto ad ATP; (3) maggiore solvatazione dei prodotti. ATP è la "valuta energetica" della cellula ma non è un deposito (t½ ≈ 1–2 min).</div>
+<p style="margin-top:8px"><strong>Cofattori nucleotidici correlati:</strong></p>
+<table>
+<tr><th>Cofattore</th><th>Base</th><th>Funzione</th></tr>
+<tr><td>NAD⁺/NADH</td><td>Adenina + nicotinamide</td><td>Trasporto elettroni (ossidazione/riduzione)</td></tr>
+<tr><td>FAD/FADH₂</td><td>Adenina + riboflavina (B₂)</td><td>Ossidoriduzione (complessi resp.)</td></tr>
+<tr><td>CoA (Coenzima A)</td><td>Adenina + pantotenico (B₅)</td><td>Trasporto gruppi acile (–CO–S–CoA)</td></tr>
+<tr><td>cAMP</td><td>Adenina (3',5'-ciclico)</td><td>Secondo messaggero (ormoni, segnalazione)</td></tr>
+</table>
+</div>
+
+<h3>17.4 Legame fosfodiestere e struttura acidi nucleici</h3>
+<div class="card">
+<p>I nucleotidi nel DNA/RNA sono collegati dal <strong>legame fosfodiestere</strong> (3'–5'): il fosfato lega il C3'–OH di un nucleotide al C5'–OH del successivo.</p>
+<div class="formula">…–5'–CH₂–zucchero₁–3'–O–PO₂⁻–O–5'–CH₂–zucchero₂–3'–O–PO₂⁻–O–…
+                              ↑
+                   legame fosfodiestere (asse dello scheletro)</div>
+<table>
+<tr><th>Caratteristica</th><th>DNA</th><th>RNA</th></tr>
+<tr><td>Zucchero</td><td>2'-desossiribosio</td><td>Ribosio (2'-OH)</td></tr>
+<tr><td>Basi</td><td>A, G, C, T</td><td>A, G, C, U</td></tr>
+<tr><td>Struttura</td><td>Doppia elica (B-DNA: passo 3.4 nm, 10 bp/giro)</td><td>Singolo filamento (+ strutture secondarie)</td></tr>
+<tr><td>Coppie di basi</td><td>A=T (2 H-bond), G≡C (3 H-bond)</td><td>A=U (2 H-bond), G≡C (3 H-bond)</td></tr>
+<tr><td>Direzione catene</td><td>Antiparallele (5'→3' e 3'→5')</td><td>Tipicamente 5'→3'</td></tr>
+<tr><td>Stabilità</td><td>Molto stabile (desossiribosilazione)</td><td>Meno stabile (2'-OH catalizza idrolisi)</td></tr>
+</table>
+<div class="tip">Il contenuto G+C correla con la temperatura di melting (Tm): ogni G≡C contribuisce ~3°C vs ~2°C di ogni A=T. Formula approssimata: Tm ≈ 69.3 + 0.41 × %G+C (per DNA &gt;2 kbp in 0.9 M NaCl).</div>
+</div>
+</section>
+
+</div><!-- #main -->
+</div><!-- #layout -->
+<script>
+// Navigation
+function goS(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-s').forEach(function(el){
+    el.classList.toggle('active',el.getAttribute('onclick')==="goS('"+id+"')");
+  });
+}
+window.addEventListener('scroll',function(){
+  var mid=window.scrollY+window.innerHeight/2;
+  var active='s1';
+  ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.offsetTop<=mid)active=id;
+  });
+  document.querySelectorAll('.nav-s').forEach(function(el){
+    el.classList.toggle('active',el.getAttribute('onclick')==="goS('"+active+"')");
+  });
+},{passive:true});
+
+// ── Newman Projection ───────────────────────────────────────────
+function drawNm(){
+  var c=document.getElementById('nmC'),ctx=c.getContext('2d');
+  var mol=document.getElementById('nmMol').value;
+  var phi=parseFloat(document.getElementById('nmPhi').value);
+  document.getElementById('nmPhiV').textContent=Math.round(phi)+'°';
+  var W=c.width,H=c.height,cx=W/2,cy=H/2,R=72,r=11,TR=Math.PI/180;
+  ctx.clearRect(0,0,W,H);
+
+  var fl=['H','H','H'],bl=['H','H','H'];
+  if(mol==='but'){fl[0]='CH₃';bl[0]='CH₃';}
+
+  var ba=[phi*TR,(phi+120)*TR,(phi+240)*TR];
+  var fa=[0,2*Math.PI/3,4*Math.PI/3];
+
+  // Back bonds dashed
+  ctx.setLineDash([4,4]);ctx.strokeStyle='#9fb3c8';ctx.lineWidth=1.5;
+  ba.forEach(function(a){ctx.beginPath();ctx.moveTo(cx+R*.28*Math.cos(a),cy+R*.28*Math.sin(a));ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.stroke();});
+  ctx.setLineDash([]);
+
+  // Back labels
+  ctx.font='bold 10px sans-serif';ctx.fillStyle='#9fb3c8';
+  ba.forEach(function(a,i){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(bl[i],cx+(R+17)*Math.cos(a),cy+(R+17)*Math.sin(a));});
+
+  // Ring
+  ctx.beginPath();ctx.arc(cx,cy,R,0,2*Math.PI);ctx.strokeStyle='#1c3a57';ctx.lineWidth=1.8;ctx.stroke();
+
+  // Front bonds
+  ctx.strokeStyle='#00c9b7';ctx.lineWidth=2.5;
+  fa.forEach(function(a){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.stroke();});
+
+  // Front circle
+  ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.fillStyle='#0d2236';ctx.fill();ctx.strokeStyle='#00c9b7';ctx.lineWidth=2;ctx.stroke();
+
+  // Front labels
+  ctx.fillStyle='#e8eef4';ctx.font='bold 10px sans-serif';
+  fa.forEach(function(a,i){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(fl[i],cx+(R+17)*Math.cos(a),cy+(R+17)*Math.sin(a));});
+
+  // Conf name
+  var p=((phi%360)+360)%360,nm='';
+  if(mol==='eth'){
+    if(p<12||p>348)nm='Eclissata';else if(Math.abs(p-60)<12)nm='Sfalsata';
+    else if(Math.abs(p-120)<12)nm='Eclissata';else if(Math.abs(p-180)<12)nm='Sfalsata';
+    else if(Math.abs(p-240)<12)nm='Eclissata';else if(Math.abs(p-300)<12)nm='Sfalsata';
+  }else{
+    if(Math.abs(p-180)<15)nm='Anti';
+    else if(Math.abs(p-60)<15||Math.abs(p-300)<15)nm='Gauche';
+    else if(p<12||p>348||Math.abs(p-120)<12||Math.abs(p-240)<12)nm='Eclissata';
+  }
+  ctx.fillStyle='#00c9b7';ctx.font='bold 11px sans-serif';ctx.textAlign='right';ctx.fillText(nm,W-10,16);
+  ctx.fillStyle='#ffb454';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('φ='+Math.round(phi)+'°',10,16);
+
+  drawNmEnergy();
+}
+
+function drawNmEnergy(){
+  var c=document.getElementById('nmEn'),ctx=c.getContext('2d');
+  var mol=document.getElementById('nmMol').value;
+  var phi=parseFloat(document.getElementById('nmPhi').value);
+  var W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  var pl={l:32,r:10,t:12,b:26},gW=W-pl.l-pl.r,gH=H-pl.t-pl.b;
+
+  function eE(d){var r=d*Math.PI/180;return 6.5*(1-Math.cos(3*r))/2;}
+  function eB(d){var r=d*Math.PI/180;return 9.5*(1-Math.cos(r))/2+3*(1-Math.cos(3*r))/2;}
+  var fn=mol==='eth'?eE:eB,mx=mol==='eth'?14:22;
+
+  ctx.strokeStyle='#1c3a57';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pl.l,pl.t);ctx.lineTo(pl.l,pl.t+gH);ctx.lineTo(pl.l+gW,pl.t+gH);ctx.stroke();
+  ctx.fillStyle='#9fb3c8';ctx.font='9px sans-serif';ctx.textAlign='center';
+  [0,60,120,180,240,300,360].forEach(function(d){ctx.fillText(d+'°',pl.l+(d/360)*gW,pl.t+gH+14);});
+  ctx.textAlign='right';
+  [0,10,20].forEach(function(v){var y=pl.t+gH-(v/mx)*gH;if(y>pl.t)ctx.fillText(v,pl.l-2,y+3);});
+
+  ctx.beginPath();ctx.strokeStyle='#00c9b7';ctx.lineWidth=2;
+  for(var d=0;d<=360;d+=2){var x=pl.l+(d/360)*gW,y=pl.t+gH-(fn(d)/mx)*gH;if(d===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+
+  var ex=pl.l+(phi/360)*gW,ey=pl.t+gH-(fn(phi)/mx)*gH;
+  ctx.beginPath();ctx.arc(ex,ey,5,0,2*Math.PI);ctx.fillStyle='#ffb454';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+}
+
+// ── Chair ───────────────────────────────────────────────────────
+function drawCh(){
+  var c=document.getElementById('chC'),ctx=c.getContext('2d');
+  var mode=document.getElementById('chMode').value;
+  var W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2,cy=H/2+8;
+  var xs=[cx-100,cx-50,cx+50,cx+100,cx+50,cx-50];
+  var ys=[cy,cy-38,cy-38,cy,cy+38,cy+38];
+
+  ctx.strokeStyle='#00c9b7';ctx.lineWidth=2.5;
+  for(var i=0;i<6;i++){var n=(i+1)%6;ctx.beginPath();ctx.moveTo(xs[i],ys[i]);ctx.lineTo(xs[n],ys[n]);ctx.stroke();}
+  xs.forEach(function(x,i){ctx.beginPath();ctx.arc(x,ys[i],3.5,0,2*Math.PI);ctx.fillStyle='#0d2236';ctx.fill();ctx.strokeStyle='#9fb3c8';ctx.lineWidth=1;ctx.stroke();});
+  if(mode==='plain')return;
+
+  var axU=[0,2,4],axD=[1,3,5];
+  var eqD=[[38,-10],[38,10],[-38,-10],[-38,10],[-38,10],[38,-10]];
+
+  function bond(x,y,dx,dy,col,lbl,thick){
+    ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=thick||1.8;
+    ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();
+    if(lbl){ctx.fillStyle=col;ctx.font=(thick?'bold ':'')+' 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbl,x+dx+(dx>0?10:-10),y+dy+(dy>0?5:-5));}
+  }
+
+  if(mode==='ae'){
+    xs.forEach(function(x,i){bond(x,ys[i],0,(axU.indexOf(i)>=0)?-40:40,'#ff6b6b','ax');});
+    xs.forEach(function(x,i){bond(x,ys[i],eqD[i][0],eqD[i][1],'#4caf80','eq');});
+  }else if(mode==='meq'){
+    bond(xs[0],ys[0],eqD[0][0],eqD[0][1],'#00c9b7','CH₃',2.5);
+    xs.forEach(function(x,i){if(i>0)bond(x,ys[i],0,(axU.indexOf(i)>=0)?-40:40,'#ff6b6b','H');});
+    ctx.fillStyle='#4caf80';ctx.font='bold 10px sans-serif';ctx.textAlign='left';ctx.fillText('Me equatoriale — più stabile (ΔG≈−7.3 kJ/mol)',10,18);
+  }else if(mode==='max'){
+    bond(xs[0],ys[0],0,-40,'#ff6b6b','CH₃',2.5);
+    xs.forEach(function(x,i){if(i>0)bond(x,ys[i],eqD[i][0],eqD[i][1],'#4caf80','H');});
+    ctx.fillStyle='#ffb454';ctx.font='bold 10px sans-serif';ctx.textAlign='left';ctx.fillText('Me assiale — interaz. 1,3-diassiali (+7.3 kJ/mol)',10,18);
+  }
+}
+
+// ── SN Energy ───────────────────────────────────────────────────
+function drawSN(){
+  var c=document.getElementById('snC'),ctx=c.getContext('2d');
+  var mech=document.getElementById('snM').value,sub=document.getElementById('snS').value;
+  var W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  var pl={l:40,r:12,t:18,b:34},gW=W-pl.l-pl.r,gH=H-pl.t-pl.b;
+
+  ctx.strokeStyle='#1c3a57';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pl.l,pl.t);ctx.lineTo(pl.l,pl.t+gH);ctx.lineTo(pl.l+gW,pl.t+gH);ctx.stroke();
+  ctx.fillStyle='#9fb3c8';ctx.font='9px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Coordinata di reazione →',pl.l+gW/2,H-3);
+  ctx.save();ctx.translate(11,pl.t+gH/2);ctx.rotate(-Math.PI/2);ctx.fillText('Energia',0,0);ctx.restore();
+
+  var col=mech==='sn2'?'#00c9b7':'#ffb454';
+  ctx.strokeStyle=col;ctx.lineWidth=2.5;
+
+  if(mech==='sn2'){
+    var Ea={'p':11,'s':22,'t':40}[sub];
+    var pts=[{x:0,y:0},{x:.5,y:Ea/55},{x:1,y:.1}];
+    drawSmooth(ctx,pts,pl,gW,gH);
+    var tx=pl.l+gW*.5,ty=pl.t+gH-(Ea/55)*gH;
+    ctx.fillStyle=col;ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('TS‡',tx,ty-9);
+    ctx.fillStyle='#9fb3c8';ctx.font='9px sans-serif';
+    ctx.fillText('Nu:   +  R–X',pl.l+8,pl.t+gH+16);
+    ctx.fillText('Nu–R  +  :X⁻',pl.l+gW-14,pl.t+gH+16);
+    ctx.fillStyle=col;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('SN2: un TS — inversione Walden',pl.l+gW/2,pl.t+9);
+  }else{
+    var Ea1={'p':35,'s':22,'t':10}[sub];
+    var intY=Ea1*0.3/55;
+    var pts2=[{x:0,y:0},{x:.3,y:Ea1/55},{x:.5,y:intY},{x:.72,y:Ea1*.45/55},{x:1,y:.1}];
+    drawSmooth(ctx,pts2,pl,gW,gH);
+    var ts1x=pl.l+gW*.3,ts1y=pl.t+gH-(Ea1/55)*gH;
+    ctx.fillStyle=col;ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('TS₁‡',ts1x,ts1y-9);
+    ctx.fillText('R⁺ + X⁻',pl.l+gW*.5,(pl.t+gH-(intY)*gH)-10);
+    ctx.fillStyle='#9fb3c8';ctx.font='9px sans-serif';
+    ctx.fillText('R–X',pl.l+8,pl.t+gH+16);ctx.fillText('R–Nu',pl.l+gW-14,pl.t+gH+16);
+    ctx.fillStyle=col;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('SN1: 2 stadi via C⁺ → possibile racemizzazione',pl.l+gW/2,pl.t+9);
+  }
+}
+
+function drawSmooth(ctx,pts,pl,gW,gH){
+  ctx.beginPath();
+  for(var t=0;t<=1;t+=0.008){
+    var i=Math.floor(t*(pts.length-1));
+    if(i>=pts.length-1)i=pts.length-2;
+    var tt=(t*(pts.length-1))-i;
+    var p0=pts[Math.max(i-1,0)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(i+2,pts.length-1)];
+    var tt2=tt*tt,tt3=tt2*tt;
+    var xi=.5*((-p0.x+3*p1.x-3*p2.x+p3.x)*tt3+(2*p0.x-5*p1.x+4*p2.x-p3.x)*tt2+(-p0.x+p2.x)*tt+2*p1.x);
+    var yi=.5*((-p0.y+3*p1.y-3*p2.y+p3.y)*tt3+(2*p0.y-5*p1.y+4*p2.y-p3.y)*tt2+(-p0.y+p2.y)*tt+2*p1.y);
+    var px=pl.l+xi*gW,py=pl.t+(gH-yi*gH);
+    if(t===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+}
+
+window.addEventListener('load',function(){drawNm();drawCh();drawSN();});
+
+// Show floating back button when embedded in BioSpecInfo overlay
+(function(){
+  try{
+    if(window.self!==window.top){
+      document.getElementById('bsi-co-back').style.display='block';
+    }
+  }catch(e){
+    document.getElementById('bsi-co-back').style.display='block';
+  }
+})();
+</script>
+
+<style>
+#bsi-co-back{position:fixed;bottom:16px;right:14px;z-index:9997;display:none}
+#bsi-co-back>button{background:#071221;border:2px solid #00c9b7;color:#00c9b7;border-radius:22px;padding:10px 22px;font-size:.82rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.65),0 0 14px rgba(0,201,183,.15);letter-spacing:.025em;transition:background .15s,transform .12s}
+#bsi-co-back>button:hover{background:rgba(0,201,183,.1);transform:scale(1.05)}
+#bsi-co-back>button:active{transform:scale(.95)}
+</style>
+<div id="bsi-co-back">
+  <button onclick="try{window.parent.document.getElementById('bsi-chimorga-ov').style.display='none';}catch(e){}" title="Torna all\'app">◀ Indietro</button>
+</div>
+</body>
+</html>

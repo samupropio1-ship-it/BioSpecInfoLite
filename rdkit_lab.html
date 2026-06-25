@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RDKit Cheminformatics Lab — BioSpecInfo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0a1b2e;color:#d4e0ec;line-height:1.55;min-height:100vh}
+h2{color:#e8eef4;font-size:1.05rem;margin:.9em 0 .4em;border-left:3px solid #00c9b7;padding-left:8px}
+h3{color:#9fb3c8;font-size:.92rem;margin:.7em 0 .25em}
+h4{color:#e8eef4;font-size:.88rem;margin:.6em 0 .2em}
+p{margin:.35em 0}
+strong{color:#e8eef4}
+ul,ol{margin:.4em 0 .4em 1.4em}li{margin:.2em 0}
+code{background:#071221;border:1px solid #1c3a57;border-radius:3px;padding:1px 6px;font-size:.86em;color:#00c9b7;font-family:monospace}
+.smiles-eg{display:inline-block;background:#071221;border:1px solid #1c3a57;border-radius:4px;padding:2px 8px;font-family:monospace;font-size:.85em;color:#ffb454;cursor:pointer;transition:border-color .15s}
+.smiles-eg:hover{border-color:#00c9b7;color:#00c9b7}
+table{border-collapse:collapse;width:100%;margin:.4em 0;font-size:.84em}
+th{background:#071221;color:#00c9b7;padding:5px 9px;text-align:left;border:1px solid #1c3a57}
+td{padding:4px 9px;border:1px solid #1c3a57;color:#d4e0ec;vertical-align:top}
+tr:nth-child(even) td{background:rgba(7,18,33,.35)}
+kbd{display:inline-block;background:#071221;border:1px solid #1c3a57;border-radius:3px;padding:1px 6px;font-size:.8em;color:#e8eef4;font-family:monospace}
+
+/* Layout */
+#app{display:flex;flex-direction:column;min-height:100vh}
+#topbar{display:flex;align-items:center;gap:0;background:#071221;border-bottom:1px solid #1c3a57;height:44px;padding:0 12px;flex-shrink:0;overflow-x:auto;white-space:nowrap}
+#topbar .logo{color:#00c9b7;font-weight:800;font-size:.88rem;margin-right:10px;white-space:nowrap}
+.tab{padding:0 10px;height:100%;display:inline-flex;align-items:center;color:#9fb3c8;font-size:.78rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;user-select:none}
+.tab.active{color:#00c9b7;border-bottom-color:#00c9b7}
+.tab:hover:not(.active){color:#e2e8f0}
+#content{flex:1;overflow-y:auto}
+.panel{display:none;padding:14px 16px;max-width:940px}
+.panel.active{display:block}
+
+/* Cards */
+.card{background:#0d2236;border:1px solid #1c3a57;border-radius:7px;padding:11px 13px;margin:.55em 0}
+.card-dark{background:#071221}
+.tip{background:#071c2e;border-left:3px solid #00c9b7;padding:7px 11px;border-radius:0 5px 5px 0;margin:.5em 0;font-size:.87rem}
+.warn{background:#1c0e00;border-left:3px solid #ffb454;padding:7px 11px;border-radius:0 5px 5px 0;margin:.5em 0;font-size:.87rem}
+.note{background:#0d1f10;border-left:3px solid #4caf80;padding:7px 11px;border-radius:0 5px 5px 0;margin:.5em 0;font-size:.87rem}
+
+/* Inputs */
+input[type=text],select{background:#071221;color:#e8eef4;border:1px solid #1c3a57;border-radius:5px;padding:7px 10px;font-size:.87rem;font-family:inherit;outline:none;transition:border-color .15s;width:100%}
+input[type=text]:focus,select:focus{border-color:#00c9b7}
+.inp-row{display:flex;gap:7px;align-items:stretch;margin:.5em 0;flex-wrap:wrap}
+.inp-row input[type=text]{flex:1;min-width:180px}
+.btn{background:#0a7a71;color:#fff;border:none;border-radius:5px;padding:7px 13px;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn:hover:not(:disabled){background:#00a898}
+.btn:disabled{background:#1c3a57;color:#9fb3c8;cursor:not-allowed;opacity:.7}
+.btn-sm{padding:4px 9px;font-size:.77rem}
+.btn-outline{background:transparent;border:1px solid #1c3a57;color:#9fb3c8}
+.btn-outline:hover:not(:disabled){border-color:#00c9b7;color:#00c9b7;background:transparent}
+.btn-danger{background:transparent;border:1px solid rgba(255,107,107,.4);color:#ff6b6b}
+.btn-danger:hover:not(:disabled){background:rgba(255,107,107,.1)}
+
+/* Status bar */
+#rdkit-status{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#071221;border:1px solid #1c3a57;border-radius:7px;margin-bottom:10px;font-size:.86rem}
+.spinner{width:16px;height:16px;border:2px solid #1c3a57;border-top-color:#00c9b7;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.s-ok{color:#4caf80}.s-err{color:#ff6b6b}.s-loading{color:#9fb3c8}
+
+/* Molecule viewer */
+#mol-svg-box{background:#fff;border-radius:7px;border:2px solid #1c3a57;min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#mol-svg-box svg{max-width:100%;height:auto}
+.placeholder{color:#9fb3c8;font-size:.83rem;text-align:center;padding:20px}
+
+/* Descriptors grid */
+.desc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px;margin:.5em 0}
+.di{background:#071221;border:1px solid #1c3a57;border-radius:6px;padding:8px 10px;position:relative}
+.di .dv{font-size:1.15rem;font-weight:700;color:#00c9b7}
+.di .dk{font-size:.73rem;color:#9fb3c8;margin-top:2px}
+.di .dh{font-size:.68rem;color:#1c3a57;font-style:italic;margin-top:1px;line-height:1.3}
+.di.ok{border-color:#4caf80}.di.ok .dv{color:#4caf80}
+.di.warn{border-color:#ffb454}.di.warn .dv{color:#ffb454}
+.di.bad{border-color:#ff6b6b}.di.bad .dv{color:#ff6b6b}
+
+/* Drug-likeness */
+.rule-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1c3a57;font-size:.84rem}
+.rule-row:last-child{border-bottom:none}
+.rbadge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.73rem;font-weight:700;flex-shrink:0}
+.rb-ok{background:rgba(76,175,128,.15);color:#4caf80}
+.rb-no{background:rgba(255,107,107,.15);color:#ff6b6b}
+.rb-warn{background:rgba(255,180,84,.15);color:#ffb454}
+.score-bar{height:6px;background:#1c3a57;border-radius:3px;overflow:hidden;margin:6px 0 2px}
+.score-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* Similarity */
+.fp-bar{height:7px;background:#1c3a57;border-radius:4px;overflow:hidden;margin:3px 0}
+.fp-fill{height:100%;background:#00c9b7;border-radius:4px;transition:width .4s}
+.sim-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1c3a57;font-size:.82rem}
+.sim-row:last-child{border-bottom:none}
+
+/* Library */
+.lib-item{background:#071221;border:1px solid #1c3a57;border-radius:6px;padding:7px 10px;margin:.3em 0;display:flex;align-items:center;gap:8px;font-size:.82rem}
+.li-name{flex:1;color:#e8eef4;min-width:80px}
+.li-smi{color:#9fb3c8;font-size:.73rem;font-family:monospace;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Export */
+.export-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+
+/* Tooltip (CSS-only) */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:#0d2236;color:#d4e0ec;border:1px solid #1c3a57;border-radius:5px;padding:5px 9px;font-size:.73rem;white-space:pre-wrap;z-index:999;pointer-events:none;max-width:260px;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+
+/* QSAR */
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:.6em 0}
+.pred-item{background:#071221;border:1px solid #1c3a57;border-radius:7px;padding:10px 12px}
+.pred-item .pv{font-size:1.1rem;font-weight:700;margin-bottom:3px}
+.pred-item .pk{font-size:.75rem;color:#9fb3c8}
+.pred-item .pe{font-size:.72rem;color:#1c3a57;margin-top:3px;line-height:1.3}
+.meter{height:8px;background:#1c3a57;border-radius:4px;overflow:hidden;margin:5px 0 2px}
+.meter-fill{height:100%;border-radius:4px}
+
+/* Guide specific */
+.guide-step{display:flex;gap:12px;margin:.7em 0;align-items:flex-start}
+.step-num{width:26px;height:26px;border-radius:50%;background:#00c9b7;color:#071221;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.syntax-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #1c3a57;font-size:.84rem}
+.syntax-row:last-child{border-bottom:none}
+.sx{font-family:monospace;color:#ffb454;min-width:80px}
+.accordion{border:1px solid #1c3a57;border-radius:7px;margin:.45em 0;overflow:hidden}
+.acc-head{background:#071221;padding:9px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.88rem;color:#e8eef4;font-weight:600;user-select:none}
+.acc-head:hover{background:#0d1f33}
+.acc-head .arr{color:#9fb3c8;transition:transform .2s;font-size:.8rem}
+.acc-body{display:none;padding:11px 13px;background:#0d2236;font-size:.85rem}
+.acc-body.open{display:block}
+
+@media(max-width:620px){.desc-grid,.pred-grid{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}.inp-row{flex-direction:column}#mol-grid{grid-template-columns:1fr}}
+
+/* SMARTS tab */
+.smarts-pill{display:inline-block;background:#071221;border:1px solid #1c3a57;border-radius:12px;padding:3px 10px;font-family:monospace;font-size:.79em;color:#00c9b7;cursor:pointer;margin:2px;transition:border-color .12s,color .12s;user-select:none}
+.smarts-pill:hover{border-color:#ffb454;color:#ffb454}
+.smarts-pill .sg{color:#9fb3c8;font-size:.85em;font-family:inherit;font-style:italic}
+#smarts-sv{background:#fff;border-radius:7px;border:2px solid #1c3a57;min-height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#smarts-sv svg{max-width:100%;height:auto}
+/* Confronto tab */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp-sv{background:#fff;border-radius:7px;border:2px solid #1c3a57;min-height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cmp-sv svg{max-width:100%;height:auto}
+.delta-pos{color:#4caf80}
+.delta-neg{color:#ff6b6b}
+.delta-neu{color:#9fb3c8}
+/* Radar */
+#radar-wrap{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:.8em 0;display:none}
+#radar-cv{background:#071221;border-radius:10px;border:1px solid #1c3a57}
+.radar-legend{font-size:.77rem}
+.rl-row{display:flex;align-items:center;gap:6px;margin:.18em 0}
+.rl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* QED */
+.qed-hero{text-align:center;padding:12px;background:#071221;border-radius:8px;border:2px solid #00c9b7;display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.qed-num{font-size:2.4rem;font-weight:900;line-height:1;min-width:80px}
+.qed-bar-row{display:flex;align-items:center;gap:7px;padding:.2em 0;font-size:.79rem}
+.qed-bar-label{min-width:52px;color:#9fb3c8;font-family:monospace}
+.qed-bar-track{flex:1;height:7px;background:#1c3a57;border-radius:3px;overflow:hidden}
+.qed-bar-fill{height:100%;border-radius:3px;transition:width .45s}
+.qed-bar-val{min-width:34px;text-align:right;font-size:.74rem}
+/* SA Score */
+.sa-dial{display:inline-flex;flex-direction:column;align-items:center;padding:10px 18px;border-radius:8px;background:#071221}
+/* FP Visualizer */
+#fp-canvas{border-radius:6px;border:1px solid #1c3a57;display:block;cursor:pointer}
+.fp-legend{display:flex;gap:14px;font-size:.76rem;margin-top:6px;flex-wrap:wrap}
+/* InChI */
+.inchi-blk{margin-top:5px}
+.inchi-row{display:flex;align-items:center;gap:5px;margin:.15em 0}
+.inchi-lbl{color:#9fb3c8;font-size:.72rem;min-width:65px;flex-shrink:0}
+.inchi-val{font-family:monospace;font-size:.73rem;color:#d4e0ec;word-break:break-all;flex:1}
+@media(max-width:500px){.cmp-grid{grid-template-columns:1fr}}
+/* ── Floating back button ── */
+#bsi-float-back{position:fixed;bottom:16px;right:14px;z-index:9997;display:none}
+#bsi-float-back>button{background:#071221;border:2px solid #00c9b7;color:#00c9b7;border-radius:22px;padding:10px 22px;font-size:.82rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.65),0 0 14px rgba(0,201,183,.15);letter-spacing:.025em;transition:background .15s,transform .12s,box-shadow .15s}
+#bsi-float-back>button:hover{background:rgba(0,201,183,.1);transform:scale(1.05);box-shadow:0 6px 24px rgba(0,0,0,.8),0 0 22px rgba(0,201,183,.28)}
+#bsi-float-back>button:active{transform:scale(.95)}
+/* ── Panel entrance ── */
+.panel.active{animation:bsiPanelIn .2s ease both}
+@keyframes bsiPanelIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ── QED SVG gauge ── */
+.qed-gauge-ring{fill:none;stroke:#1c3a57;stroke-width:9}
+.qed-gauge-arc{fill:none;stroke-width:9;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50px 50px;transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke .4s}
+/* ── Animated score bars ── */
+.score-fill{transition:width .75s cubic-bezier(.4,0,.2,1)}
+.meter-fill{transition:width .75s cubic-bezier(.4,0,.2,1)}
+.fp-fill{transition:width .65s cubic-bezier(.4,0,.2,1)}
+.qed-bar-fill{transition:width .8s cubic-bezier(.4,0,.2,1)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="topbar">
+  <div class="logo">🧪 RDKit Lab</div>
+  <div class="tab active" data-panel="p-mol" onclick="showPanel(this,'p-mol')">🔬 Molecola</div>
+  <div class="tab" data-panel="p-desc" onclick="showPanel(this,'p-desc')">📊 Descrittori</div>
+  <div class="tab" data-panel="p-drug" onclick="showPanel(this,'p-drug')">💊 Drug-likeness</div>
+  <div class="tab" data-panel="p-qsar" onclick="showPanel(this,'p-qsar')">🔮 QSAR</div>
+  <div class="tab" data-panel="p-sim" onclick="showPanel(this,'p-sim')">🔗 Similarità</div>
+  <div class="tab" data-panel="p-smarts" onclick="showPanel(this,'p-smarts')">🔍 SMARTS</div>
+  <div class="tab" data-panel="p-cmp" onclick="showPanel(this,'p-cmp')">⚖️ Confronto</div>
+  <div class="tab" data-panel="p-lib" onclick="showPanel(this,'p-lib')">📚 Libreria</div>
+  <div class="tab" data-panel="p-guide" onclick="showPanel(this,'p-guide')">📖 Guida</div>
+</div>
+
+<div id="content">
+<div style="padding:8px 16px 0">
+<div id="rdkit-status">
+  <div class="spinner" id="rdk-spin"></div>
+  <span id="rdk-msg" class="s-loading">Caricamento RDKit.js…</span>
+  <span id="rdk-ver" style="color:#1c3a57;font-size:.73rem;margin-left:auto"></span>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: MOLECOLA -->
+<div class="panel active" id="p-mol">
+<h2>🔬 Visualizzatore Molecolare</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="smiles-input" placeholder="Inserisci SMILES — es. CC(=O)Nc1ccc(O)cc1 (paracetamolo)"
+      onkeydown="if(event.key==='Enter')analyzeMol()">
+    <button class="btn" onclick="analyzeMol()">Analizza</button>
+    <button class="btn btn-outline btn-sm" onclick="loadExample()">Esempio</button>
+  </div>
+  <div style="font-size:.76rem;color:#9fb3c8;margin-top:4px">
+    Farmaci noti: premi per caricare
+    <span style="color:#1c3a57"> · <kbd>Enter</kbd> per analizzare</span>
+  </div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)Nc1ccc(O)cc1')">Paracetamolo</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Ibuprofene</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C(O)c1ccccc1OC(C)=O')">Aspirina</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CCC[C@H]1c2cccnc2')">Nicotina</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1cnc2N(C)C(=O)N(C)c12')">Caffeina</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCc1ccc(O)c(O)c1')">Dopamina</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')">Testosterone</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O')">Glucosio</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1=C2[C@@]([C@H](C(=O)[C@@H]3[C@@]2(C[C@@H]([C@H]4[C@]3(COC4=O)OC(=O)c5ccccc5)O)C)OC(=O)[C@@H](NC(=O)c6ccccc6)c7ccccc7)(C[C@@H]1OC(=O)[C@H](O)[C@@H](NC(=O)c8ccccc8)c9ccccc9)O')">Paclitaxel</button>
+    <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34')">Pirene</button>
+  </div>
+</div>
+
+<div id="mol-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+  <div>
+    <h3>Struttura 2D <span style="color:#1c3a57;font-size:.7rem">(generata da RDKit)</span></h3>
+    <div id="mol-svg-box"><div class="placeholder">Inserisci uno SMILES e premi Analizza<br>oppure clicca su un farmaco qui sopra</div></div>
+    <div class="export-row">
+      <button class="btn btn-sm btn-outline" id="btn-svg" onclick="exportSVG()" disabled>⬇ SVG</button>
+      <button class="btn btn-sm btn-outline" id="btn-png" onclick="exportPNG()" disabled>⬇ PNG</button>
+      <button class="btn btn-sm btn-outline" id="btn-cpsmi" onclick="copySMILES()" disabled>📋 Copia SMILES</button>
+      <button class="btn btn-sm" id="btn-addlib" onclick="addToLibrary()" disabled>+ Libreria</button>
+    </div>
+  </div>
+  <div>
+    <h3>Info molecola</h3>
+    <div class="card card-dark" id="mol-info" style="min-height:90px;font-size:.82rem;color:#9fb3c8">
+      Nessuna molecola caricata.
+    </div>
+    <div id="mol-inchi" style="display:none" class="card card-dark inchi-blk"></div>
+    <h3 style="margin-top:10px">Descrittori rapidi</h3>
+    <div id="mol-desc-quick" class="desc-grid"></div>
+  </div>
+</div>
+<div id="mol-err" class="warn" style="display:none;margin-top:8px"></div>
+
+<div style="margin-top:10px">
+  <button class="btn btn-outline btn-sm" onclick="runAllTabs()" id="btn-runall" disabled>⚡ Analisi completa (tutti i tab)</button>
+  <span style="color:#9fb3c8;font-size:.75rem;margin-left:8px">Calcola descrittori + drug-likeness + QSAR in un clic</span>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: DESCRITTORI -->
+<div class="panel" id="p-desc">
+<h2>📊 Descrittori Molecolari Completi</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="desc-smiles" placeholder="SMILES (oppure usa ← per caricare dal tab Molecola)"
+      onkeydown="if(event.key==='Enter')calcDescriptors()">
+    <button class="btn" onclick="calcDescriptors()">Calcola</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('desc-smiles')">← da Molecola</button>
+  </div>
+</div>
+<div id="desc-result"></div>
+<div id="desc-export" style="display:none" class="export-row">
+  <button class="btn btn-sm btn-outline" onclick="exportDescJSON()">⬇ JSON</button>
+  <button class="btn btn-sm btn-outline" onclick="exportDescCSV()">⬇ CSV</button>
+</div>
+<div class="tip" style="margin-top:10px">
+  <strong>Hover</strong> su ogni descrittore per leggerne la spiegazione. Colori: <span style="color:#4caf80">verde = range ottimale</span>, <span style="color:#ffb454">giallo = attenzione</span>, <span style="color:#ff6b6b">rosso = fuori range farmaceutico</span>.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: DRUG-LIKENESS -->
+<div class="panel" id="p-drug">
+<h2>💊 Drug-likeness — Regole Farmaceutiche</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="drug-smiles" placeholder="SMILES" onkeydown="if(event.key==='Enter')calcDrugLike()">
+    <button class="btn" onclick="calcDrugLike()">Valuta</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('drug-smiles')">← da Molecola</button>
+  </div>
+</div>
+<div id="drug-result"></div>
+<div id="drug-qed-box" style="display:none;margin-top:10px"></div>
+<div id="radar-wrap">
+  <canvas id="radar-cv" width="230" height="230"></canvas>
+  <div class="radar-legend card card-dark" style="min-width:150px">
+    <div style="color:#e8eef4;font-weight:700;font-size:.82rem;margin-bottom:6px">Drug Profile</div>
+    <div id="radar-legend-rows"></div>
+    <div style="margin-top:8px;color:#9fb3c8;font-size:.72rem">Score = distanza da centro<br>1.0 = range ottimale farmaci</div>
+  </div>
+</div>
+<div class="tip" style="margin-top:10px">
+  Le regole indicano la <em>probabilità</em> che una molecola sia un buon candidato farmaco, non una certezza. Alcuni farmaci approvati violano le regole (es. Paclitaxel). Le regole sono valide per la somministrazione <strong>orale</strong>.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: QSAR -->
+<div class="panel" id="p-qsar">
+<h2>🔮 Predizioni QSAR</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="qsar-smiles" placeholder="SMILES" onkeydown="if(event.key==='Enter')calcQSAR()">
+    <button class="btn" onclick="calcQSAR()">Predici</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('qsar-smiles')">← da Molecola</button>
+  </div>
+</div>
+<div id="qsar-result"></div>
+<div class="warn" style="margin-top:10px">
+  <strong>Nota metodologica:</strong> queste predizioni usano modelli empirici basati sui descrittori RDKit (TPSA, LogP, MW, HBD, HBA, FrCSP3, RotBonds). Non sono modelli ML addestrati su dataset biologici. Usarle come <em>indicazioni orientative</em>, non come previsioni cliniche.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: SIMILARITÀ -->
+<div class="panel" id="p-sim">
+<h2>🔗 Fingerprint e Similarità di Tanimoto</h2>
+
+<div class="card">
+  <h3>Confronto diretto tra due molecole</h3>
+  <div class="inp-row">
+    <input type="text" id="sim-smi1" placeholder="SMILES molecola 1" onkeydown="if(event.key==='Enter')calcSimilarity()">
+    <input type="text" id="sim-smi2" placeholder="SMILES molecola 2" onkeydown="if(event.key==='Enter')calcSimilarity()">
+    <button class="btn" onclick="calcSimilarity()">Calcola</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">
+    <button class="btn btn-outline btn-sm" onclick="quickSim('CC(=O)Nc1ccc(O)cc1','CC(=O)Nc1ccc(Cl)cc1')">Parac. vs Para-cloroacetanilide</button>
+    <button class="btn btn-outline btn-sm" onclick="quickSim('CC(C)Cc1ccc(cc1)C(C)C(=O)O','CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Ibuprofene vs Ibuprofene</button>
+    <button class="btn btn-outline btn-sm" onclick="quickSim('NCCc1ccc(O)c(O)c1','NCCc1c[nH]c2ccc(O)cc12')">Dopamina vs Serotonina</button>
+  </div>
+  <div id="sim-result"></div>
+</div>
+
+<div class="card" style="margin-top:10px">
+  <h3>Ricerca di similarità contro farmaci di riferimento</h3>
+  <div class="inp-row">
+    <input type="text" id="sim-query" placeholder="SMILES da cercare" onkeydown="if(event.key==='Enter')simSearch()">
+    <button class="btn" onclick="simSearch()">Cerca</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('sim-query')">← da Molecola</button>
+  </div>
+  <div id="sim-search-result"></div>
+</div>
+
+<div class="card" style="margin-top:10px">
+  <h3>🗺 Visualizzatore Fingerprint Morgan (2048 bit)</h3>
+  <div class="inp-row">
+    <input type="text" id="fp-smi" placeholder="SMILES da visualizzare (oppure ← da Molecola)"
+      onkeydown="if(event.key==='Enter')drawFPVis()">
+    <button class="btn" onclick="drawFPVis()">Visualizza</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('fp-smi')">← da Molecola</button>
+  </div>
+  <div id="fp-vis-box" style="margin-top:8px;display:none">
+    <canvas id="fp-canvas" width="512" height="128" title="Clicca per ingrandire"></canvas>
+    <div class="fp-legend">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#00c9b7;border-radius:2px;vertical-align:middle"></span> Bit attivo (1)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#071221;border:1px solid #1c3a57;border-radius:2px;vertical-align:middle"></span> Bit inattivo (0)</span>
+      <span id="fp-active-count" style="color:#9fb3c8"></span>
+    </div>
+    <div style="margin-top:5px;font-size:.77rem;color:#9fb3c8">
+      La griglia mostra i 2048 bit del fingerprint Morgan (radius=2, ECFP4). Ogni colonna = 32 bit, ogni riga = 64 bit. Più bit attivi = molecola più grande/complessa.
+    </div>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Come leggere la similarità Tanimoto:</strong><br>
+  <span style="color:#4caf80">≥ 70%</span> = molto simile, probabile stesso scaffold &nbsp;|&nbsp;
+  <span style="color:#ffb454">40–70%</span> = moderatamente simile &nbsp;|&nbsp;
+  <span style="color:#ff6b6b">&lt; 40%</span> = strutturalmente distinte.<br>
+  Fingerprint usato: Morgan (raggio 2, 2048 bit).
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: LIBRERIA -->
+<div class="panel" id="p-lib">
+<h2>📚 Libreria Molecole Personale</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="lib-smi" placeholder="SMILES" style="flex:1">
+    <input type="text" id="lib-name" placeholder="Nome molecola" style="width:160px;flex:none">
+    <button class="btn" onclick="addToLibManual()">+ Aggiungi</button>
+    <button class="btn btn-danger btn-sm" onclick="clearLib()">Svuota</button>
+  </div>
+</div>
+<div id="lib-list"></div>
+<div class="export-row" style="margin-top:6px">
+  <button class="btn btn-sm btn-outline" onclick="exportLibJSON()">⬇ JSON</button>
+  <button class="btn btn-sm btn-outline" onclick="exportLibCSV()">⬇ CSV</button>
+  <button class="btn btn-sm btn-outline" onclick="importLibJSON()">⬆ Importa JSON</button>
+</div>
+<div class="note" style="margin-top:10px">
+  La libreria è salvata nel browser (<code>localStorage</code>) — rimane dopo aver chiuso il Lab, finché non svuoti la cache del browser. Usa "⬇ JSON" per backup permanente.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: GUIDA -->
+<div class="panel" id="p-guide">
+<h2>📖 Guida al RDKit Cheminformatics Lab</h2>
+
+<!-- Accordion 1: Cos'è questo lab -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🧪 Cos'è il RDKit Lab e cosa puoi farci?
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body open">
+    <p>Il <strong>RDKit Cheminformatics Lab</strong> usa la libreria <strong>RDKit.js</strong> — la versione WebAssembly della famosa libreria di cheminformatica open-source RDKit — per analizzare molecole direttamente nel browser, senza server.</p>
+    <p>Puoi:</p>
+    <ul>
+      <li>Disegnare la struttura 2D di qualsiasi molecola partendo dal suo codice SMILES</li>
+      <li>Calcolare automaticamente 10+ descrittori molecolari (MW, LogP, TPSA, …)</li>
+      <li>Verificare se una molecola soddisfa le regole farmaceutiche (Lipinski, Veber, Ghose…)</li>
+      <li>Fare predizioni QSAR orientative (solubilità, permeabilità BBB, tossicità hERG…)</li>
+      <li>Confrontare due molecole per similarità strutturale (fingerprint di Morgan)</li>
+      <li>Cercare i farmaci più simili in un database di riferimento</li>
+      <li>Salvare le tue molecole in una libreria personale persistente</li>
+    </ul>
+    <div class="tip"><strong>Requisito:</strong> il Lab richiede connessione internet al primo avvio per scaricare RDKit.js (~7MB). Dopo il caricamento funziona completamente offline.</div>
+  </div>
+</div>
+
+<!-- Accordion 2: SMILES -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🔤 Cos'è uno SMILES e come si scrive?
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body open">
+    <p><strong>SMILES</strong> (Simplified Molecular Input Line Entry System) è un sistema per descrivere strutture molecolari con una stringa di testo. È il linguaggio universale della cheminformatica.</p>
+    <h4 style="margin-top:10px">Regole di base</h4>
+    <div class="card card-dark">
+      <div class="syntax-row"><span class="sx">C</span><span>Carbonio sp³ (un carbonio in un alcano)</span></div>
+      <div class="syntax-row"><span class="sx">CC</span><span>Etano (C–C)</span></div>
+      <div class="syntax-row"><span class="sx">C=C</span><span>Etilene (C=C)</span></div>
+      <div class="syntax-row"><span class="sx">C#N</span><span>Acrilonitrile/nitrile (C≡N)</span></div>
+      <div class="syntax-row"><span class="sx">c1ccccc1</span><span>Benzene (anello aromatico — lettere minuscole)</span></div>
+      <div class="syntax-row"><span class="sx">O</span><span>Acqua / ossigeno (H₂O implicita)</span></div>
+      <div class="syntax-row"><span class="sx">N</span><span>Ammina (NH₃ implicita)</span></div>
+      <div class="syntax-row"><span class="sx">C(=O)O</span><span>Acido acetico (il ramo =O è tra parentesi)</span></div>
+      <div class="syntax-row"><span class="sx">CC(=O)O</span><span>Acido acetico con metile</span></div>
+      <div class="syntax-row"><span class="sx">[NH4+]</span><span>Atomo con carica o H espliciti tra parentesi quadre</span></div>
+      <div class="syntax-row"><span class="sx">C[C@@H](O)N</span><span>Stereochimica: @@ = R (guardando dall'H verso il C)</span></div>
+      <div class="syntax-row"><span class="sx">C/C=C/C</span><span>Doppio legame E (trans): / = stesso lato</span></div>
+      <div class="syntax-row"><span class="sx">C/C=C\C</span><span>Doppio legame Z (cis): / e \ = lati opposti</span></div>
+    </div>
+    <h4 style="margin-top:10px">Esempi cliccabili — premi per caricare nel tab Molecola</h4>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">
+      <span class="smiles-eg" onclick="loadFromGuide('CCO','Etanolo')">CCO — etanolo</span>
+      <span class="smiles-eg" onclick="loadFromGuide('CC(=O)O','Acido acetico')">CC(=O)O — ac. acetico</span>
+      <span class="smiles-eg" onclick="loadFromGuide('c1ccccc1','Benzene')">c1ccccc1 — benzene</span>
+      <span class="smiles-eg" onclick="loadFromGuide('CC(=O)Nc1ccc(O)cc1','Paracetamolo')">CC(=O)Nc1ccc(O)cc1 — paracetamolo</span>
+      <span class="smiles-eg" onclick="loadFromGuide('OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O','Glucosio')">Glucosio</span>
+      <span class="smiles-eg" onclick="loadFromGuide('CC(C)Cc1ccc(cc1)C(C)C(=O)O','Ibuprofene')">Ibuprofene</span>
+    </div>
+    <div class="tip" style="margin-top:8px"><strong>Suggerimento:</strong> se non conosci lo SMILES di una molecola, cercala su PubChem (https://pubchem.ncbi.nlm.nih.gov) e copia il campo "Canonical SMILES" o "Isomeric SMILES".</div>
+  </div>
+</div>
+
+<!-- Accordion 3: Tab Molecola -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🔬 Tab "Molecola" — come usarla passo per passo
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>Inserisci lo SMILES</strong> nel campo in alto, oppure clicca uno dei farmaci preimpostati (Paracetamolo, Ibuprofene, ecc.).</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>Premi "Analizza"</strong> oppure <kbd>Enter</kbd>. RDKit genera la struttura 2D e calcola i descrittori rapidi.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>Struttura 2D:</strong> appare nel riquadro bianco. L'immagine è un SVG vettoriale generato da RDKit, con atomi e legami posizionati ottimalmente.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">4</div>
+      <div class="step-body"><strong>Info molecola:</strong> mostra SMILES canonico (standardizzato), peso molecolare, e SMILES di input originale.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">5</div>
+      <div class="step-body"><strong>Descrittori rapidi:</strong> 10 valori chiave in formato card. Passa il mouse sopra ogni card per la spiegazione. Colori: verde = ottimale per farmaci, giallo = attenzione, rosso = fuori range.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">6</div>
+      <div class="step-body"><strong>Export:</strong> salva la struttura come SVG (vettoriale, modificabile in Inkscape) o PNG (raster 400×300). Copia SMILES negli appunti. Aggiungi alla libreria personale.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">7</div>
+      <div class="step-body"><strong>Analisi completa:</strong> il pulsante "⚡ Analisi completa" popola automaticamente tutti gli altri tab con la stessa molecola e li calcola.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Accordion 4: Descrittori -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    📊 Tab "Descrittori" — cosa significa ogni valore?
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <table>
+      <tr><th>Descrittore</th><th>Spiegazione</th><th>Range utile</th></tr>
+      <tr><td><strong>MW</strong></td><td>Peso molecolare medio (media ponderata sulle abbondanze isotopiche)</td><td>&lt; 500 Da per farmaci orali</td></tr>
+      <tr><td><strong>LogP</strong></td><td>Log del coefficiente di ripartizione ottanolo/acqua. Misura la lipofilia. Valore calcolato con metodo Crippen–Wildman.</td><td>−0.4 a 5.6</td></tr>
+      <tr><td><strong>TPSA</strong></td><td>Topological Polar Surface Area. Superficie degli atomi polari. Correlata con assorbimento intestinale e penetrazione BBB.</td><td>&lt; 90 Ų per assorbimento orale; &lt; 60 Ų per BBB</td></tr>
+      <tr><td><strong>HBA</strong></td><td>Numero di accettori di legame H (N e O con lone pair)</td><td>≤ 10 (Lipinski)</td></tr>
+      <tr><td><strong>HBD</strong></td><td>Numero di donatori di legame H (N–H e O–H)</td><td>≤ 5 (Lipinski)</td></tr>
+      <tr><td><strong>RotBonds</strong></td><td>Legami rotabili. Misura la flessibilità conformazionale. Troppi legami rotabili = scarsa biodisponibilità orale.</td><td>≤ 10 (Veber)</td></tr>
+      <tr><td><strong>Anelli Ar.</strong></td><td>Numero di anelli aromatici. Troppi anelli aromatici = rischio di tossicità e scarsa solubilità.</td><td>≤ 3–4</td></tr>
+      <tr><td><strong>FrCSP3</strong></td><td>Frazione di carboni sp³ rispetto al totale. Molecole "piatte" (FrCSP3 bassa) tendono a essere meno solubili.</td><td>&gt; 0.25</td></tr>
+      <tr><td><strong>Atomi pesanti</strong></td><td>Numero di atomi non-H. Correlato con MW.</td><td>20–70 per drug-like</td></tr>
+      <tr><td><strong>Stereocentri</strong></td><td>Numero di centri stereogenici. Importante per la sintesi e la selettività biologica.</td><td>— (informativo)</td></tr>
+    </table>
+    <div class="tip" style="margin-top:8px">Usa "⬇ JSON" o "⬇ CSV" per esportare i valori e copiarli in Excel o Python per analisi successive.</div>
+  </div>
+</div>
+
+<!-- Accordion 5: Drug-likeness -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    💊 Tab "Drug-likeness" — le 6 regole spiegate
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <table>
+      <tr><th>Regola</th><th>Criteri</th><th>Contesto d'uso</th></tr>
+      <tr><td><strong>Lipinski Ro5</strong></td><td>MW≤500, LogP≤5, HBD≤5, HBA≤10</td><td>Il gold standard per farmaci orali. Violazioni ≤1 tollerabile (es. macrolidi).</td></tr>
+      <tr><td><strong>Veber</strong></td><td>Legami rot. ≤10, TPSA ≤140 Ų</td><td>Biodisponibilità orale nei ratti. Complementa Lipinski.</td></tr>
+      <tr><td><strong>Ghose</strong></td><td>MW 160–480, LogP −0.4–5.6, HeavyAtoms 20–70</td><td>Più restrittiva di Lipinski, ottima per drug-like leads.</td></tr>
+      <tr><td><strong>Egan</strong></td><td>TPSA ≤131.6, LogP ≤5.88</td><td>Predizione assorbimento intestinale umano (Caco-2).</td></tr>
+      <tr><td><strong>Lead-likeness</strong></td><td>MW 200–350, LogP ≤3.5, HBD ≤3</td><td>Per lead optimization: molecole più piccole, ottimizzabili.</td></tr>
+      <tr><td><strong>Fragment Ro3</strong></td><td>MW≤300, LogP≤3, HBD≤3, HBA≤3</td><td>Fragment-based drug design (FBDD). Punti di partenza minimi.</td></tr>
+    </table>
+    <div class="tip" style="margin-top:8px"><strong>Esempio pratico:</strong> carica il Paclitaxel (Taxolo) — un farmaco anticancro approvato — e vedrai che viola quasi tutte le regole. Questo dimostra che le regole sono linee guida, non leggi assolute.</div>
+  </div>
+</div>
+
+<!-- Accordion 6: QSAR -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🔮 Tab "QSAR" — come interpretare le predizioni
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <p>QSAR (<em>Quantitative Structure–Activity Relationship</em>) studia la relazione tra struttura molecolare e attività/proprietà biologica.</p>
+    <p>Le predizioni del Lab sono <strong>modelli empirici</strong> basati su equazioni derivate dalla letteratura:</p>
+    <table>
+      <tr><th>Proprietà</th><th>Metodo</th><th>Come interpretare</th></tr>
+      <tr><td>Solubilità acquosa (LogS)</td><td>Equazione di Egan/Delaney semplificata (LogS ≈ 0.16 − 0.63·LogP − 0.0062·MW + 0.066·RotBonds − 0.74·ArRings)</td><td>&gt; −2 = solubile, −4 to −2 = moderato, &lt; −4 = insolubile</td></tr>
+      <tr><td>Permeabilità BBB</td><td>Formula basata su MW e TPSA: penetra se MW &lt; 450 e TPSA &lt; 90 e LogP 1–3</td><td>Score 0–100%. Non è un test biologico.</td></tr>
+      <tr><td>Rischio hERG</td><td>Stima basata su LogP &gt; 3.7 e presenza di anelli aromatici — canale hERG cardiaco</td><td>Alto rischio = possibile cardiotossicità. Solo indicativo.</td></tr>
+      <tr><td>Biodisponib. orale</td><td>Combinazione pesata di Lipinski + Veber</td><td>Percentuale di probabilità, non un valore assoluto.</td></tr>
+      <tr><td>Permeabilità Caco-2</td><td>Modello basato su TPSA e HBD</td><td>Alta = buon assorbimento intestinale umano (Papp &gt; 20 nm/s)</td></tr>
+    </table>
+    <div class="warn">Questi modelli sono <strong>approssimativi</strong>. Per predizioni affidabili in drug discovery si usano modelli ML addestrati su migliaia di molecole (es. ADMETlab, pkCSM, SwissADME).</div>
+  </div>
+</div>
+
+<!-- Accordion 7: Similarità -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🔗 Tab "Similarità" — fingerprint e Tanimoto spiegati
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <h4>Fingerprint di Morgan (ECFP)</h4>
+    <p>I fingerprint codificano la struttura molecolare come un vettore binario di 2048 bit. Ogni bit corrisponde a un sottostruttura (frammento) trovata nella molecola entro un certo raggio dal centro. Il fingerprint di Morgan con raggio 2 è equivalente a ECFP4, lo standard in drug discovery.</p>
+    <h4 style="margin-top:10px">Similarità di Tanimoto (Jaccard)</h4>
+    <p><strong>T(A,B) = |A ∩ B| / |A ∪ B|</strong> — cioè: bit accesi in entrambe / bit accesi in almeno una.</p>
+    <p>Va da 0 (nessun bit in comune) a 1 (bit identici = stessa molecola).</p>
+    <table style="margin-top:6px">
+      <tr><th>Range</th><th>Significato</th></tr>
+      <tr><td style="color:#4caf80">≥ 0.85</td><td>Praticamente identiche (isomeri, sali, piccole variazioni)</td></tr>
+      <tr><td style="color:#4caf80">0.70–0.84</td><td>Molto simili — probabile stesso scaffold, attività simile</td></tr>
+      <tr><td style="color:#ffb454">0.40–0.69</td><td>Moderatamente simili — potenziale analogo</td></tr>
+      <tr><td style="color:#ff6b6b">&lt; 0.40</td><td>Strutturalmente distinte</td></tr>
+    </table>
+    <div class="tip" style="margin-top:8px">
+      <strong>Esempio:</strong> prova dopamina vs serotonina — entrambe ammine biogene con anello aromatico, ma la serotonina ha un indolo invece del catecolo. Tanimoto ~0.35–0.45.
+      <br>Prova Ibuprofene vs Naprossene (SMILES: <span class="smiles-eg" onclick="document.getElementById('sim-smi2').value='COc1ccc2cc(ccc2c1)C(C)C(=O)O';showPanelById('p-sim')" style="cursor:pointer">COc1ccc2cc(ccc2c1)C(C)C(=O)O</span>) — entrambi FANS.
+    </div>
+  </div>
+</div>
+
+<!-- Accordion 8: Libreria -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    📚 Tab "Libreria" — gestione delle molecole salvate
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div class="step-body">Analizza una molecola nel tab Molecola e usa <strong>"+ Libreria"</strong> per salvarla con un nome.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div class="step-body">Oppure inserisci SMILES + nome direttamente nel tab Libreria e usa <strong>"+ Aggiungi"</strong>.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>"Carica"</strong> su ogni voce apre quella molecola nel tab Molecola per analizzarla.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">4</div>
+      <div class="step-body">Esporta tutta la libreria in <strong>JSON</strong> (ricaricabile) o <strong>CSV</strong> (per Excel/Python).</div>
+    </div>
+    <div class="note">La libreria è salvata nel <code>localStorage</code> del browser — persiste tra sessioni, ma è legata a quel browser specifico. Fai backup JSON regolari per non perdere i dati.</div>
+  </div>
+</div>
+
+<!-- Accordion 9b: SMARTS -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    🔍 Tab "SMARTS" — ricerca per sottostruttura
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <p><strong>SMARTS</strong> è un linguaggio di pattern per molecole. Invece di specificare una molecola esatta (come SMILES), con SMARTS descrivi un <em>tipo</em> di frammento: es. "qualsiasi carbonile" (<code>[C]=O</code>), "qualsiasi alogeno" (<code>[F,Cl,Br,I]</code>).</p>
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div class="step-body">Inserisci lo SMILES della molecola da analizzare (oppure usa ← da Molecola).</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div class="step-body">Inserisci il pattern SMARTS — o clicca uno dei <strong>gruppi funzionali rapidi</strong>.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div class="step-body">Il risultato mostra la struttura SVG con gli atomi <strong>evidenziati in giallo</strong>, il conteggio dei match e la lista degli indici atomici per ogni occorrenza.</div>
+    </div>
+    <div class="note">SMARTS differenze chiave: <code>[#6]</code> = qualsiasi C; <code>[NH]</code> = N con H; <code>[F,Cl]</code> = F oppure Cl; <code>a</code> = atomo aromatico qualsiasi; <code>~</code> = qualsiasi legame.</div>
+  </div>
+</div>
+
+<!-- Accordion 9c: Confronto -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    ⚖️ Tab "Confronto" — analisi side-by-side
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <p>Il tab Confronto permette di mettere due molecole fianco a fianco per confrontare struttura e proprietà.</p>
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div class="step-body">Inserisci gli SMILES di <strong>Molecola A</strong> e <strong>Molecola B</strong> (oppure usa i preset: Paracetamolo/Ibuprofene, Dopamina/Serotonina, ecc.).</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div class="step-body">Premi <strong>"Confronta"</strong>: vengono generate le strutture 2D affiancate e la tabella di confronto descrittori.</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div class="step-body">La colonna <strong>Δ (A−B)</strong> mostra la differenza: giallo = A è maggiore, verde = B è maggiore. La colonna "Migliore" indica quale delle due è più vicina al range ottimale per farmaci.</div>
+    </div>
+    <div class="tip">Usa il Confronto per esplorare <em>SAR</em> (Structure-Activity Relationship): come cambia LogP/TPSA/MW modificando un gruppo funzionale?</div>
+  </div>
+</div>
+
+<!-- Accordion 9: Errori comuni -->
+<div class="accordion">
+  <div class="acc-head" onclick="toggleAcc(this)">
+    ❓ Domande frequenti e risoluzione problemi
+    <span class="arr">▼</span>
+  </div>
+  <div class="acc-body">
+    <table>
+      <tr><th>Problema</th><th>Causa</th><th>Soluzione</th></tr>
+      <tr><td>"SMILES non valido"</td><td>Carattere errato, parentesi non bilanciate, simbolo sconosciuto</td><td>Controlla la stringa. Usa PubChem per copiare SMILES verificati.</td></tr>
+      <tr><td>RDKit non si carica</td><td>Nessuna connessione internet (al primo avvio)</td><td>Il file RDKit_minimal.js (~7MB) è richiesto al primo accesso. Connettiti a internet.</td></tr>
+      <tr><td>SVG non appare</td><td>RDKit non ancora pronto o SMILES non valido</td><td>Attendi la barra verde "RDKit.js pronto" in alto.</td></tr>
+      <tr><td>LogP = 0 o valori anomali</td><td>Molecola molto piccola (es. acqua H₂O) o errore di parsing</td><td>Normale per molecole semplici. RDKit calcola su strutture >2 atomi pesanti.</td></tr>
+      <tr><td>"← da Molecola" non funziona</td><td>Nessuna molecola analizzata nel tab Molecola</td><td>Prima analizza una molecola nel tab Molecola, poi usa il pulsante.</td></tr>
+    </table>
+    <div class="tip" style="margin-top:8px"><strong>Suggerimento veloce:</strong> usa sempre il pulsante <kbd>⚡ Analisi completa</kbd> nel tab Molecola per popolare tutti i tab in un clic.</div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:12px;text-align:center;background:#071221">
+  <p style="color:#00c9b7;font-weight:700">🧪 RDKit Cheminformatics Lab — BioSpecInfo</p>
+  <p style="color:#9fb3c8;font-size:.8rem;margin-top:4px">Powered by RDKit.js · 100% client-side · 0 server · vanilla JS</p>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: SMARTS -->
+<div class="panel" id="p-smarts">
+<h2>🔍 Ricerca per Sottostruttura (SMARTS)</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="smarts-mol" placeholder="SMILES molecola da analizzare (oppure ← da Molecola)"
+      onkeydown="if(event.key==='Enter')calcSMARTS()">
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('smarts-mol')">← da Molecola</button>
+  </div>
+  <div class="inp-row" style="margin-top:6px">
+    <input type="text" id="smarts-query" placeholder="Pattern SMARTS — es. [OH], C(=O)O, c1ccccc1"
+      onkeydown="if(event.key==='Enter')calcSMARTS()">
+    <button class="btn" onclick="calcSMARTS()">Cerca</button>
+  </div>
+</div>
+
+<div class="card" style="margin-top:8px">
+  <h3>Gruppi funzionali rapidi — clicca per cercare</h3>
+  <div style="margin-top:6px">
+    <span class="smarts-pill" onclick="smartsPreset('[OH]')">[OH] <span class="sg">idrossile</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C(=O)[OH]')">C(=O)OH <span class="sg">acido carbossilico</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C(=O)N')">C(=O)N <span class="sg">ammide</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C(=O)[#6]')">[C]=O <span class="sg">carbonile</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[NH2]')">[NH2] <span class="sg">ammina 1°</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[NH]')">[NH] <span class="sg">ammina 2°</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('c1ccccc1')">c1ccccc1 <span class="sg">benzene</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('c1ccncc1')">c1ccncc1 <span class="sg">piridina</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[nH]1cccc1')">[nH]-pirrolo</span>
+    <span class="smarts-pill" onclick="smartsPreset('[F,Cl,Br,I]')">[F,Cl,Br,I] <span class="sg">alogeni</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C=C')">C=C <span class="sg">alchene</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C#C')">C#C <span class="sg">alchino</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('C#N')">C#N <span class="sg">nitrile</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('S(=O)(=O)')">SO₂ <span class="sg">solfonil</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[S;H]')">[SH] <span class="sg">tiolico</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('P(=O)')">P=O <span class="sg">fosforile</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[N+](=O)[O-]')">[NO2] <span class="sg">nitro</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('COC')">C-O-C <span class="sg">etere</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[C@@H]')">[C@@H] <span class="sg">stereocentro R</span></span>
+    <span class="smarts-pill" onclick="smartsPreset('[C@H]')">[C@H] <span class="sg">stereocentro S</span></span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+  <div>
+    <h3 id="smarts-title">Struttura con highlights</h3>
+    <div id="smarts-sv"><div class="placeholder">Inserisci molecola + SMARTS e premi Cerca</div></div>
+    <div id="smarts-count" style="margin-top:6px;font-size:.84rem"></div>
+  </div>
+  <div>
+    <h3>Tutti i match</h3>
+    <div id="smarts-all" class="card card-dark" style="min-height:80px;font-size:.82rem;color:#9fb3c8">
+      In attesa della ricerca…
+    </div>
+  </div>
+</div>
+
+<div class="tip" style="margin-top:10px">
+  <strong>SMARTS</strong> (SMiles ARbitrary Target Specification) è un linguaggio per descrivere <em>pattern</em> molecolari, non molecole specifiche.<br>
+  Differenze da SMILES: <code>[#6]</code> = qualsiasi carbonio; <code>[NH]</code> = N con un H; <code>a</code> = atomo aromatico qualsiasi; <code>,</code> = OR (es. <code>[F,Cl]</code>).<br>
+  Fonte SMARTS di riferimento: <strong>Daylight SMARTS</strong> e <strong>RDKit SMARTS</strong>.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: CONFRONTO -->
+<div class="panel" id="p-cmp">
+<h2>⚖️ Confronto Molecole</h2>
+<div class="card">
+  <div class="cmp-grid">
+    <div>
+      <div style="color:#00c9b7;font-weight:700;font-size:.8rem;margin-bottom:5px">Molecola A</div>
+      <div class="inp-row">
+        <input type="text" id="cmp-smi1" placeholder="SMILES molecola A" onkeydown="if(event.key==='Enter')calcComparison()">
+        <button class="btn btn-outline btn-sm" onclick="syncFrom('cmp-smi1')">← da Mol.</button>
+      </div>
+    </div>
+    <div>
+      <div style="color:#ffb454;font-weight:700;font-size:.8rem;margin-bottom:5px">Molecola B</div>
+      <div class="inp-row">
+        <input type="text" id="cmp-smi2" placeholder="SMILES molecola B" onkeydown="if(event.key==='Enter')calcComparison()">
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap">
+    <button class="btn" onclick="calcComparison()">Confronta</button>
+    <button class="btn btn-outline btn-sm" onclick="cmpPreset('CC(=O)Nc1ccc(O)cc1','CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Paracetamolo vs Ibuprofene</button>
+    <button class="btn btn-outline btn-sm" onclick="cmpPreset('NCCc1ccc(O)c(O)c1','NCCc1c[nH]c2ccc(O)cc12')">Dopamina vs Serotonina</button>
+    <button class="btn btn-outline btn-sm" onclick="cmpPreset('O=C(O)c1ccccc1OC(C)=O','CC(=O)Nc1ccc(O)cc1')">Aspirina vs Paracetamolo</button>
+  </div>
+</div>
+
+<div id="cmp-result" style="display:none">
+  <div class="cmp-grid" style="margin-top:12px">
+    <div>
+      <h3 style="color:#00c9b7">Molecola A</h3>
+      <div class="cmp-sv" id="cmp-svg1"><div class="placeholder">—</div></div>
+      <div id="cmp-info1" style="font-size:.78rem;color:#9fb3c8;margin-top:5px"></div>
+    </div>
+    <div>
+      <h3 style="color:#ffb454">Molecola B</h3>
+      <div class="cmp-sv" id="cmp-svg2"><div class="placeholder">—</div></div>
+      <div id="cmp-info2" style="font-size:.78rem;color:#9fb3c8;margin-top:5px"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <h3>Confronto descrittori</h3>
+    <div id="cmp-table"></div>
+  </div>
+
+  <div style="margin-top:10px">
+    <h3>Drug-likeness comparata</h3>
+    <div id="cmp-drug"></div>
+  </div>
+</div>
+
+<div class="tip" style="margin-top:10px">
+  Il confronto mostra i valori di ciascun descrittore per entrambe le molecole con il <strong>Δ (A−B)</strong>.
+  Verde = A ha il valore migliore per quella proprietà, rosso = B è migliore.
+  Nessun colore su stereocentri o anelli (informativi, non hanno "migliore").
+</div>
+</div>
+
+</div><!-- #content -->
+</div><!-- #app -->
+
+<script>
+// ─── RDKit loader ────────────────────────────────────────────────────
+var RDKit=null, rdkReady=false;
+
+function setStatus(msg,type){
+  var el=document.getElementById('rdk-msg'),sp=document.getElementById('rdk-spin');
+  el.textContent=msg; el.className='s-'+type;
+  sp.style.display=type==='loading'?'block':'none';
+}
+
+(function(){
+  setStatus('Caricamento RDKit.js…','loading');
+  function tryLoad(src,onOk,onFail){
+    var s=document.createElement('script');
+    s.src=src; s.crossOrigin='anonymous';
+    s.onload=onOk; s.onerror=onFail;
+    document.head.appendChild(s);
+  }
+  var CDN1='https://unpkg.com/@rdkit/rdkit@2024.3.3/Code/MinimalLib/dist/RDKit_minimal.js';
+  var CDN2='https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2024.3.3/Code/MinimalLib/dist/RDKit_minimal.js';
+
+  function onLoaded(){
+    if(typeof initRDKitModule!=='function'){setStatus('Errore: initRDKitModule non trovato','err');return;}
+    initRDKitModule().then(function(rdk){
+      RDKit=rdk; rdkReady=true;
+      document.getElementById('rdk-ver').textContent='v'+rdk.version();
+      setStatus('RDKit.js pronto — tutte le funzioni disponibili ✔','ok');
+      document.querySelectorAll('.btn').forEach(function(b){if(b.id!=='btn-svg'&&b.id!=='btn-png'&&b.id!=='btn-cpsmi'&&b.id!=='btn-addlib'&&b.id!=='btn-runall')b.disabled=false;});
+    }).catch(function(e){setStatus('Errore init: '+e.message,'err');});
+  }
+  tryLoad(CDN1,onLoaded,function(){
+    setStatus('CDN1 fallito, provo CDN2…','loading');
+    tryLoad(CDN2,onLoaded,function(){setStatus('Nessun CDN raggiungibile. Connessione internet richiesta.','err');});
+  });
+})();
+
+// ─── Tab navigation ──────────────────────────────────────────────────
+function showPanel(tab,id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  tab.classList.add('active');
+}
+function showPanelById(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  var t=document.querySelector('[data-panel="'+id+'"]');
+  if(t)t.classList.add('active');
+}
+
+// ─── Accordion ───────────────────────────────────────────────────────
+function toggleAcc(head){
+  var body=head.nextElementSibling;
+  var open=body.classList.toggle('open');
+  head.querySelector('.arr').textContent=open?'▲':'▼';
+}
+
+// ─── State ───────────────────────────────────────────────────────────
+var curSMI='', curCanon='', curDesc={};
+var library=JSON.parse(localStorage.getItem('bsi_rdkit_lib2')||'[]');
+
+// ─── Molecule analysis ───────────────────────────────────────────────
+var EXAMPLES=['CC(=O)Nc1ccc(O)cc1','CC(C)Cc1ccc(cc1)C(C)C(=O)O','CN1CCC[C@H]1c2cccnc2','O=C(O)c1ccccc1OC(C)=O','NCCc1ccc(O)c(O)c1'];
+var exIdx=0;
+function loadExample(){document.getElementById('smiles-input').value=EXAMPLES[exIdx++%EXAMPLES.length];analyzeMol();}
+function loadPreset(smi){document.getElementById('smiles-input').value=smi;analyzeMol();}
+function syncFrom(id){if(curSMI)document.getElementById(id).value=curSMI;}
+function loadFromGuide(smi,name){
+  document.getElementById('smiles-input').value=smi;
+  showPanelById('p-mol');
+  setTimeout(analyzeMol,50);
+}
+
+function requireRDKit(){
+  if(!rdkReady){setStatus('RDKit.js in caricamento — attendi…','loading');return false;}
+  return true;
+}
+
+function getMolSafe(smi){
+  if(!rdkReady)return null;
+  var m=null;
+  try{m=RDKit.get_mol(smi);}catch(e){}
+  if(!m||!m.is_valid()){if(m)m.delete();return null;}
+  return m;
+}
+
+function analyzeMol(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('smiles-input').value.trim();
+  if(!smi){showMolErr('Inserisci uno SMILES.');return;}
+  var mol=getMolSafe(smi);
+  if(!mol){showMolErr('SMILES non valido: controlla la sintassi (es. parentesi, simboli atomo).');return;}
+
+  document.getElementById('mol-err').style.display='none';
+  curSMI=smi;
+  curCanon=mol.get_smiles();
+
+  // SVG
+  var svg=mol.get_svg_with_highlights('{}');
+  document.getElementById('mol-svg-box').innerHTML=svg;
+
+  // Descriptors + InChI (before deleting mol)
+  curDesc=computeDesc(mol);
+  var molInChI='', molInChIKey='';
+  try{ molInChI=mol.get_inchi()||''; }catch(e){}
+  try{ molInChIKey=mol.get_inchikey()||''; }catch(e){}
+  mol.delete();
+
+  // Info panel
+  document.getElementById('mol-info').innerHTML=
+    '<div style="margin-bottom:6px"><span style="color:#9fb3c8;font-size:.76rem">SMILES canonico</span><br>'+
+    '<span style="color:#00c9b7;font-family:monospace;font-size:.82rem;word-break:break-all">'+escH(curCanon)+'</span></div>'+
+    '<div><span style="color:#9fb3c8;font-size:.76rem">Peso molecolare</span> '+
+    '<strong style="color:#e8eef4">'+curDesc.MW.toFixed(2)+' Da</strong></div>'+
+    (curDesc.Formula?'<div><span style="color:#9fb3c8;font-size:.76rem">Formula</span> <strong>'+escH(curDesc.Formula)+'</strong></div>':'')+
+    '<div style="margin-top:4px"><span style="color:#9fb3c8;font-size:.76rem">Input originale</span><br>'+
+    '<span style="color:#ffb454;font-family:monospace;font-size:.78rem;word-break:break-all">'+escH(smi)+'</span></div>';
+
+  // InChI block
+  var inchiEl=document.getElementById('mol-inchi');
+  if(molInChIKey||molInChI){
+    var inchiHtml='';
+    if(molInChIKey){
+      inchiHtml+='<div class="inchi-row"><span class="inchi-lbl">InChIKey</span>'+
+        '<span class="inchi-val" id="inchikey-val">'+escH(molInChIKey)+'</span>'+
+        '<button class="btn btn-sm btn-outline" id="btn-cpinchi" style="flex-shrink:0;font-size:.7rem;padding:2px 7px" onclick="copyInChIKey(\''+escH(molInChIKey)+'\')">📋</button></div>';
+    }
+    if(molInChI){
+      inchiHtml+='<div class="inchi-row"><span class="inchi-lbl">InChI</span>'+
+        '<span class="inchi-val">'+escH(molInChI)+'</span></div>';
+    }
+    inchiEl.innerHTML=inchiHtml;
+    inchiEl.style.display='block';
+  } else {
+    inchiEl.style.display='none';
+  }
+
+  renderQuickDesc(curDesc);
+  ['btn-svg','btn-png','btn-cpsmi','btn-addlib','btn-runall'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.disabled=false;
+  });
+}
+
+function showMolErr(msg){
+  var el=document.getElementById('mol-err');
+  el.innerHTML='⚠ '+escH(msg)+' — vedi la <a href="#" onclick="showPanelById(\'p-guide\');return false">Guida SMILES</a> per esempi.';
+  el.style.display='block';
+  document.getElementById('mol-svg-box').innerHTML='<div class="placeholder" style="color:#ff6b6b">'+escH(msg)+'</div>';
+}
+
+// ─── Descriptor computation ──────────────────────────────────────────
+function computeDesc(mol){
+  var d={MW:0,LogP:0,TPSA:0,HBA:0,HBD:0,RotBonds:0,ArRings:0,Rings:0,FrCSP3:0,HeavyAtoms:0,Stereo:0,Formula:''};
+  try{
+    var raw=JSON.parse(mol.get_descriptors());
+    d.MW=raw.amw||raw.MolWt||raw.amw||0;
+    d.ExactMW=raw.exactmw||raw.ExactMolWt||0;
+    d.LogP=raw.CrippenClogP||raw.MolLogP||0;
+    d.TPSA=raw.tpsa||raw.TPSA||0;
+    d.HBA=raw.NumHBA||raw.NumHAcceptors||0;
+    d.HBD=raw.NumHBD||raw.NumHDonors||0;
+    d.RotBonds=raw.NumRotatableBonds||0;
+    d.ArRings=raw.NumAromaticRings||0;
+    d.Rings=raw.RingCount||0;
+    d.FrCSP3=raw.FractionCSP3||0;
+    d.HeavyAtoms=raw.NumHeavyAtoms||0;
+    d.Stereo=raw.NumChiralCenters||raw.NumStereocenters||0;
+    d.Formula=raw.formula||'';
+    d.SMILES=mol.get_smiles();
+  }catch(e){d.SMILES=mol.get_smiles();}
+  return d;
+}
+
+function renderQuickDesc(d){
+  var items=[
+    {k:'MW',v:d.MW.toFixed(2),u:'Da',tip:'Peso molecolare medio.\n≤ 500 Da per Lipinski.',
+     cls:d.MW<=500?'ok':(d.MW<=600?'warn':'bad')},
+    {k:'LogP',v:d.LogP.toFixed(2),u:'',tip:'Lipofilia (Crippen).\nRange drug-like: −0.4 a 5.6',
+     cls:d.LogP<=5&&d.LogP>=-0.4?'ok':(d.LogP<=6?'warn':'bad')},
+    {k:'TPSA',v:d.TPSA.toFixed(1),u:'Ų',tip:'Polar Surface Area.\n< 90 Ų = buon assorbimento\n< 60 Ų = penetra BBB',
+     cls:d.TPSA<=90?'ok':(d.TPSA<=140?'warn':'bad')},
+    {k:'HBA',v:d.HBA,u:'',tip:'H-bond acceptors.\nLipinski: ≤ 10',
+     cls:d.HBA<=10?'ok':(d.HBA<=12?'warn':'bad')},
+    {k:'HBD',v:d.HBD,u:'',tip:'H-bond donors.\nLipinski: ≤ 5',
+     cls:d.HBD<=5?'ok':(d.HBD<=7?'warn':'bad')},
+    {k:'RotBonds',v:d.RotBonds,u:'',tip:'Legami rotabili.\nVeber: ≤ 10',
+     cls:d.RotBonds<=10?'ok':(d.RotBonds<=14?'warn':'bad')},
+    {k:'ArRings',v:d.ArRings,u:'',tip:'Anelli aromatici.\n≤ 3 = ottimale',
+     cls:d.ArRings<=3?'ok':(d.ArRings<=4?'warn':'bad')},
+    {k:'FrCSP3',v:(d.FrCSP3*100).toFixed(0)+'%',u:'',tip:'Frazione carboni sp³.\n> 25% = miglior solubilità',
+     cls:d.FrCSP3>=0.25?'ok':(d.FrCSP3>=0.1?'warn':'bad')},
+    {k:'Atomi',v:d.HeavyAtoms,u:'',tip:'Atomi pesanti (non-H).\nDrug-like: 20–70',
+     cls:d.HeavyAtoms>=20&&d.HeavyAtoms<=70?'ok':'warn'},
+    {k:'Stereocentri',v:d.Stereo,u:'',tip:'Centri stereogenici.\n(Informativo)',cls:''},
+  ];
+
+  // QED badge at top
+  var qr=calcQED(d);
+  var qc=qr.score>=0.67?'ok':(qr.score>=0.33?'warn':'bad');
+  items.unshift({k:'QED Score',v:qr.score.toFixed(3),u:'',
+    tip:'Quantitative Estimate of Drug-likeness\n(Bickerton 2012)\n≥0.67 buono · 0.33–0.67 moderato · <0.33 basso',cls:qc});
+
+  document.getElementById('mol-desc-quick').innerHTML=items.map(function(it){
+    return '<div class="di '+(it.cls||'')+'" data-tip="'+it.tip+'">'+'<div class="dv">'+it.v+(it.u?' <span style="font-size:.68rem;color:#9fb3c8">'+it.u+'</span>':'')+'</div><div class="dk">'+it.k+'</div></div>';
+  }).join('');
+}
+
+// ─── Full descriptors ────────────────────────────────────────────────
+function calcDescriptors(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('desc-smiles').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES o caricalo dal tab Molecola.');return;}
+  var mol=getMolSafe(smi);
+  if(!mol){document.getElementById('desc-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+  var d=computeDesc(mol);mol.delete();
+  curDesc=d;
+
+  var fullItems=[
+    {k:'Peso Molecolare (MW)',v:d.MW.toFixed(3),u:'Da',tip:'Media pesata isotopica. ≤ 500 Da per Lipinski.',
+     hint:'Formula: Σ(massa isotopica × abbondanza)',cls:d.MW<=500?'ok':(d.MW<=600?'warn':'bad')},
+    {k:'ExactMW',v:d.ExactMW?d.ExactMW.toFixed(4):d.MW.toFixed(4),u:'Da',tip:'Massa esatta (isotopo più abbondante).',hint:'Usato in MS/HRMS',cls:''},
+    {k:'LogP (Crippen)',v:d.LogP.toFixed(3),u:'',tip:'Lipofilia. Range drug-like: −0.4 a 5.6.',
+     hint:'> 5 = scarsa solubilità, < −1 = troppo idrofilo',cls:d.LogP>=-0.4&&d.LogP<=5.6?'ok':(d.LogP<=5?'warn':'bad')},
+    {k:'TPSA',v:d.TPSA.toFixed(2),u:'Ų',tip:'< 90 Ų = buon assorbimento orale\n< 60 Ų = penetra BBB',
+     hint:'Correla con biodisponibilità',cls:d.TPSA<=90?'ok':(d.TPSA<=140?'warn':'bad')},
+    {k:'H-bond Acceptors',v:d.HBA,u:'',tip:'N e O che accettano H-bond. Lipinski ≤ 10.',hint:'',cls:d.HBA<=10?'ok':(d.HBA<=12?'warn':'bad')},
+    {k:'H-bond Donors',v:d.HBD,u:'',tip:'N–H e O–H. Lipinski ≤ 5.',hint:'',cls:d.HBD<=5?'ok':(d.HBD<=7?'warn':'bad')},
+    {k:'Legami Rotabili',v:d.RotBonds,u:'',tip:'Veber: ≤ 10. Misura flessibilità.',hint:'Molti legami rot. = scarsa biodisponib.',cls:d.RotBonds<=10?'ok':(d.RotBonds<=14?'warn':'bad')},
+    {k:'Anelli Aromatici',v:d.ArRings,u:'',tip:'≤ 3 ottimale.',hint:'>4 = rischio hERG, scarsa solubilità',cls:d.ArRings<=3?'ok':(d.ArRings<=4?'warn':'bad')},
+    {k:'Anelli Totali',v:d.Rings,u:'',tip:'Numero totale di anelli.',hint:'',cls:''},
+    {k:'Frac. C sp³ (FrCSP3)',v:(d.FrCSP3*100).toFixed(1)+'%',u:'',tip:'> 25% = miglior solubilità.',hint:'Molecole "piatte" meno solubili',cls:d.FrCSP3>=0.25?'ok':(d.FrCSP3>=0.1?'warn':'bad')},
+    {k:'Atomi Pesanti',v:d.HeavyAtoms,u:'',tip:'Non-H. Ghose: 20–70.',hint:'',cls:d.HeavyAtoms>=20&&d.HeavyAtoms<=70?'ok':'warn'},
+    {k:'Stereocentri',v:d.Stereo,u:'',tip:'Centri stereogenici totali.',hint:'Importante per sintesi e sel. biologica',cls:''},
+  ];
+  var html='<div class="desc-grid">';
+  html+=fullItems.map(function(it){
+    return '<div class="di '+(it.cls||'')+'" data-tip="'+it.tip+'">'+
+      '<div class="dv">'+it.v+(it.u?' <span style="font-size:.68rem;color:#9fb3c8">'+it.u+'</span>':'')+'</div>'+
+      '<div class="dk">'+it.k+'</div>'+
+      '<div class="dh">'+it.hint+'</div></div>';
+  }).join('');
+  html+='</div>';
+  document.getElementById('desc-result').innerHTML=html;
+  document.getElementById('desc-export').style.display='flex';
+}
+
+// ─── Drug-likeness ───────────────────────────────────────────────────
+function calcDrugLike(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('drug-smiles').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  var mol=getMolSafe(smi);
+  if(!mol){document.getElementById('drug-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+  var d=computeDesc(mol);mol.delete();
+  var mw=d.MW,lp=d.LogP,hba=d.HBA,hbd=d.HBD,rb=d.RotBonds,tpsa=d.TPSA,ha=d.HeavyAtoms;
+
+  var rules=[
+    {name:'Lipinski Ro5',sub:'Farmaci orali classici — il gold standard',
+     checks:[
+       {l:'MW ≤ 500 Da',ok:mw<=500,v:mw.toFixed(1)+' Da',tip:'Assorbimento intestinale: troppo grande non attraversa la membrana'},
+       {l:'LogP ≤ 5',ok:lp<=5,v:lp.toFixed(2),tip:'Troppo lipofilico = scarsa solubilità in acqua'},
+       {l:'HBD ≤ 5',ok:hbd<=5,v:hbd,tip:'Donatori H-bond'},
+       {l:'HBA ≤ 10',ok:hba<=10,v:hba,tip:'Accettori H-bond'},
+     ]},
+    {name:'Veber',sub:'Biodisponibilità orale — complementa Lipinski',
+     checks:[
+       {l:'Legami rotabili ≤ 10',ok:rb<=10,v:rb,tip:'Flessibilità conformazionale'},
+       {l:'TPSA ≤ 140 Ų',ok:tpsa<=140,v:tpsa.toFixed(1)+' Ų',tip:'Polar surface area'},
+     ]},
+    {name:'Ghose',sub:'Lead drug-like (più restrittivo di Lipinski)',
+     checks:[
+       {l:'MW 160–480 Da',ok:mw>=160&&mw<=480,v:mw.toFixed(1)+' Da',tip:''},
+       {l:'LogP −0.4 a 5.6',ok:lp>=-0.4&&lp<=5.6,v:lp.toFixed(2),tip:''},
+       {l:'Atomi pesanti 20–70',ok:ha>=20&&ha<=70,v:ha,tip:''},
+     ]},
+    {name:'Egan',sub:'Assorbimento intestinale umano (Caco-2)',
+     checks:[
+       {l:'TPSA ≤ 131.6 Ų',ok:tpsa<=131.6,v:tpsa.toFixed(1)+' Ų',tip:''},
+       {l:'LogP ≤ 5.88',ok:lp<=5.88,v:lp.toFixed(2),tip:''},
+     ]},
+    {name:'Lead-likeness (Teague)',sub:'Per lead optimization — molecole ottimizzabili',
+     checks:[
+       {l:'MW 200–350 Da',ok:mw>=200&&mw<=350,v:mw.toFixed(1)+' Da',tip:'Lead più piccoli = più margine di ottimizzazione'},
+       {l:'LogP ≤ 3.5',ok:lp<=3.5,v:lp.toFixed(2),tip:''},
+       {l:'HBD ≤ 3',ok:hbd<=3,v:hbd,tip:''},
+     ]},
+    {name:'Fragment-likeness (Ro3)',sub:'Fragment-based drug design (FBDD)',
+     checks:[
+       {l:'MW ≤ 300 Da',ok:mw<=300,v:mw.toFixed(1)+' Da',tip:'Fragment minimo da cui partire'},
+       {l:'LogP ≤ 3',ok:lp<=3,v:lp.toFixed(2),tip:''},
+       {l:'HBD ≤ 3',ok:hbd<=3,v:hbd,tip:''},
+       {l:'HBA ≤ 3',ok:hba<=3,v:hba,tip:''},
+     ]},
+  ];
+
+  var totalPass=0,totalChecks=0;
+  var html='';
+  rules.forEach(function(r){
+    var pass=r.checks.filter(function(c){return c.ok;}).length;
+    var tot=r.checks.length;
+    totalPass+=pass;totalChecks+=tot;
+    var pct=Math.round((pass/tot)*100);
+    var bc=pct===100?'rb-ok':(pct>=50?'rb-warn':'rb-no');
+    var fc=pct===100?'#4caf80':(pct>=50?'#ffb454':'#ff6b6b');
+    html+='<div class="card" style="margin:.45em 0">';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<strong style="flex:1">'+r.name+'</strong>'+
+      '<span style="color:#9fb3c8;font-size:.75rem">'+r.sub+'</span>'+
+      '<span class="rbadge '+bc+'">'+pass+'/'+tot+'</span></div>';
+    html+='<div class="score-bar"><div class="score-fill" style="width:'+pct+'%;background:'+fc+'"></div></div>';
+    r.checks.forEach(function(c){
+      html+='<div class="rule-row">'+
+        '<span class="rbadge '+(c.ok?'rb-ok':'rb-no')+'">'+(c.ok?'✔':'✘')+'</span>'+
+        '<span style="flex:1" data-tip="'+c.tip+'">'+c.l+'</span>'+
+        '<span style="color:#9fb3c8;font-size:.77rem">'+c.v+'</span></div>';
+    });
+    html+='</div>';
+  });
+
+  var overall=Math.round((totalPass/totalChecks)*100);
+  var oc=overall>=80?'#4caf80':(overall>=50?'#ffb454':'#ff6b6b');
+  var summary='<div class="card" style="margin-bottom:8px;border-color:'+oc+'">'+
+    '<div style="display:flex;align-items:center;gap:12px">'+
+    '<div style="font-size:1.6rem;font-weight:800;color:'+oc+'">'+overall+'%</div>'+
+    '<div><div style="color:#e8eef4;font-weight:700">Score complessivo</div>'+
+    '<div style="color:#9fb3c8;font-size:.78rem">'+totalPass+'/'+totalChecks+' criteri soddisfatti</div></div>'+
+    '</div><div class="score-bar" style="margin-top:8px"><div class="score-fill" style="width:'+overall+'%;background:'+oc+'"></div></div></div>';
+  document.getElementById('drug-result').innerHTML=summary+html;
+  // Animate score bars: set to 0, reflow, then restore width for CSS transition
+  requestAnimationFrame(function(){
+    document.querySelectorAll('#drug-result .score-fill').forEach(function(el){
+      var w=el.style.width; el.style.width='0'; el.offsetWidth; el.style.width=w;
+    });
+  });
+
+  // Radar chart
+  var rw=document.getElementById('radar-wrap');
+  if(rw){rw.style.display='flex';drawRadar('radar-cv',{MW:mw,LogP:lp,TPSA:tpsa,HBD:hbd,HBA:hba,RotBonds:rb});}
+
+  // QED breakdown with animated SVG gauge
+  var qedBox=document.getElementById('drug-qed-box');
+  if(qedBox){
+    var qr=calcQED(d);
+    var qc=qr.score>=0.67?'#4caf80':(qr.score>=0.33?'#ffb454':'#ff6b6b');
+    var ql=qr.score>=0.67?'Elevata drug-likeness':(qr.score>=0.33?'Drug-likeness moderata':'Bassa drug-likeness');
+    var circ=2*Math.PI*40; // circumference for r=40
+    var barsHtml=qr.components.map(function(c){
+      var cc=c.score>=0.67?'#4caf80':(c.score>=0.33?'#ffb454':'#ff6b6b');
+      var pct=Math.round(c.score*100);
+      return '<div class="qed-bar-row">'+
+        '<span class="qed-bar-label">'+c.name+'</span>'+
+        '<div class="qed-bar-track"><div class="qed-bar-fill" style="width:0%;background:'+cc+'" data-w="'+pct+'"></div></div>'+
+        '<span class="qed-bar-val" style="color:'+cc+'">'+pct+'%</span></div>';
+    }).join('');
+    qedBox.style.display='block';
+    qedBox.innerHTML='<h3 style="margin-bottom:8px">QED — Quantitative Estimate of Drug-likeness</h3>'+
+      '<div class="qed-hero">'+
+      '<svg width="100" height="100" viewBox="0 0 100 100" class="qed-svg-gauge">'+
+        '<circle cx="50" cy="50" r="40" class="qed-gauge-ring"/>'+
+        '<circle cx="50" cy="50" r="40" class="qed-gauge-arc" id="qed-gauge-arc"'+
+          ' stroke="'+qc+'" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+circ.toFixed(1)+'"/>'+
+        '<text x="50" y="45" text-anchor="middle" fill="'+qc+'" font-size="16" font-weight="900" font-family="system-ui,sans-serif">'+qr.score.toFixed(3)+'</text>'+
+        '<text x="50" y="61" text-anchor="middle" fill="#9fb3c8" font-size="8" font-family="system-ui,sans-serif">QED</text>'+
+      '</svg>'+
+      '<div style="flex:1"><div style="color:'+qc+';font-weight:700;font-size:.88rem;margin-bottom:6px">'+ql+'</div>'+barsHtml+'</div></div>'+
+      '<div class="note" style="margin-top:8px;font-size:.78rem">Formula: Bickerton et al., <em>Nature Chemistry</em> 2012. QED = media geometrica di 8 funzioni ADS. 1.0 = farmaco ideale.</div>';
+    // Animate gauge arc and QED bars after paint
+    requestAnimationFrame(function(){
+      var arc=document.getElementById('qed-gauge-arc');
+      if(arc){arc.style.strokeDashoffset=String(circ*(1-qr.score));}
+      qedBox.querySelectorAll('.qed-bar-fill').forEach(function(el){
+        var w=el.getAttribute('data-w'); if(w)el.style.width=w+'%';
+      });
+    });
+  }
+}
+
+// ─── QSAR predictions ────────────────────────────────────────────────
+function calcQSAR(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('qsar-smiles').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  var mol=getMolSafe(smi);
+  if(!mol){document.getElementById('qsar-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+  var d=computeDesc(mol);mol.delete();
+  var mw=d.MW,lp=d.LogP,tpsa=d.TPSA,hbd=d.HBD,hba=d.HBA,rb=d.RotBonds,ar=d.ArRings,fsp3=d.FrCSP3;
+
+  // LogS (solubilità acquosa) — Delaney-like
+  var logS=0.16-0.63*lp-0.0062*mw+0.066*rb-0.74*ar;
+  var logScl=logS>=-1?'ok':(logS>=-4?'warn':'bad');
+  var logSlbl=logS>=-1?'Buona (solubile)': (logS>=-4?'Moderata':'Scarsa (insolubile)');
+
+  // BBB permeability score
+  var bbbScore=0;
+  if(mw<450) bbbScore+=25;
+  if(tpsa<90) bbbScore+=30;
+  if(lp>=1&&lp<=3) bbbScore+=25;
+  if(hbd<=3) bbbScore+=20;
+  var bbbCl=bbbScore>=70?'ok':(bbbScore>=40?'warn':'bad');
+
+  // hERG risk
+  var hergRisk=0;
+  if(lp>3.7) hergRisk+=40;
+  if(ar>=2) hergRisk+=20;
+  if(mw>400) hergRisk+=20;
+  if(hba>=4) hergRisk+=10;
+  hergRisk=Math.min(hergRisk,100);
+  var hergCl=hergRisk<30?'ok':(hergRisk<60?'warn':'bad');
+
+  // Oral bioavailability
+  var lipViol=[mw>500,lp>5,hbd>5,hba>10].filter(Boolean).length;
+  var veberOk=rb<=10&&tpsa<=140;
+  var bioavail=Math.max(0,100-lipViol*25-(veberOk?0:20));
+  var bioCl=bioavail>=70?'ok':(bioavail>=40?'warn':'bad');
+
+  // Caco-2 permeability
+  var caco2=100;
+  if(tpsa>60)caco2-=Math.min(50,(tpsa-60)*1.2);
+  if(mw>500)caco2-=20;
+  if(hbd>3)caco2-=15;
+  caco2=Math.max(0,Math.round(caco2));
+  var cacoCl=caco2>=70?'ok':(caco2>=40?'warn':'bad');
+
+  // Metabolic stability (CYP, rough)
+  var metab=60;
+  if(ar>=3)metab-=15;
+  if(fsp3>=0.4)metab+=15;
+  if(lp>4)metab-=10;
+  metab=Math.min(100,Math.max(0,Math.round(metab)));
+  var metCl=metab>=60?'ok':(metab>=35?'warn':'bad');
+
+  function predCard(id,label,value,unit,pct,cls,desc,hint){
+    var col=cls==='ok'?'#4caf80':(cls==='warn'?'#ffb454':'#ff6b6b');
+    return '<div class="pred-item"><div class="pv" style="color:'+col+'">'+value+(unit?' <span style="font-size:.7rem;color:#9fb3c8">'+unit+'</span>':'')+'</div>'+
+      '<div class="pk">'+label+'</div>'+
+      '<div class="meter"><div class="meter-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+      '<div class="pe">'+desc+'<br><em style="color:#9fb3c8">'+hint+'</em></div></div>';
+  }
+
+  var html='<div class="pred-grid">';
+  html+=predCard('ls','Solubilità acquosa (LogS)',logS.toFixed(2),'',Math.max(0,Math.min(100,(logS+6)*12)),logScl,logSlbl,'Delaney-like. > −2 = solubile in acqua');
+  html+=predCard('bb','Permeabilità BBB',bbbScore+'%','',bbbScore,bbbCl,bbbScore>=70?'Probabile penetrazione BBB':bbbScore>=40?'Incerta':'Improbabile penetrazione BBB','Basato su MW, TPSA, LogP, HBD');
+  html+=predCard('hg','Rischio hERG',hergRisk+'%','',hergRisk,hergRisk<30?'ok':(hergRisk<60?'warn':'bad'),hergRisk<30?'Basso rischio cardiotossicità':hergRisk<60?'Rischio moderato':'Alto rischio cardiotossicità','LogP, anelli aromatici, MW, HBA');
+  html+=predCard('bo','Biodisponibilità orale',bioavail+'%','',bioavail,bioCl,bioavail>=70?'Buona (Lipinski + Veber ok)':bioavail>=40?'Moderata':'Scarsa (molte violazioni)','Stima da Lipinski + Veber');
+  html+=predCard('ca','Permeabilità Caco-2',caco2+'%','',caco2,cacoCl,caco2>=70?'Alta (Papp > 20 nm/s, stimato)':caco2>=40?'Moderata':'Bassa','Modello TPSA/HBD — assorbimento intestinale');
+  html+=predCard('ms','Stabilità metabolica (CYP)',metab+'%','',metab,metCl,metab>=60?'Buona stabilità metabolica':metab>=35?'Moderata (possibile metabolismo)':'Instabile (substrato CYP)','Fsp3, aromaticità, LogP');
+
+  // QED
+  var qr=calcQED(d);
+  var qpct=Math.round(qr.score*100);
+  var qcl=qr.score>=0.67?'ok':(qr.score>=0.33?'warn':'bad');
+  html+=predCard('qed','QED Score',qr.score.toFixed(3),'',qpct,qcl,
+    qr.score>=0.67?'Drug-likeness elevata (≥0.67)':qr.score>=0.33?'Drug-likeness moderata':'Bassa drug-likeness',
+    'Bickerton 2012 — media geom. di 8 funzioni ADS');
+
+  // SA Score
+  var sa=calcSAScore(d);
+  var sapct=Math.round((10-parseFloat(sa.score))/9*100);
+  html+=predCard('sa','SA Score (accessib. sint.)',sa.score+'/10','',sapct,sa.cls,
+    sa.label+' da sintetizzare',
+    'Appross. empirica — ≤3 = facile, ≥7 = molto difficile');
+
+  // Plasma Protein Binding
+  var ppb=50;
+  if(lp>3) ppb+=20;
+  if(mw>400) ppb+=10;
+  if(ar>=2) ppb+=10;
+  if(tpsa<60) ppb+=10;
+  ppb=Math.min(99,ppb);
+  var ppbCl=ppb<75?'ok':(ppb<90?'warn':'bad');
+  html+=predCard('ppb','Legame Proteine Plasma (PPB)',ppb+'%','',ppb,ppbCl,
+    ppb<75?'Basso PPB — buona distribuzione':ppb<90?'Moderato — riduce farmaco libero':'Alto PPB — possibili interazioni',
+    'Stima da LogP, MW, aromaticità, TPSA');
+
+  html+='</div>';
+
+  // Append QED compact detail
+  html+='<div class="note" style="margin-top:8px;font-size:.79rem">'+
+    '<strong>QED breakdown:</strong> '+qr.components.map(function(c){
+      var cc=c.score>=0.67?'#4caf80':(c.score>=0.33?'#ffb454':'#ff6b6b');
+      return '<span style="color:'+cc+'">'+c.name+' '+Math.round(c.score*100)+'%</span>';
+    }).join(' · ')+'</div>';
+
+  document.getElementById('qsar-result').innerHTML=html;
+  // Animate meter bars
+  requestAnimationFrame(function(){
+    document.querySelectorAll('#qsar-result .meter-fill').forEach(function(el){
+      var w=el.style.width; el.style.width='0'; el.offsetWidth; el.style.width=w;
+    });
+  });
+}
+
+// ─── Similarity ──────────────────────────────────────────────────────
+function getMFP(smi){
+  var mol=getMolSafe(smi);if(!mol)return null;
+  var fp=mol.get_morgan_fp();mol.delete();return fp;
+}
+
+function tanimoto(fp1,fp2){
+  if(!fp1||!fp2||fp1.length!==fp2.length)return 0;
+  var ab=0,a=0,b=0;
+  for(var i=0;i<fp1.length;i++){
+    var c1=fp1.charCodeAt(i)>48?1:0, c2=fp2.charCodeAt(i)>48?1:0;
+    if(c1&&c2)ab++;if(c1)a++;if(c2)b++;
+  }
+  return a+b-ab===0?0:ab/(a+b-ab);
+}
+
+function calcSimilarity(){
+  if(!requireRDKit())return;
+  var s1=document.getElementById('sim-smi1').value.trim();
+  var s2=document.getElementById('sim-smi2').value.trim();
+  if(!s1||!s2){alert('Inserisci entrambi gli SMILES.');return;}
+  var fp1=getMFP(s1),fp2=getMFP(s2);
+  if(!fp1||!fp2){document.getElementById('sim-result').innerHTML='<div class="warn">Uno o entrambi gli SMILES non validi.</div>';return;}
+  var sim=tanimoto(fp1,fp2);
+  var pct=(sim*100).toFixed(1);
+  var col=sim>=0.7?'#4caf80':(sim>=0.4?'#ffb454':'#ff6b6b');
+  var interp=sim>=0.85?'Praticamente identiche (stessa molecola o isomero)':
+             sim>=0.7?'Molto simili — probabile stesso scaffold':
+             sim>=0.4?'Similarità moderata — possibile analogo':
+             'Strutturalmente distinte';
+  document.getElementById('sim-result').innerHTML=
+    '<div class="card" style="margin-top:8px;border-color:'+col+'">'+
+    '<div style="display:flex;align-items:center;gap:16px">'+
+    '<div style="font-size:2rem;font-weight:800;color:'+col+'">'+pct+'%</div>'+
+    '<div><div style="color:#e8eef4;font-weight:700">Similarità di Tanimoto</div>'+
+    '<div style="color:#9fb3c8;font-size:.8rem">'+interp+'</div></div></div>'+
+    '<div class="fp-bar" style="margin-top:10px;height:10px"><div class="fp-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+    '<div style="font-size:.77rem;color:#9fb3c8;margin-top:4px">Morgan fingerprint r=2 · 2048 bit · algoritmo Jaccard/Tanimoto</div></div>';
+}
+
+function quickSim(s1,s2){
+  document.getElementById('sim-smi1').value=s1;
+  document.getElementById('sim-smi2').value=s2;
+  calcSimilarity();
+}
+
+var REFDB=[
+  {n:'Paracetamolo',s:'CC(=O)Nc1ccc(O)cc1'},
+  {n:'Ibuprofene',s:'CC(C)Cc1ccc(cc1)C(C)C(=O)O'},
+  {n:'Aspirina',s:'O=C(O)c1ccccc1OC(C)=O'},
+  {n:'Caffeina',s:'Cn1cnc2N(C)C(=O)N(C)c12'},
+  {n:'Nicotina',s:'CN1CCC[C@H]1c2cccnc2'},
+  {n:'Dopamina',s:'NCCc1ccc(O)c(O)c1'},
+  {n:'Serotonina',s:'NCCc1c[nH]c2ccc(O)cc12'},
+  {n:'Adrenalina',s:'CNC[C@@H](O)c1ccc(O)c(O)c1'},
+  {n:'Testosterone',s:'CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C'},
+  {n:'Glucosio',s:'OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O'},
+  {n:'Colesterolo',s:'CC(C)CCCC(C)C1CCC2C1(CCC3C2CC=C4C3(CCC(C4)O)C)C'},
+  {n:'Penicillina G',s:'CC1(C(N2C(S1)C(C2=O)NC(=O)Cc3ccccc3)C(=O)O)C'},
+  {n:'Morfina',s:'OC1CC2CC3Oc4c(CC3N(C)CC2C=C1)cc(O)cc4'},
+  {n:'Vitamina C',s:'OC[C@H](O)[C@H]1OC(=O)C(O)=C1O'},
+  {n:'Metformina',s:'CN(C)C(=N)NC(=N)N'},
+  {n:'Atorvastatina',s:'CC(C)c1n(CC(CC(=O)O)O)c(C(=O)c2ccc(F)cc2)c(c3ccccc3)c1'},
+  {n:'Naprossene',s:'COc1ccc2cc(ccc2c1)C(C)C(=O)O'},
+  {n:'Omeprazolo',s:'CC1=CN=C(CS(=O)c2[nH]c3ccc(OC)cc3n2)C(C)=C1OC'},
+  {n:'Fluoxetina (Prozac)',s:'CNCCC(Oc1ccc(cc1)C(F)(F)F)c1ccccc1'},
+  {n:'Amoxicillina',s:'CC1(C)SC2C(NC(=O)C(N)c3ccc(O)cc3)C(=O)N2C1C(=O)O'},
+  {n:'Diazepam (Valium)',s:'CN1C(=O)CN=C(c2ccccc2)c2cc(Cl)ccc21'},
+  {n:'Warfarin',s:'CC(=O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O'},
+  {n:'Lidocaina',s:'CCN(CC)CC(=O)Nc1c(C)cccc1C'},
+  {n:'Metotrexato',s:'CN(Cc1cnc2nc(N)nc(N)c2n1)c1ccc(CC(=O)[C@@H](CCC(=O)O)N)cc1'},
+  {n:'Oseltamivir (Tamiflu)',s:'CCOC(=O)C1=C[C@@H](OC(CC)CC)[C@H](NC(C)=O)[C@@H](N)C1'},
+  {n:'Sildenafil (Viagra)',s:'CCCC1=NN(C)C(=O)c2[nH]c(-c3cc(S(=O)(=O)N4CCN(C)CC4)ccc3OCC)nc21'},
+  {n:'Colchicina',s:'COc1ccc2cc3cc(OC)c(OC)c(OC)c3c(=O)c2c1NC(C)=O'},
+  {n:'Quercetina',s:'OC1=CC(=CC(=C1)O)C1=CC(=O)C2=C(O)C(=CC(O)=C2O1)O'},
+  {n:'Resveratrolo',s:'Oc1ccc(cc1)/C=C/c1cc(O)cc(O)c1'},
+  {n:'Vitamina D3',s:'CC(CCCC(C)C)C1CCC2C1(CCCC2=CC=C1CC(O)CCC1=C)C'},
+];
+
+function simSearch(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('sim-query').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  var fp=getMFP(smi);
+  if(!fp){document.getElementById('sim-search-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+  var results=REFDB.map(function(drug){
+    var rfp=getMFP(drug.s);if(!rfp)return null;
+    return{n:drug.n,s:drug.s,sim:tanimoto(fp,rfp)};
+  }).filter(Boolean).sort(function(a,b){return b.sim-a.sim;});
+
+  var html='<div class="card" style="margin-top:8px">';
+  results.forEach(function(r){
+    var pct=(r.sim*100).toFixed(1);
+    var col=r.sim>=0.7?'#4caf80':(r.sim>=0.3?'#ffb454':'#ff6b6b');
+    html+='<div class="sim-row"><span style="min-width:130px;color:#e8eef4;font-weight:600">'+r.n+'</span>'+
+      '<div class="fp-bar" style="flex:1;margin:0 8px"><div class="fp-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+      '<span style="color:'+col+';min-width:42px;text-align:right;font-weight:700;font-size:.85rem">'+pct+'%</span>'+
+      '<button class="btn btn-sm btn-outline" style="margin-left:8px;font-size:.72rem" onclick="loadIntoMol(\''+escH(r.s)+'\')">Carica</button></div>';
+  });
+  html+='</div>';
+  document.getElementById('sim-search-result').innerHTML=html;
+}
+
+function loadIntoMol(smi){
+  document.getElementById('smiles-input').value=smi;
+  showPanelById('p-mol');
+  setTimeout(analyzeMol,80);
+}
+
+// ─── Run all tabs ────────────────────────────────────────────────────
+function runAllTabs(){
+  if(!curSMI){alert('Prima analizza una molecola.');return;}
+  ['desc-smiles','drug-smiles','qsar-smiles','sim-query','fp-smi','smarts-mol'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value=curSMI;
+  });
+  calcDescriptors();calcDrugLike();calcQSAR();simSearch();drawFPVis();
+  showPanelById('p-desc');
+}
+
+// ─── Library ─────────────────────────────────────────────────────────
+function saveLib(){localStorage.setItem('bsi_rdkit_lib2',JSON.stringify(library));}
+
+function addToLibrary(){
+  if(!curSMI)return;
+  var name=prompt('Nome per questa molecola:','Molecola '+(library.length+1));
+  if(name===null)return;
+  library.push({name:name,smiles:curCanon||curSMI,ts:Date.now()});
+  saveLib();renderLib();
+}
+
+function addToLibManual(){
+  var smi=document.getElementById('lib-smi').value.trim();
+  var name=document.getElementById('lib-name').value.trim()||'Molecola '+(library.length+1);
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  library.push({name:name,smiles:smi,ts:Date.now()});
+  saveLib();renderLib();
+  document.getElementById('lib-smi').value='';
+  document.getElementById('lib-name').value='';
+}
+
+function removeFromLib(idx){library.splice(idx,1);saveLib();renderLib();}
+
+function clearLib(){
+  if(confirm('Svuotare tutta la libreria? Esporta prima in JSON se vuoi un backup.')){library=[];saveLib();renderLib();}
+}
+
+function renderLib(){
+  var el=document.getElementById('lib-list');
+  if(!library.length){
+    el.innerHTML='<div class="card" style="text-align:center;color:#9fb3c8;padding:16px">'+
+      'Libreria vuota.<br>Analizza una molecola e usa <strong>"+ Libreria"</strong> per salvarla.</div>';
+    return;
+  }
+  el.innerHTML=library.map(function(it,i){
+    var dt=new Date(it.ts).toLocaleDateString('it-IT');
+    return '<div class="lib-item"><div class="li-name">'+escH(it.name)+'<br>'+
+      '<span style="font-size:.7rem;color:#1c3a57">'+dt+'</span></div>'+
+      '<div class="li-smi">'+escH(it.smiles)+'</div>'+
+      '<button class="btn btn-sm btn-outline" onclick="loadIntoMol(\''+escH(it.smiles)+'\')">Carica</button>'+
+      '<button class="btn btn-sm btn-danger" onclick="removeFromLib('+i+')">✕</button></div>';
+  }).join('');
+}
+
+// ─── Export ──────────────────────────────────────────────────────────
+function exportSVG(){
+  var svg=document.getElementById('mol-svg-box').innerHTML;
+  if(!svg||svg.includes('placeholder'))return;
+  dlBlob(new Blob([svg],{type:'image/svg+xml'}),'molecule.svg');
+}
+function exportPNG(){
+  var svgEl=document.getElementById('mol-svg-box').querySelector('svg');if(!svgEl)return;
+  var data=new XMLSerializer().serializeToString(svgEl);
+  var cv=document.createElement('canvas');cv.width=500;cv.height=400;
+  var ctx=cv.getContext('2d');
+  var img=new Image();
+  img.onload=function(){ctx.fillStyle='#fff';ctx.fillRect(0,0,500,400);ctx.drawImage(img,0,0,500,400);cv.toBlob(function(b){dlBlob(b,'molecule.png');});};
+  img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(data)));
+}
+function copySMILES(){
+  if(curCanon) navigator.clipboard.writeText(curCanon).then(function(){
+    var b=document.getElementById('btn-cpsmi');
+    b.textContent='✔ Copiato!';setTimeout(function(){b.textContent='📋 Copia SMILES';},1500);
+  });
+}
+function exportDescJSON(){dlBlob(new Blob([JSON.stringify(curDesc,null,2)],{type:'application/json'}),'descriptors.json');}
+function exportDescCSV(){
+  var lines=['Descrittore,Valore'];
+  Object.entries(curDesc).forEach(function(kv){lines.push(escCsv(kv[0])+','+escCsv(String(kv[1])));});
+  dlBlob(new Blob([lines.join('\n')],{type:'text/csv'}),'descriptors.csv');
+}
+function exportLibJSON(){dlBlob(new Blob([JSON.stringify(library,null,2)],{type:'application/json'}),'bsi_lib.json');}
+function exportLibCSV(){
+  var lines=['Nome,SMILES,Data'];
+  library.forEach(function(it){lines.push(escCsv(it.name)+','+escCsv(it.smiles)+','+new Date(it.ts).toISOString());});
+  dlBlob(new Blob([lines.join('\n')],{type:'text/csv'}),'bsi_lib.csv');
+}
+function dlBlob(blob,fname){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();}
+
+// ─── Utils ───────────────────────────────────────────────────────────
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escCsv(s){return '"'+String(s).replace(/"/g,'""')+'"';}
+
+// ─── QED — Quantitative Estimate of Drug-likeness ────────────────────
+// Bickerton et al., Nature Chemistry, 2012
+// Uses the ADS (Asymmetric Double Sigmoidal) function per descriptor
+var QED_P=[
+  // [a, b, c, d, e, f,  name,           value_fmt]
+  [2.817, 392.575, 290.749, 2.420,  49.223, 65.372, 'MW',      function(d){return d.MW;}],
+  [3.172, 137.413,   2.534, 4.581,   0.882,  0.793, 'LogP',    function(d){return d.LogP;}],
+  [2.948, 160.457,   3.615, 4.436,   0.290,  1.154, 'HBA',     function(d){return d.HBA;}],
+  [1.618, 1010.051,  0.985, 0.956,   5.390,  0.327, 'HBD',     function(d){return d.HBD;}],
+  [1.876, 125.187,  62.378, 0.695,   0.653, 37.270, 'TPSA',    function(d){return d.TPSA;}],
+  [0.010, 272.468,   2.558, 1.565,   1.841,  2.539, 'RotBonds',function(d){return d.RotBonds;}],
+  [3.217, 957.751,   2.303, 3.343,   0.257,  1.400, 'ArRings', function(d){return d.ArRings;}],
+  [0.010, 1199.094, -0.090, 0.414,   0.001,  0.389, 'Alerts',  function(){return 0;}],
+];
+
+function _ads(x, a, b, c, dd, e, f){
+  var dmax=(a+2)*f;
+  var s1=1/(1+Math.pow(10,(b-x)*c));
+  var s2=1/(1+Math.pow(10,(dd-x)*e));
+  return Math.min(1,Math.max(0.001,(a+s1+s2)*f/dmax));
+}
+
+function calcQED(d){
+  var comps=QED_P.map(function(p){
+    var x=p[7](d);
+    var s=_ads(x,p[0],p[1],p[2],p[3],p[4],p[5]);
+    return{name:p[6],score:s,value:x};
+  });
+  var logSum=comps.reduce(function(acc,c){return acc+Math.log(c.score);},0);
+  return{score:Math.exp(logSum/comps.length), components:comps};
+}
+
+// ─── SA Score (Synthetic Accessibility approximation) ────────────────
+// Approximation inspired by Ertl & Schuffenhauer 2009 (scale 1–10)
+// True SA Score requires a fragment database; this is a fast heuristic
+function calcSAScore(d){
+  var score=1.0;
+  // Size & complexity penalties
+  score+=Math.max(0,(d.HeavyAtoms-20)*0.055);
+  score+=d.Stereo*0.65;
+  score+=Math.max(0,d.Rings-2)*0.45;
+  score+=(1-d.FrCSP3)*1.6;
+  score+=Math.max(0,d.ArRings-2)*0.55;
+  // Simplicity rewards
+  if(d.Rings<=2&&d.Stereo===0) score-=0.5;
+  if(d.FrCSP3>=0.5) score-=0.3;
+  score=Math.min(10,Math.max(1,score));
+  var lbl=score<=3?'Facile':(score<=5?'Moderata':(score<=7?'Difficile':'Molto difficile'));
+  var cls=score<=3?'ok':(score<=5?'warn':'bad');
+  return{score:score.toFixed(1),label:lbl,cls:cls};
+}
+
+// ─── Fingerprint Visualizer ──────────────────────────────────────────
+function drawFPVis(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('fp-smi').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  var mol=getMolSafe(smi);
+  if(!mol){return;}
+  var fp=mol.get_morgan_fp();
+  mol.delete();
+  if(!fp){return;}
+
+  var box=document.getElementById('fp-vis-box');
+  box.style.display='block';
+  var cv=document.getElementById('fp-canvas');
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height; // 512 × 128
+  ctx.clearRect(0,0,W,H);
+
+  // fp is a 2048-char string of '0'/'1'
+  // Layout: 64 cols × 32 rows = 2048 bits
+  var COLS=64, ROWS=32, bw=W/COLS, bh=H/ROWS;
+  var active=0;
+  for(var k=0;k<2048;k++){if(fp.charCodeAt(k)>48)active++;}
+  document.getElementById('fp-active-count').textContent='';
+
+  // Animate columns appearing left-to-right
+  if(cv._fpRaf)cancelAnimationFrame(cv._fpRaf);
+  var colDone=0;
+  (function drawCols(){
+    var limit=Math.min(colDone+3,COLS);
+    for(var col=colDone;col<limit;col++){
+      for(var row=0;row<ROWS;row++){
+        var idx=col*ROWS+row;
+        var on=fp.charCodeAt(idx)>48;
+        ctx.fillStyle=on?'#00c9b7':'#071221';
+        ctx.fillRect(col*bw+0.5,row*bh+0.5,bw-1,bh-1);
+      }
+    }
+    colDone=limit;
+    if(colDone<COLS){cv._fpRaf=requestAnimationFrame(drawCols);}
+    else{document.getElementById('fp-active-count').textContent='Bit attivi: '+active+'/2048 ('+(active/2048*100).toFixed(1)+'%)';}
+  })();
+}
+
+// ─── SMARTS substructure ─────────────────────────────────────────────
+function calcSMARTS(){
+  if(!requireRDKit())return;
+  var smi=document.getElementById('smarts-mol').value.trim()||curSMI;
+  var smarts=document.getElementById('smarts-query').value.trim();
+  if(!smi){alert('Inserisci uno SMILES molecola (o caricalo dal tab Molecola).');return;}
+  if(!smarts){alert('Inserisci un pattern SMARTS.');return;}
+
+  var mol=getMolSafe(smi);
+  if(!mol){
+    document.getElementById('smarts-count').innerHTML='<span class="s-err">SMILES molecola non valido.</span>';
+    document.getElementById('smarts-all').innerHTML='—';return;
+  }
+
+  var query=null;
+  try{query=RDKit.get_mol_from_smarts(smarts);}catch(e){}
+  if(!query||!query.is_valid()){
+    if(query)query.delete();mol.delete();
+    document.getElementById('smarts-count').innerHTML='<span class="s-err">SMARTS non valido o non riconosciuto.</span>';
+    document.getElementById('smarts-all').innerHTML='Controlla la sintassi SMARTS.';return;
+  }
+
+  // All matches
+  var allMatchJson='[]';
+  try{allMatchJson=mol.get_substruct_matches(query);}catch(e){}
+  var allMatches=[];
+  try{allMatches=JSON.parse(allMatchJson);if(!Array.isArray(allMatches))allMatches=[];}catch(e){}
+  var count=allMatches.length;
+
+  // Highlighted SVG (first match)
+  var svg;
+  if(count>0){
+    var fm=allMatches[0];
+    try{svg=mol.get_svg_with_highlights(JSON.stringify({atoms:fm.atoms||[],bonds:fm.bonds||[]}));}
+    catch(e){svg=mol.get_svg_with_highlights('{}');}
+  }else{
+    svg=mol.get_svg_with_highlights('{}');
+  }
+
+  query.delete();mol.delete();
+
+  var col=count>0?'#4caf80':'#ff6b6b';
+  document.getElementById('smarts-sv').innerHTML=svg;
+  document.getElementById('smarts-count').innerHTML=
+    '<span style="color:'+col+';font-weight:700">'+(count>0?count+' corrisp.'+(count>1?'e trovate':'a trovata')+' ':''+'<em style="color:#9fb3c8">(1° evidenziata in giallo)</em>':'Nessuna corrispondenza — pattern assente in questa molecola.')+'</span>';
+
+  // List all matches
+  if(count>0){
+    var ahtml='<div style="font-size:.8rem">';
+    allMatches.forEach(function(m,i){
+      ahtml+='<div style="margin:.2em 0;color:#9fb3c8">Match '+(i+1)+': atomi ['+((m.atoms||[]).join(', '))+']</div>';
+    });
+    ahtml+='</div>';
+    document.getElementById('smarts-all').innerHTML=ahtml;
+  }else{
+    document.getElementById('smarts-all').innerHTML='<span style="color:#ff6b6b">Nessun match trovato.</span>';
+  }
+}
+
+function smartsPreset(smarts){
+  document.getElementById('smarts-query').value=smarts;
+  if(document.getElementById('smarts-mol').value.trim()||curSMI){
+    if(!document.getElementById('smarts-mol').value.trim())
+      document.getElementById('smarts-mol').value=curSMI;
+    calcSMARTS();
+  }
+}
+
+// ─── Confronto molecole ──────────────────────────────────────────────
+function cmpPreset(s1,s2){
+  document.getElementById('cmp-smi1').value=s1;
+  document.getElementById('cmp-smi2').value=s2;
+  calcComparison();
+}
+
+function calcComparison(){
+  if(!requireRDKit())return;
+  var s1=document.getElementById('cmp-smi1').value.trim();
+  var s2=document.getElementById('cmp-smi2').value.trim();
+  if(!s1||!s2){alert('Inserisci entrambi gli SMILES.');return;}
+
+  var mol1=getMolSafe(s1),mol2=getMolSafe(s2);
+  if(!mol1||!mol2){
+    if(mol1)mol1.delete();if(mol2)mol2.delete();
+    document.getElementById('cmp-result').innerHTML='<div class="warn">Uno o entrambi gli SMILES non validi.</div>';
+    return;
+  }
+
+  var d1=computeDesc(mol1),d2=computeDesc(mol2);
+  var svg1=mol1.get_svg_with_highlights('{}');
+  var svg2=mol2.get_svg_with_highlights('{}');
+  mol1.delete();mol2.delete();
+
+  document.getElementById('cmp-svg1').innerHTML=svg1;
+  document.getElementById('cmp-svg2').innerHTML=svg2;
+  document.getElementById('cmp-info1').innerHTML='<span style="color:#00c9b7">MW:</span> '+d1.MW.toFixed(2)+' Da  <span style="color:#00c9b7">LogP:</span> '+d1.LogP.toFixed(2)+(d1.Formula?' <span style="color:#00c9b7">Formula:</span> '+escH(d1.Formula):'');
+  document.getElementById('cmp-info2').innerHTML='<span style="color:#ffb454">MW:</span> '+d2.MW.toFixed(2)+' Da  <span style="color:#ffb454">LogP:</span> '+d2.LogP.toFixed(2)+(d2.Formula?' <span style="color:#ffb454">Formula:</span> '+escH(d2.Formula):'');
+
+  // Descriptor comparison table
+  // best: 'low' = lower is better, 'high' = higher better, 'mid' = closer to ideal, 'none' = neutral
+  var fields=[
+    {k:'MW',l:'Peso Molecolare',u:'Da',fmt:function(v){return v.toFixed(2);},best:'low',ideal:300},
+    {k:'LogP',l:'LogP (Crippen)',u:'',fmt:function(v){return v.toFixed(3);},best:'mid',ideal:2.5},
+    {k:'TPSA',l:'TPSA',u:'Ų',fmt:function(v){return v.toFixed(1);},best:'low',ideal:60},
+    {k:'HBA',l:'H-bond Acceptors',u:'',fmt:function(v){return String(v);},best:'low',ideal:5},
+    {k:'HBD',l:'H-bond Donors',u:'',fmt:function(v){return String(v);},best:'low',ideal:2},
+    {k:'RotBonds',l:'Legami rotabili',u:'',fmt:function(v){return String(v);},best:'low',ideal:4},
+    {k:'ArRings',l:'Anelli aromatici',u:'',fmt:function(v){return String(v);},best:'low',ideal:2},
+    {k:'FrCSP3',l:'Frac. C sp³',u:'',fmt:function(v){return (v*100).toFixed(0)+'%';},best:'high',ideal:0.4},
+    {k:'HeavyAtoms',l:'Atomi pesanti',u:'',fmt:function(v){return String(v);},best:'none',ideal:35},
+    {k:'Stereo',l:'Stereocentri',u:'',fmt:function(v){return String(v);},best:'none',ideal:0},
+  ];
+
+  var thtml='<table><tr><th>Proprietà</th><th style="color:#00c9b7">Mol A</th><th style="color:#ffb454">Mol B</th><th>Δ (A−B)</th><th>Migliore</th></tr>';
+  fields.forEach(function(f){
+    var v1=d1[f.k]||0,v2=d2[f.k]||0;
+    var raw1=v1,raw2=v2;
+    var dval=raw1-raw2;
+    var dabs=Math.abs(dval);
+    var dstr=(dval>=0?'+':'')+f.fmt(dval);
+    var dcol=dabs<0.01?'#9fb3c8':(dval>0?'#ffb454':'#4caf80');
+    // Who is closer to ideal?
+    var winner='';
+    if(f.best==='low'){ winner=raw1<raw2?'A':'(raw1>raw2?\'B\':\'=\')'; }
+    if(f.best!=='none'){
+      var d1ideal=Math.abs(raw1-f.ideal),d2ideal=Math.abs(raw2-f.ideal);
+      if(f.best==='low'){winner=raw1<=raw2?'<span style="color:#00c9b7">A</span>':'<span style="color:#ffb454">B</span>';}
+      else if(f.best==='high'){winner=raw1>=raw2?'<span style="color:#00c9b7">A</span>':'<span style="color:#ffb454">B</span>';}
+      else if(f.best==='mid'){winner=d1ideal<=d2ideal?'<span style="color:#00c9b7">A</span>':'<span style="color:#ffb454">B</span>';}
+      if(Math.abs(dval)<0.01)winner='<span style="color:#9fb3c8">=</span>';
+    }else{winner='<span style="color:#9fb3c8">—</span>';}
+    thtml+='<tr><td>'+f.l+'</td>'+
+      '<td style="color:#00c9b7">'+f.fmt(raw1)+(f.u?' '+f.u:'')+'</td>'+
+      '<td style="color:#ffb454">'+f.fmt(raw2)+(f.u?' '+f.u:'')+'</td>'+
+      '<td style="color:'+dcol+'">'+dstr+'</td>'+
+      '<td style="text-align:center">'+winner+'</td></tr>';
+  });
+  thtml+='</table>';
+  document.getElementById('cmp-table').innerHTML=thtml;
+
+  // Simple drug-likeness summary
+  function lipScore(d){
+    var v=[d.MW<=500,d.LogP<=5,d.HBD<=5,d.HBA<=10,d.RotBonds<=10,d.TPSA<=140];
+    return Math.round(v.filter(Boolean).length/v.length*100);
+  }
+  var sc1=lipScore(d1),sc2=lipScore(d2);
+  var c1=sc1>=80?'#4caf80':(sc1>=50?'#ffb454':'#ff6b6b');
+  var c2=sc2>=80?'#4caf80':(sc2>=50?'#ffb454':'#ff6b6b');
+  document.getElementById('cmp-drug').innerHTML=
+    '<div class="cmp-grid"><div class="card" style="border-color:'+c1+'">'+
+    '<div style="font-size:1.4rem;font-weight:800;color:'+c1+'">'+sc1+'%</div>'+
+    '<div style="color:#9fb3c8;font-size:.78rem">Drug-likeness Mol A<br>(Lip+Veber quick)</div>'+
+    '<div class="score-bar" style="margin-top:6px"><div class="score-fill" style="width:'+sc1+'%;background:'+c1+'"></div></div></div>'+
+    '<div class="card" style="border-color:'+c2+'">'+
+    '<div style="font-size:1.4rem;font-weight:800;color:'+c2+'">'+sc2+'%</div>'+
+    '<div style="color:#9fb3c8;font-size:.78rem">Drug-likeness Mol B<br>(Lip+Veber quick)</div>'+
+    '<div class="score-bar" style="margin-top:6px"><div class="score-fill" style="width:'+sc2+'%;background:'+c2+'"></div></div></div></div>';
+
+  document.getElementById('cmp-result').style.display='block';
+}
+
+// ─── Radar chart (Drug profile hexagon) ──────────────────────────────
+function drawRadar(cvId,d,_prog){
+  var cv=document.getElementById(cvId);if(!cv)return;
+  // Kick off animation when called without progress
+  if(_prog===undefined){
+    if(cv._raf)cancelAnimationFrame(cv._raf);
+    var t0=performance.now();
+    (function frame(ts){
+      var p=Math.min(1,(ts-t0)/650);
+      p=p<1?p*p*(3-2*p):1; // smoothstep
+      drawRadar(cvId,d,p);
+      if(p<1)cv._raf=requestAnimationFrame(frame);
+    })(t0);
+    return;
+  }
+  var prog=_prog;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  var r=Math.min(cx,cy)-28;
+  ctx.clearRect(0,0,W,H);
+
+  var labels=['MW','LogP','TPSA','HBD','HBA','RotB'];
+  var vals=[d.MW,d.LogP,d.TPSA,d.HBD,d.HBA,d.RotBonds];
+
+  // Normalize to 0–1 drug-like score (raw)
+  var rawScores=[
+    Math.max(0,1-Math.max(0,d.MW-500)/400),
+    d.LogP<-0.4?Math.max(0,(d.LogP+5)/4.6):(d.LogP<=5?1:Math.max(0,1-(d.LogP-5)/5)),
+    Math.max(0,1-Math.max(0,d.TPSA-90)/90),
+    Math.max(0,1-d.HBD/5),
+    Math.max(0,1-d.HBA/10),
+    Math.max(0,1-d.RotBonds/10)
+  ];
+  // Scale by animation progress
+  var scores=rawScores.map(function(s){return s*prog;});
+
+  var n=6;
+  var angles=scores.map(function(_,i){return i*2*Math.PI/n-Math.PI/2;});
+
+  // Grid rings
+  for(var ring=1;ring<=4;ring++){
+    ctx.beginPath();
+    angles.forEach(function(a,j){
+      var rr=r*ring/4;
+      var x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);
+      if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    ctx.strokeStyle='rgba(28,58,87,0.7)';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Spokes
+  angles.forEach(function(a){
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+    ctx.strokeStyle='rgba(28,58,87,0.8)';ctx.lineWidth=1;ctx.stroke();
+  });
+  // 100% ring reference (dashed)
+  ctx.beginPath();ctx.setLineDash([3,3]);
+  angles.forEach(function(a,j){
+    var x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+    if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.closePath();ctx.strokeStyle='rgba(0,201,183,0.25)';ctx.lineWidth=1;ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Score polygon (animated positions)
+  var rawAvg=rawScores.reduce(function(a,b){return a+b;},0)/n;
+  var fc=rawAvg>=0.65?'rgba(76,175,128,.3)':(rawAvg>=0.4?'rgba(255,180,84,.3)':'rgba(255,107,107,.3)');
+  var sc=rawAvg>=0.65?'#4caf80':(rawAvg>=0.4?'#ffb454':'#ff6b6b');
+  ctx.beginPath();
+  scores.forEach(function(s,i){
+    var x=cx+r*s*Math.cos(angles[i]),y=cy+r*s*Math.sin(angles[i]);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle=fc;ctx.fill();
+  ctx.strokeStyle=sc;ctx.lineWidth=2;ctx.stroke();
+
+  // Dots at each animated vertex
+  scores.forEach(function(s,i){
+    var x=cx+r*s*Math.cos(angles[i]),y=cy+r*s*Math.sin(angles[i]);
+    ctx.beginPath();ctx.arc(x,y,3.5,0,2*Math.PI);
+    ctx.fillStyle='#00c9b7';ctx.fill();
+  });
+
+  // Axis labels + values (always at full radius, not animated)
+  var valFmts=[
+    function(v){return v.toFixed(0);},
+    function(v){return v.toFixed(2);},
+    function(v){return v.toFixed(0)+'Ų';},
+    function(v){return String(Math.round(v));},
+    function(v){return String(Math.round(v));},
+    function(v){return String(Math.round(v));}
+  ];
+  angles.forEach(function(a,i){
+    var lx=cx+(r+20)*Math.cos(a),ly=cy+(r+20)*Math.sin(a);
+    ctx.fillStyle='#9fb3c8';ctx.font='bold 10px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(labels[i],lx,ly);
+    ctx.fillStyle='#e8eef4';ctx.font='9px sans-serif';
+    ctx.fillText(valFmts[i](vals[i]),lx,ly+13);
+  });
+
+  // Center: animated score
+  ctx.fillStyle=sc;ctx.font='bold 15px sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(Math.round(rawAvg*100*prog)+'%',cx,cy-6);
+  ctx.fillStyle='#9fb3c8';ctx.font='9px sans-serif';
+  ctx.fillText('drug score',cx,cy+8);
+
+  // Legend rows (update only on final frame to avoid jank)
+  if(prog>=1){
+    var legEl=document.getElementById('radar-legend-rows');
+    if(legEl){
+      legEl.innerHTML=labels.map(function(l,i){
+        var sc2=rawScores[i];
+        var cc=sc2>=0.65?'#4caf80':(sc2>=0.35?'#ffb454':'#ff6b6b');
+        return '<div class="rl-row"><span class="rl-dot" style="background:'+cc+'"></span>'+
+          '<span style="color:#9fb3c8;min-width:40px">'+l+'</span>'+
+          '<span style="color:'+cc+'">'+Math.round(sc2*100)+'%</span></div>';
+      }).join('');
+    }
+  }
+}
+
+// ─── Library import from JSON ────────────────────────────────────────
+function importLibJSON(){
+  var inp=document.createElement('input');
+  inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var imported=JSON.parse(ev.target.result);
+        if(!Array.isArray(imported)){
+          alert('File JSON non valido: deve essere un array (usare il JSON esportato dal Lab).');return;
+        }
+        var added=0,skipped=0;
+        imported.forEach(function(it){
+          if(it.smiles&&it.name){
+            if(!library.find(function(l){return l.smiles===it.smiles;})){
+              library.push({name:it.name,smiles:it.smiles,ts:it.ts||Date.now()});
+              added++;
+            }else{skipped++;}
+          }
+        });
+        saveLib();renderLib();
+        alert(added+' molecole importate, '+skipped+' già presenti (duplicate skippate).');
+      }catch(ex){alert('Errore lettura file JSON: '+ex.message);}
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// ─── Copy InChIKey ───────────────────────────────────────────────────
+function copyInChIKey(key){
+  if(!key)return;
+  navigator.clipboard.writeText(key).then(function(){
+    var b=document.getElementById('btn-cpinchi');
+    if(b){b.textContent='✔';setTimeout(function(){b.textContent='📋';},1500);}
+  }).catch(function(){});
+}
+
+// Init
+renderLib();
+// Pre-load a molecule if none yet
+window.addEventListener('load',function(){
+  if(!curSMI){document.getElementById('smiles-input').value='CC(=O)Nc1ccc(O)cc1';}
+});
+
+// Show floating back button when embedded in BioSpecInfo overlay
+(function(){
+  try{
+    if(window.self!==window.top){
+      document.getElementById('bsi-float-back').style.display='block';
+    }
+  }catch(e){
+    document.getElementById('bsi-float-back').style.display='block';
+  }
+})();
+</script>
+
+<!-- Floating back button — visible only inside the BioSpecInfo overlay -->
+<div id="bsi-float-back">
+  <button onclick="try{window.parent.document.getElementById('bsi-rdkitlab-ov').style.display='none';}catch(e){}" title="Chiudi Lab e torna all\'app">◀ Indietro</button>
+</div>
+</body>
+</html>
