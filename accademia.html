@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accademia BioSpecInfo</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #071221;
+  --card: #0d2236;
+  --card2: #0f2942;
+  --accent: #00c9b7;
+  --amber: #ffb454;
+  --coral: #ff6b6b;
+  --violet: #b794f6;
+  --text: #e2e8f0;
+  --muted: #8fa5bc;
+  --border: #1e3a55;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0.3) translateY(-60px); opacity: 0; }
+  50%  { transform: scale(1.1) translateY(0);     opacity: 1; }
+  70%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+@keyframes popXP {
+  0%   { opacity: 0; transform: translateY(0)    scale(0.7); }
+  20%  { opacity: 1; transform: translateY(-10px) scale(1.15); }
+  80%  { opacity: 1; transform: translateY(-30px) scale(1); }
+  100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(0,201,183,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(0,201,183,0); }
+}
+
+.view { display: none; animation: fadeIn 0.35s ease; padding: 0 0 60px; }
+.view.active { display: block; }
+
+/* ── TOP BAR ── */
+#topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,18,33,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; gap: 12px;
+}
+#topbar .logo { font-size: 1.05rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+#topbar .tb-right { display: flex; align-items: center; gap: 12px; }
+#streak-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 0.85rem; font-weight: 600; color: var(--amber);
+}
+#level-badge {
+  background: linear-gradient(135deg, var(--violet), #7c5cbf);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.8rem; font-weight: 700; color: #fff; white-space: nowrap;
+}
+
+/* ── XP BAR ── */
+#xp-bar-wrap { padding: 12px 16px 0; }
+#xp-bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;
+}
+#xp-bar-outer {
+  background: var(--card); border-radius: 999px; height: 10px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+#xp-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #00e5d0);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── SECTION TITLES ── */
+.section-title {
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); padding: 18px 16px 8px;
+}
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; padding: 0 16px;
+}
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 10px; text-align: center;
+}
+.stat-card .val { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-card .lbl { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+/* ── CATEGORY GRID ── */
+.cat-grid {
+  display: grid; grid-template-columns: repeat(2,1fr);
+  gap: 12px; padding: 0 16px;
+}
+@media (min-width: 600px) { .cat-grid { grid-template-columns: repeat(3,1fr); } }
+.cat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px 14px;
+  cursor: pointer; transition: transform .18s, border-color .18s, box-shadow .18s;
+  position: relative; overflow: hidden;
+}
+.cat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 24px rgba(0,201,183,.15);
+}
+.cat-card .cat-icon { font-size: 2rem; margin-bottom: 8px; }
+.cat-card .cat-name { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.cat-card .cat-sub  { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+.cat-card .cat-prog-bar {
+  margin-top: 10px; background: var(--bg);
+  border-radius: 999px; height: 4px; overflow: hidden;
+}
+.cat-card .cat-prog-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #00e5d0);
+  transition: width .5s ease;
+}
+.cat-card .cat-score { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+/* ── CATEGORY VIEW ── */
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--accent);
+  font-size: 0.9rem; cursor: pointer;
+  padding: 14px 16px 4px; font-family: inherit;
+}
+.back-btn:hover { color: #00e5d0; }
+.cat-hero { padding: 10px 16px 16px; border-bottom: 1px solid var(--border); }
+.cat-hero h2 { font-size: 1.4rem; font-weight: 800; }
+.cat-hero p  { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.diff-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; padding: 16px;
+}
+.diff-btn {
+  background: var(--card2); border: 2px solid var(--border);
+  border-radius: 14px; padding: 16px 8px; text-align: center;
+  cursor: pointer; color: var(--text);
+  font-family: inherit; font-weight: 600; font-size: 0.85rem;
+  transition: all .18s;
+}
+.diff-btn:hover { border-color: var(--accent); background: var(--card); }
+.diff-btn .diff-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.diff-btn .diff-xp   { font-size: 0.7rem; color: var(--amber); margin-top: 4px; }
+.start-all-btn {
+  margin: 4px 16px 0; display: block; width: calc(100% - 32px);
+  background: linear-gradient(135deg, var(--accent), #009e8f);
+  color: #fff; font-family: inherit; font-size: 1rem; font-weight: 700;
+  border: none; border-radius: 14px; padding: 14px; cursor: pointer;
+  transition: opacity .18s;
+}
+.start-all-btn:hover { opacity: 0.9; }
+
+/* ── QUIZ VIEW ── */
+#quiz-header {
+  padding: 14px 16px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#quiz-progress-outer {
+  flex: 1; background: var(--card); border-radius: 999px; height: 8px;
+  overflow: hidden; margin-right: 12px; border: 1px solid var(--border);
+}
+#quiz-progress-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #00e5d0);
+  border-radius: 999px; transition: width .4s ease;
+}
+#quiz-counter { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+#timer-wrap {
+  margin: 12px 16px 0;
+  display: flex; align-items: center; gap: 8px;
+}
+#timer-bar-outer {
+  flex: 1; background: var(--card); border-radius: 999px; height: 6px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+#timer-bar-inner {
+  height: 100%; border-radius: 999px; background: var(--accent);
+  transition: width 1s linear, background .3s;
+}
+#timer-val {
+  font-size: 0.85rem; font-weight: 700;
+  min-width: 28px; text-align: right; transition: color .3s;
+}
+#quiz-card {
+  margin: 14px 16px 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px 18px;
+}
+#quiz-diff-badge {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 2px 8px; border-radius: 999px; margin-bottom: 10px;
+}
+#quiz-question {
+  font-size: 1.05rem; font-weight: 600;
+  line-height: 1.5; margin-bottom: 16px;
+}
+.opt {
+  display: block; width: 100%;
+  background: var(--card2); border: 2px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; text-align: left;
+  color: var(--text); font-family: inherit; font-size: 0.9rem;
+  cursor: pointer; margin-bottom: 9px;
+  transition: border-color .18s, background .18s, transform .12s;
+}
+.opt:last-child { margin-bottom: 0; }
+.opt:hover:not(:disabled) {
+  border-color: var(--accent); background: var(--card); transform: translateX(3px);
+}
+.opt.correct {
+  border-color: #22c55e !important;
+  background: rgba(34,197,94,.15) !important;
+  color: #86efac;
+}
+.opt.wrong {
+  border-color: var(--coral) !important;
+  background: rgba(255,107,107,.15) !important;
+  color: var(--coral);
+}
+.opt:disabled { cursor: default; }
+#explanation-box {
+  margin-top: 14px;
+  background: rgba(0,201,183,.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 14px;
+  font-size: 0.85rem; color: var(--text); line-height: 1.55;
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height .4s ease, opacity .35s ease;
+}
+#explanation-box.visible { max-height: 300px; opacity: 1; }
+#next-btn {
+  display: none; margin: 14px 16px 0; width: calc(100% - 32px);
+  background: linear-gradient(135deg, var(--accent), #009e8f);
+  color: #fff; font-family: inherit; font-size: 1rem; font-weight: 700;
+  border: none; border-radius: 14px; padding: 14px; cursor: pointer;
+  transition: opacity .18s;
+}
+#next-btn:hover { opacity: 0.9; }
+
+/* ── XP POPUP ── */
+#xp-popup {
+  position: fixed; top: 70px; right: 16px;
+  background: var(--card); border: 1px solid var(--accent);
+  border-radius: 999px; padding: 6px 14px;
+  font-size: 0.9rem; font-weight: 700; color: var(--accent);
+  pointer-events: none; opacity: 0; z-index: 200;
+}
+#xp-popup.show { animation: popXP 1.4s ease forwards; }
+
+/* ── LEVEL UP OVERLAY ── */
+#lvlup-ov {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(7,18,33,.85);
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#lvlup-ov.show { display: flex; }
+#lvlup-box {
+  background: var(--card2); border: 2px solid var(--violet);
+  border-radius: 24px; padding: 36px 32px; text-align: center;
+  animation: bounceIn .6s cubic-bezier(.34,1.56,.64,1);
+  max-width: 320px; width: 90%;
+}
+#lvlup-box .lv-emoji { font-size: 3.5rem; }
+#lvlup-box h2 { font-size: 1.5rem; font-weight: 800; color: var(--violet); margin-top: 10px; }
+#lvlup-box p  { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
+#lvlup-box .lv-name { font-size: 1.2rem; font-weight: 700; color: var(--amber); margin-top: 10px; }
+#lvlup-close {
+  margin-top: 22px;
+  background: var(--violet); color: #fff; border: none;
+  border-radius: 12px; padding: 10px 28px;
+  font-family: inherit; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: opacity .18s;
+}
+#lvlup-close:hover { opacity: 0.85; }
+
+/* ── RESULTS VIEW ── */
+.results-hero { text-align: center; padding: 28px 16px 16px; }
+.results-hero .score-circle {
+  width: 110px; height: 110px; border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  border: 3px solid var(--accent); background: var(--card);
+  animation: pulse 2s infinite;
+}
+.results-hero .score-pct {
+  font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1;
+}
+.results-hero .score-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.results-hero h2 { font-size: 1.3rem; font-weight: 800; margin-top: 8px; }
+.results-hero .xp-earned { margin-top: 8px; font-size: 1rem; color: var(--amber); font-weight: 700; }
+.results-summary {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; padding: 0 16px 16px;
+}
+.results-summary .s-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 8px; text-align: center;
+}
+.results-summary .s-val  { font-size: 1.5rem; font-weight: 800; }
+.results-summary .s-lbl  { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+.results-actions { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+.btn-primary {
+  display: block; width: 100%;
+  background: linear-gradient(135deg, var(--accent), #009e8f);
+  color: #fff; font-family: inherit; font-size: 1rem; font-weight: 700;
+  border: none; border-radius: 14px; padding: 14px; cursor: pointer;
+  transition: opacity .18s; text-align: center;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary {
+  display: block; width: 100%;
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--text); font-family: inherit; font-size: 0.95rem; font-weight: 600;
+  border-radius: 14px; padding: 13px; cursor: pointer; transition: border-color .18s;
+}
+.btn-secondary:hover { border-color: var(--accent); }
+
+/* ── CONFETTI ── */
+#confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 250; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">🎓 Accademia BioSpecInfo</div>
+  <div class="tb-right">
+    <div id="streak-badge">🔥 <span id="streak-val">0</span></div>
+    <div id="level-badge">Lv1 Molecola</div>
+  </div>
+</div>
+
+<!-- XP BAR -->
+<div id="xp-bar-wrap">
+  <div id="xp-bar-label">
+    <span id="xp-bar-text">0 XP</span>
+    <span id="xp-bar-next">100 XP al prossimo livello</span>
+  </div>
+  <div id="xp-bar-outer"><div id="xp-bar-inner" style="width:0%"></div></div>
+</div>
+
+<!-- XP POPUP -->
+<div id="xp-popup">+0 XP</div>
+
+<!-- LEVEL UP OVERLAY -->
+<div id="lvlup-ov">
+  <div id="lvlup-box">
+    <div class="lv-emoji">🏆</div>
+    <h2>Livello raggiunto!</h2>
+    <p>Sei salito al livello</p>
+    <div class="lv-name" id="lvlup-name">Atomo</div>
+    <button id="lvlup-close">Continua</button>
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════════ DASHBOARD ═══ -->
+<div id="dashboard-view" class="view active">
+  <div class="section-title">Le tue statistiche</div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="val" id="stat-total-xp">0</div>
+      <div class="lbl">XP totali</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="stat-streak">0</div>
+      <div class="lbl">Streak giorni</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="stat-accuracy">–</div>
+      <div class="lbl">Accuratezza</div>
+    </div>
+  </div>
+  <div class="section-title">Scegli una categoria</div>
+  <div class="cat-grid" id="cat-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ CATEGORY ═══ -->
+<div id="category-view" class="view">
+  <button class="back-btn" id="cat-back">← Dashboard</button>
+  <div class="cat-hero">
+    <h2 id="cat-view-title">Categoria</h2>
+    <p id="cat-view-desc">Seleziona difficoltà o avvia quiz misto</p>
+  </div>
+  <div class="section-title">Difficoltà</div>
+  <div class="diff-grid">
+    <div class="diff-btn" data-diff="facile">
+      <div class="diff-icon">🟢</div>Facile
+      <div class="diff-xp">+5 XP/domanda</div>
+    </div>
+    <div class="diff-btn" data-diff="medio">
+      <div class="diff-icon">🟡</div>Medio
+      <div class="diff-xp">+10 XP/domanda</div>
+    </div>
+    <div class="diff-btn" data-diff="difficile">
+      <div class="diff-icon">🔴</div>Difficile
+      <div class="diff-xp">+20 XP/domanda</div>
+    </div>
+  </div>
+  <button class="start-all-btn" id="start-all-btn">🎲 Quiz misto (tutti i livelli)</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ ═══ -->
+<div id="quiz-view" class="view">
+  <div id="quiz-header">
+    <div id="quiz-progress-outer"><div id="quiz-progress-inner" style="width:0%"></div></div>
+    <div id="quiz-counter">1 / 10</div>
+  </div>
+  <div id="timer-wrap">
+    <div id="timer-bar-outer"><div id="timer-bar-inner" style="width:100%"></div></div>
+    <div id="timer-val">30</div>
+  </div>
+  <div id="quiz-card">
+    <div id="quiz-diff-badge">medio</div>
+    <div id="quiz-question">Caricamento...</div>
+    <div id="opts-wrap"></div>
+    <div id="explanation-box"></div>
+  </div>
+  <button id="next-btn">Prossima domanda →</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ RESULTS ═══ -->
+<div id="results-view" class="view">
+  <div class="results-hero">
+    <div class="score-circle">
+      <div class="score-pct" id="res-pct">0%</div>
+      <div class="score-label">punteggio</div>
+    </div>
+    <h2 id="res-title">Ottimo lavoro!</h2>
+    <div class="xp-earned" id="res-xp">+0 XP guadagnati</div>
+  </div>
+  <div class="section-title">Riepilogo</div>
+  <div class="results-summary">
+    <div class="s-card">
+      <div class="s-val" id="res-correct" style="color:var(--accent)">0</div>
+      <div class="s-lbl">Corrette</div>
+    </div>
+    <div class="s-card">
+      <div class="s-val" id="res-wrong" style="color:var(--coral)">0</div>
+      <div class="s-lbl">Errate</div>
+    </div>
+    <div class="s-card">
+      <div class="s-val" id="res-streak-bonus" style="color:var(--amber)">×1.0</div>
+      <div class="s-lbl">Moltiplicatore</div>
+    </div>
+  </div>
+  <div class="results-actions">
+    <button class="btn-primary" id="res-again">🔁 Rigioca questa categoria</button>
+    <button class="btn-secondary" id="res-home">🏠 Torna alla Dashboard</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════
+   QUESTION BANK — 83 questions
+══════════════════════════════════════════════════ */
+const QUESTIONS = [
+  /* ── BIOCHIMICA (20) ── */
+  {cat:'biochimica',diff:'facile',
+   q:'Qual è il monomero delle proteine?',
+   opts:['Nucleotide','Amminoacido','Monosaccaride','Acido grasso'],ans:1,
+   exp:'Le proteine sono polimeri di amminoacidi uniti da legami peptidici.'},
+  {cat:'biochimica',diff:'facile',
+   q:'Quale legame unisce due amminoacidi?',
+   opts:['Glicosidico','Estere','Peptidico','Fosfodiestere'],ans:2,
+   exp:'Il legame peptidico si forma tra il gruppo carbossilico di un amminoacido e il gruppo amminico del successivo.'},
+  {cat:'biochimica',diff:'facile',
+   q:'Quale molecola è la principale fonte di energia cellulare?',
+   opts:['DNA','ATP','ARN','Glucosio-6-fosfato'],ans:1,
+   exp:"L'ATP (adenosina trifosfato) è la principale molecola energetica della cellula."},
+  {cat:'biochimica',diff:'facile',
+   q:'Quanti amminoacidi proteinogenici esistono?',
+   opts:['10','20','30','64'],ans:1,
+   exp:'Esistono 20 amminoacidi standard che costituiscono le proteine.'},
+  {cat:'biochimica',diff:'facile',
+   q:"Quale nucleobase è presente nell'RNA ma non nel DNA?",
+   opts:['Adenina','Citosina','Uracile','Guanina'],ans:2,
+   exp:"L'RNA contiene uracile al posto della timina presente nel DNA."},
+  {cat:'biochimica',diff:'facile',
+   q:'Dove avviene la sintesi proteica?',
+   opts:['Nucleo','Mitocondri','Ribosomi','Golgi'],ans:2,
+   exp:"I ribosomi sono le macchine molecolari responsabili della traduzione dell'mRNA in proteine."},
+  {cat:'biochimica',diff:'facile',
+   q:'Quale vitamina è essenziale per la coagulazione del sangue?',
+   opts:['Vitamina C','Vitamina D','Vitamina K','Vitamina A'],ans:2,
+   exp:"La vitamina K è necessaria per l'attivazione dei fattori di coagulazione."},
+  {cat:'biochimica',diff:'facile',
+   q:"Come si chiama la regione dell'enzima che lega il substrato?",
+   opts:['Sito allosterico','Sito attivo','Cofattore','Sito prositetico'],ans:1,
+   exp:"Il sito attivo è la regione dell'enzima che si lega specificamente al substrato per catalizzare la reazione."},
+  {cat:'biochimica',diff:'medio',
+   q:'Quale processo produce NADH nella glicolisi?',
+   opts:['Fosforilazione del glucosio','Ossidazione del gliceraldeide-3-fosfato','Idratazione del fumarato','Decarbossilazione del piruvato'],ans:1,
+   exp:"L'ossidazione del gliceraldeide-3-fosfato a 1,3-bisfosfoglicerato riduce NAD+ a NADH."},
+  {cat:'biochimica',diff:'medio',
+   q:'Il ciclo di Krebs avviene in quale compartimento cellulare?',
+   opts:['Citoplasma','Membrana plasmatica','Matrice mitocondriale','Nucleo'],ans:2,
+   exp:"Il ciclo di Krebs (ciclo dell'acido citrico) si svolge nella matrice mitocondriale."},
+  {cat:'biochimica',diff:'medio',
+   q:'Quale enzima catalizza la prima tappa della glicolisi?',
+   opts:['Piruvato chinasi','Fosfofruttochinasi','Esochinasi','Aldolasi'],ans:2,
+   exp:"L'esochinasi catalizza la fosforilazione del glucosio a glucosio-6-fosfato usando ATP."},
+  {cat:'biochimica',diff:'medio',
+   q:'Cosa si intende per struttura quaternaria di una proteina?',
+   opts:['Sequenza amminoacidica','Struttura α-elica o β-foglietto','Conformazione tridimensionale','Associazione di più subunità polipeptidiche'],ans:3,
+   exp:'La struttura quaternaria descrive come più catene polipeptidiche si associano a formare una proteina multimerica.'},
+  {cat:'biochimica',diff:'medio',
+   q:'Quale coenzima trasporta equivalenti riducenti nella catena respiratoria?',
+   opts:['CoA','ATP','NAD+/NADH','Biotina'],ans:2,
+   exp:'NADH e FADH2 donano elettroni alla catena di trasporto degli elettroni mitocondriale.'},
+  {cat:'biochimica',diff:'medio',
+   q:'Il pH ottimale della pepsina è circa:',
+   opts:['7.4','9.0','2.0','5.5'],ans:2,
+   exp:"La pepsina, proteasi gastrica, ha pH ottimale intorno a 2 in accordo con l'ambiente acido dello stomaco."},
+  {cat:'biochimica',diff:'medio',
+   q:'Quale molecola funge da accettore finale di elettroni nella respirazione aerobia?',
+   opts:['CO2','NAD+','O2','FAD'],ans:2,
+   exp:"L'ossigeno molecolare è l'accettore finale di elettroni nella catena respiratoria, riducendosi ad acqua."},
+  {cat:'biochimica',diff:'difficile',
+   q:'Quante molecole di ATP vengono prodotte nette dalla completa ossidazione di una molecola di glucosio?',
+   opts:['2','8','30-32','38'],ans:2,
+   exp:'La stima moderna indica circa 30-32 ATP per glucosio, considerando le efficienze reali del trasporto di protoni e della ATP sintasi.'},
+  {cat:'biochimica',diff:'difficile',
+   q:"Quale reazione catalizza l'enzima piruvato carbossilasi?",
+   opts:['Piruvato → Acetil-CoA','Piruvato + CO2 → Ossalacetato','Piruvato → Lattato','Piruvato → Etanolo'],ans:1,
+   exp:'La piruvato carbossilasi, enzima biotina-dipendente, converte il piruvato in ossalacetato per rifornire il ciclo di Krebs.'},
+  {cat:'biochimica',diff:'difficile',
+   q:"Cosa descrive l'equazione di Michaelis-Menten?",
+   opts:['Velocità di trascrizione','Velocità di reazione enzimatica in funzione della concentrazione di substrato','Energia di attivazione','Equilibrio acido-base delle proteine'],ans:1,
+   exp:'Il modello di Michaelis-Menten descrive come la velocità di una reazione enzimatica dipende dalla concentrazione di substrato tramite i parametri Vmax e Km.'},
+  {cat:'biochimica',diff:'difficile',
+   q:'Quale aminoacido contiene un gruppo tiolico (-SH) che forma ponti disolfuro?',
+   opts:['Serina','Treonina','Cisteina','Metionina'],ans:2,
+   exp:"La cisteina possiede un gruppo -SH che può ossidarsi formando un legame disolfuro (-S-S-) con un'altra cisteina, stabilizzando la struttura proteica."},
+  {cat:'biochimica',diff:'difficile',
+   q:'Il coefficiente di Hill > 1 per un enzima indica:',
+   opts:['Inibizione competitiva','Cooperatività positiva nel legame del substrato','Cooperatività negativa','Catalisi acido-base'],ans:1,
+   exp:"Un coefficiente di Hill maggiore di 1 indica cooperatività positiva: il legame di una molecola di substrato aumenta l'affinità per le molecole successive, come nell'emoglobina."},
+
+  /* ── ORGANICA (20) ── */
+  {cat:'organica',diff:'facile',
+   q:'Qual è il gruppo funzionale degli alcoli?',
+   opts:['-COOH','-OH','-NH2','-CHO'],ans:1,
+   exp:'Gli alcoli contengono il gruppo ossidrile (-OH) legato a un carbonio saturo.'},
+  {cat:'organica',diff:'facile',
+   q:'Come si chiama la reazione tra un acido carbossilico e un alcol?',
+   opts:['Eliminazione','Sostituzione nucleofila','Esterificazione','Addizione elettrofila'],ans:2,
+   exp:"L'esterificazione è la reazione di condensazione che produce un estere e acqua da un acido e un alcol."},
+  {cat:'organica',diff:'facile',
+   q:'Quale tipo di isomeria presentano composti con formula C4H10?',
+   opts:['Geometrica','Ottica','Di catena','Di posizione'],ans:2,
+   exp:'Il butano (n-butano e isobutano) presentano isomeria di catena: stessa formula molecolare ma diversa connettività.'},
+  {cat:'organica',diff:'facile',
+   q:'Quanti elettroni condivide un doppio legame C=C?',
+   opts:['2','4','6','8'],ans:1,
+   exp:'Un doppio legame è composto da un legame σ e uno π, per un totale di 4 elettroni condivisi (2 coppie).'},
+  {cat:'organica',diff:'facile',
+   q:'Qual è il nome del composto CH3-CO-CH3?',
+   opts:['Acetato','Acetone','Etanolo','Acido acetico'],ans:1,
+   exp:"CH3-CO-CH3 è il propan-2-one, comunemente noto come acetone, il chetone più semplice."},
+  {cat:'organica',diff:'facile',
+   q:'Quale reagente si usa per identificare un aldeide con il test di Tollens?',
+   opts:['Soluzione di Fehling','Nitrato di argento ammoniacale','Permanganato di potassio','Acqua di bromo'],ans:1,
+   exp:"Il reattivo di Tollens (soluzione di [Ag(NH3)2]+) ossida gli aldeidi depositando uno specchio d'argento."},
+  {cat:'organica',diff:'facile',
+   q:'Qual è la formula molecolare del benzene?',
+   opts:['C6H12','C6H6','C6H10','C4H6'],ans:1,
+   exp:'Il benzene ha formula C6H6, con struttura aromatica ciclica stabilizzata dalla delocalizzazione degli elettroni π.'},
+  {cat:'organica',diff:'facile',
+   q:'Come si chiama il meccanismo preferito dal benzene nelle reazioni?',
+   opts:['Addizione nucleofila','Sostituzione elettrofila aromatica','Eliminazione','Sostituzione radicale'],ans:1,
+   exp:'Il benzene reagisce preferenzialmente per sostituzione elettrofila aromatica (SEA), preservando l\'aromaticità.'},
+  {cat:'organica',diff:'medio',
+   q:'Qual è il prodotto principale dell\'addizione di HBr al propene secondo la regola di Markovnikov?',
+   opts:['1-bromopropano','2-bromopropano','Propanolo','1,2-dibromopropano'],ans:1,
+   exp:'Secondo Markovnikov, il protone si addiziona al carbonio meno sostituito, portando al 2-bromopropano come prodotto principale.'},
+  {cat:'organica',diff:'medio',
+   q:'Quale tipo di reazione subiscono gli alcheni in presenza di O3 seguito da Zn/H2O?',
+   opts:['Idrogenazione','Ozonolisi','Alogenazione','Epossidazione'],ans:1,
+   exp:"L'ozonolisi scinde il doppio legame C=C mediante ozono, producendo aldeidi o chetoni."},
+  {cat:'organica',diff:'medio',
+   q:'In quale ordine decresce la reattività verso la sostituzione nucleofila SN2?',
+   opts:['Terziario>Secondario>Primario','Primario>Secondario>Terziario','Secondario>Primario>Terziario','Tutti uguale'],ans:1,
+   exp:"Nella SN2, l'ingombro sterico rallenta la reazione: substrati primari sono più reattivi di secondari e terziari."},
+  {cat:'organica',diff:'medio',
+   q:'Quale caratteristica strutturale rende un composto aromatico secondo Hückel?',
+   opts:['Anello a 6 atomi','Sistema ciclico planare con 4n+2 elettroni π','Sistema ciclico con 4n elettroni π','Presenza di atomi eterogenei'],ans:1,
+   exp:'La regola di Hückel: un composto è aromatico se è ciclico, planare, coniugato e ha 4n+2 elettroni π (n intero).'},
+  {cat:'organica',diff:'medio',
+   q:'Cosa produce la reazione di Diels-Alder?',
+   opts:['Alchene','Cicloesene','Benzene','Alchino'],ans:1,
+   exp:'La reazione di Diels-Alder è una cicloaddizione [4+2] tra un diene coniugato e un dienofilo che produce un cicloesene.'},
+  {cat:'organica',diff:'medio',
+   q:'Quale gruppo è un attivante orto/para nella sostituzione elettrofila aromatica?',
+   opts:['-NO2','-COOH','-NH2','-CF3'],ans:2,
+   exp:"Il gruppo amminico (-NH2) è un forte donatore elettronico che attiva l'anello e dirige in posizione orto e para."},
+  {cat:'organica',diff:'medio',
+   q:'Cosa si intende per enantiomeri?',
+   opts:['Isomeri di catena','Stereoisomeri non sovrapponibili immagini speculari','Isomeri di posizione','Diastereoisomeri'],ans:1,
+   exp:'Gli enantiomeri sono stereoisomeri che si relazionano come oggetto e immagine speculare non sovrapponibile, differendo nella configurazione di un centro chirale.'},
+  {cat:'organica',diff:'difficile',
+   q:'Quale intermedio si forma nella sostituzione elettrofila aromatica?',
+   opts:['Carbanione','Carbocatione (complesso σ, arenio)','Radicale','Carbanione aromatico'],ans:1,
+   exp:"Nella SEA si forma un carbocatione detto complesso sigma o ione arenio (Wheland), che poi perde un protone per restaurare l'aromaticità."},
+  {cat:'organica',diff:'difficile',
+   q:"Qual è il requisito geometrico della reazione di eliminazione E2?",
+   opts:['Preferisce il prodotto più sostituito','Richiede anti-periplanarità tra H e il gruppo uscente','Produce sempre il prodotto cis','Non ha stereochimica specifica'],ans:1,
+   exp:"La E2 richiede geometria anti-periplanare (180°) tra H e il gruppo uscente, determinando la stereospecificità del prodotto."},
+  {cat:'organica',diff:'difficile',
+   q:'Cosa descrive la regola di Bredt?',
+   opts:['Addizione di alogeni agli alcheni','Impossibilità di avere un doppio legame alla testa di un anello biciclico piccolo','Aromaticità degli anelli eterociclici','Stabilità dei radicali'],ans:1,
+   exp:'La regola di Bredt afferma che non è possibile formare un doppio legame a testa di ponte in sistemi biciclici piccoli a causa della deformazione geometrica.'},
+  {cat:'organica',diff:'difficile',
+   q:'Quale reagente converte un alcol primario in bromuro alchilico con inversione di configurazione?',
+   opts:['SOCl2 in piridina','PBr3','HBr','Cl2/hν'],ans:1,
+   exp:'PBr3 converte alcoli primari in bromuri alchilici con inversione di configurazione al centro di reazione tramite meccanismo SN2.'},
+  {cat:'organica',diff:'difficile',
+   q:"Qual è il prodotto della reazione di Wittig tra un fosforio ilide e un'aldeide?",
+   opts:['Alcol','Alcano','Alchene','Chetone'],ans:2,
+   exp:'La reazione di Wittig converte il gruppo carbonilico (C=O) in un alchene (C=C) usando un fosforio ilide come reagente.'},
+
+  /* ── SPETTRI (15) ── */
+  {cat:'spettri',diff:'facile',
+   q:"A quale lunghezza d'onda approssimativa assorbe il gruppo carbonilico C=O in IR?",
+   opts:['1000-1100 cm⁻¹','1700-1750 cm⁻¹','2200-2300 cm⁻¹','3200-3600 cm⁻¹'],ans:1,
+   exp:'Il gruppo carbonilico C=O assorbe fortemente intorno a 1700-1750 cm⁻¹ per lo stretching.'},
+  {cat:'spettri',diff:'facile',
+   q:'In NMR ¹H, i protoni aromatici appaiono a circa:',
+   opts:['0-2 ppm','2-4 ppm','6.5-8.5 ppm','9-10 ppm'],ans:2,
+   exp:'I protoni aromatici sono deschermati dalla corrente di anello e risuonano a 6.5-8.5 ppm nel tipico spettro ¹H-NMR.'},
+  {cat:'spettri',diff:'facile',
+   q:'Cosa misura la spettrometria di massa?',
+   opts:['Frequenza di assorbimento IR','Rapporto massa/carica (m/z) degli ioni','Spostamento chimico NMR','Assorbimento UV'],ans:1,
+   exp:'La spettrometria di massa separa e misura gli ioni in base al loro rapporto massa/carica (m/z).'},
+  {cat:'spettri',diff:'facile',
+   q:'Quale tecnica spettroscopica sfrutta la risonanza dei nuclei magneticamente attivi?',
+   opts:['IR','UV-Vis','NMR','MS'],ans:2,
+   exp:'La risonanza magnetica nucleare (NMR) sfrutta lo spin di nuclei attivi (¹H, ¹³C ecc.) in un campo magnetico.'},
+  {cat:'spettri',diff:'facile',
+   q:'La banda di assorbimento O-H in IR appare:',
+   opts:['Stretta a 1710 cm⁻¹','Larga a 3200-3550 cm⁻¹','A 2850-2960 cm⁻¹','A 1600 cm⁻¹'],ans:1,
+   exp:'Il gruppo O-H mostra una banda larga e intensa per stretching intorno a 3200-3550 cm⁻¹ a causa dei legami idrogeno.'},
+  {cat:'spettri',diff:'medio',
+   q:'In NMR, cosa indica la molteplicità di un segnale secondo la regola n+1?',
+   opts:['Numero di protoni equivalenti','Numero di protoni non equivalenti adiacenti + 1','Spostamento chimico','Integrale del segnale'],ans:1,
+   exp:'La regola n+1: un protone accoppiato con n protoni non equivalenti adiacenti appare come un multiplo con n+1 picchi.'},
+  {cat:'spettri',diff:'medio',
+   q:'Cosa rappresenta il picco dello ione molecolare M+ in spettrometria di massa?',
+   opts:['Il frammento più abbondante','La massa molare della molecola integra','Il frammento più piccolo','Il rumore di fondo'],ans:1,
+   exp:'Il picco M+ (ione molecolare) corrisponde alla molecola privata di un elettrone e dà la massa molare del composto.'},
+  {cat:'spettri',diff:'medio',
+   q:'A quale valore di δ appaiono tipicamente i protoni aldeici in ¹H-NMR?',
+   opts:['0-1 ppm','2-3 ppm','5-6 ppm','9-10 ppm'],ans:3,
+   exp:'I protoni aldeici (-CHO) sono molto deschermati per effetto del gruppo carbonilico e risuonano a 9-10 ppm.'},
+  {cat:'spettri',diff:'medio',
+   q:"La legge di Beer-Lambert afferma che l'assorbanza è:",
+   opts:['Inversamente proporzionale alla concentrazione','Proporzionale a εlc (coefficiente×cammino×concentrazione)','Uguale alla trasmittanza','Indipendente dal cammino ottico'],ans:1,
+   exp:"La legge di Beer-Lambert: A = εlc; l'assorbanza è proporzionale al coefficiente di estinzione molare, al cammino ottico e alla concentrazione."},
+  {cat:'spettri',diff:'medio',
+   q:'Quale tecnica NMR 2D correla protoni con i carboni direttamente legati?',
+   opts:['COSY','NOESY','HSQC','HMBC'],ans:2,
+   exp:'L\'HSQC (Heteronuclear Single Quantum Coherence) correla ¹H con i ¹³C legati direttamente attraverso un legame.'},
+  {cat:'spettri',diff:'medio',
+   q:'La presenza di un isotopo M+2 con intensità circa uguale a M+ in MS suggerisce:',
+   opts:['Presenza di azoto','Presenza di bromo','Presenza di ossigeno','Presenza di carbonio'],ans:1,
+   exp:'Il bromo ha due isotopi abbondanti (⁷⁹Br e ⁸¹Br, circa 1:1), dando picchi M+ e M+2 di intensità simile nello spettro di massa.'},
+  {cat:'spettri',diff:'difficile',
+   q:'Cosa misura la costante di accoppiamento J in NMR?',
+   opts:['La frequenza di Larmor','La distanza energetica tra livelli di spin accoppiati (in Hz)','La velocità di rilassamento','Lo spostamento chimico relativo'],ans:1,
+   exp:'La costante J (in Hz) misura l\'entità dell\'accoppiamento spin-spin tra nuclei, trasmessa attraverso i legami chimici.'},
+  {cat:'spettri',diff:'difficile',
+   q:'In UV-Vis, quale transizione è tipica dei sistemi π coniugati con alta intensità di assorbimento?',
+   opts:['n→σ*','σ→σ*','π→π*','n→π*'],ans:2,
+   exp:'I sistemi π coniugati mostrano intense transizioni π→π* a lunghezze d\'onda più elevate, con coefficienti di estinzione molto alti.'},
+  {cat:'spettri',diff:'difficile',
+   q:'Cosa si intende per effetto batocromo nello spettro UV-Vis?',
+   opts:['Spostamento verso λ minori (blue shift)','Aumento dell\'intensità del picco','Spostamento verso λ maggiori (red shift)','Diminuzione dell\'intensità'],ans:2,
+   exp:'L\'effetto batocromo (red shift) è lo spostamento di un assorbimento verso lunghezze d\'onda maggiori causato da sostituzione o variazione ambientale.'},
+  {cat:'spettri',diff:'difficile',
+   q:"Qual è l'origine dell'effetto NOE (Nuclear Overhauser Effect) in NMR?",
+   opts:['Accoppiamento scalare through-bond','Rilassamento dipolico through-space tra nuclei vicini','Differenza di elettronegatività','Anisotropia magnetica'],ans:1,
+   exp:'Il NOE è dovuto al rilassamento dipolico cross-relaxation tra nuclei vicini nello spazio (< 5 Å), non attraverso legami.'},
+
+  /* ── TERMODINAMICA (10) ── */
+  {cat:'termo',diff:'facile',
+   q:'Se ΔG < 0, la reazione è:',
+   opts:['Non spontanea','Spontanea','All\'equilibrio','Endotermica'],ans:1,
+   exp:"Un'energia libera di Gibbs negativa (ΔG < 0) indica che la reazione procede spontaneamente nelle condizioni date."},
+  {cat:'termo',diff:'facile',
+   q:'La prima legge della termodinamica afferma che:',
+   opts:['L\'entropia tende ad aumentare','L\'energia interna è conservata: ΔU = q + w','Il calore fluisce dal caldo al freddo','A 0 K l\'entropia è zero'],ans:1,
+   exp:"La prima legge è il principio di conservazione dell'energia: la variazione di energia interna è uguale al calore assorbito più il lavoro compiuto sul sistema."},
+  {cat:'termo',diff:'facile',
+   q:'Cosa misura l\'entalpia di formazione standard ΔHf°?',
+   opts:['Calore di vaporizzazione','Calore rilasciato nella combustione','Entalpia per formare 1 mol di composto dagli elementi allo stato standard','Energia di legame'],ans:2,
+   exp:'ΔHf° è la variazione di entalpia nella formazione di 1 mole di composto dai suoi elementi nei loro stati standard a 298 K.'},
+  {cat:'termo',diff:'facile',
+   q:'Quale grandezza descrive il grado di disordine di un sistema?',
+   opts:['Entalpia','Energia libera di Gibbs','Entropia','Calore specifico'],ans:2,
+   exp:"L'entropia (S) è la grandezza termodinamica che quantifica il grado di disordine o le configurazioni statistiche accessibili al sistema."},
+  {cat:'termo',diff:'medio',
+   q:'Qual è la relazione tra energia libera di Gibbs e costante di equilibrio?',
+   opts:['ΔG° = RT ln K','ΔG° = -RT ln K','ΔG° = K/RT','ΔG° = -K·T'],ans:1,
+   exp:'La relazione fondamentale ΔG° = -RT ln K collega la variazione di energia libera standard alla costante di equilibrio termodinamico.'},
+  {cat:'termo',diff:'medio',
+   q:'La legge di Hess afferma che:',
+   opts:['La velocità di reazione dipende dalla temperatura','ΔH di una reazione è indipendente dal cammino di reazione','L\'entropia aumenta sempre','ΔG dipende dalla pressione'],ans:1,
+   exp:"La legge di Hess stabilisce che l'entalpia di reazione è una funzione di stato, indipendente dal percorso: si possono sommare le entalpie di reazioni note."},
+  {cat:'termo',diff:'medio',
+   q:'Cosa si intende per capacità termica a pressione costante (Cp)?',
+   opts:['Calore per portare 1 mol a ebollizione','Energia per aumentare di 1 K la temperatura a pressione costante','Calore di vaporizzazione','Energia libera di attivazione'],ans:1,
+   exp:'Cp è la quantità di calore necessaria per aumentare di 1 grado la temperatura di 1 mole di sostanza a pressione costante.'},
+  {cat:'termo',diff:'medio',
+   q:'Per una reazione con ΔH > 0 e ΔS > 0, la spontaneità dipende da:',
+   opts:['Sempre spontanea','Mai spontanea','Dipende dalla temperatura: spontanea ad alta T','Dipende dalla concentrazione'],ans:2,
+   exp:'Poiché ΔG = ΔH - TΔS, con ΔH > 0 e ΔS > 0 la reazione diventa spontanea (ΔG < 0) solo ad alta temperatura.'},
+  {cat:'termo',diff:'difficile',
+   q:'L\'equazione di Clausius-Clapeyron descrive:',
+   opts:['La variazione dell\'entropia con la temperatura','La dipendenza della pressione di vapore dalla temperatura','L\'energia di attivazione delle reazioni','La solubilità dei gas'],ans:1,
+   exp:"L'equazione di Clausius-Clapeyron descrive come la pressione di vapore di una sostanza varia con la temperatura, legata all'entalpia di vaporizzazione."},
+  {cat:'termo',diff:'difficile',
+   q:'Cosa prevede il terzo principio della termodinamica?',
+   opts:['L\'energia è conservata','L\'entropia di un cristallo perfetto a 0 K è zero','Il calore fluisce dal freddo al caldo','ΔG determina la spontaneità'],ans:1,
+   exp:"Il terzo principio (Nernst) afferma che l'entropia assoluta di un cristallo perfetto puro tende a zero quando la temperatura si avvicina allo zero assoluto."},
+
+  /* ── CINETICA (10) ── */
+  {cat:'cinetica',diff:'facile',
+   q:"Come varia la velocità di reazione con l'aumentare della temperatura?",
+   opts:['Diminuisce','Rimane costante','Aumenta','Diventa zero'],ans:2,
+   exp:'Aumentando la temperatura, le molecole hanno più energia cinetica, aumentano le collisioni efficaci e la velocità di reazione aumenta.'},
+  {cat:'cinetica',diff:'facile',
+   q:"Cosa rappresenta l'energia di attivazione (Ea)?",
+   opts:['Energia rilasciata nella reazione','Energia minima necessaria per avviare la reazione','Energia libera di Gibbs','Entalpia di reazione'],ans:1,
+   exp:"L'energia di attivazione è la barriera energetica minima che i reagenti devono superare per trasformarsi in prodotti."},
+  {cat:'cinetica',diff:'facile',
+   q:'Come agisce un catalizzatore sulla velocità di reazione?',
+   opts:['Aumenta Ea','Riduce Ea senza essere consumato','Sposta l\'equilibrio','Aumenta la concentrazione dei reagenti'],ans:1,
+   exp:"Un catalizzatore abbassa l'energia di attivazione offrendo un percorso alternativo, aumentando la velocità senza essere consumato."},
+  {cat:'cinetica',diff:'facile',
+   q:'In v = k[A][B], qual è l\'ordine totale di reazione?',
+   opts:['1','2','3','0'],ans:1,
+   exp:"In v = k[A][B] l'ordine totale è 2 (primo rispetto ad A e primo rispetto a B), importante per determinare il meccanismo."},
+  {cat:'cinetica',diff:'medio',
+   q:'Come si determina l\'ordine di reazione rispetto a un reagente?',
+   opts:['Dal bilanciamento stechiometrico','Sperimentalmente variando la concentrazione del reagente','Dall\'energia di attivazione','Dal valore della costante di equilibrio'],ans:1,
+   exp:"L'ordine rispetto a ciascun reagente si determina sperimentalmente, non dalla stechiometria della reazione bilanciata."},
+  {cat:'cinetica',diff:'medio',
+   q:'In una reazione del primo ordine, il tempo di dimezzamento t½ è:',
+   opts:['Proporzionale alla concentrazione iniziale','Indipendente dalla concentrazione iniziale','t½ = [A]₀/2k','t½ = k/[A]₀'],ans:1,
+   exp:'Per una reazione del primo ordine, t½ = ln2/k = 0.693/k, indipendente dalla concentrazione iniziale.'},
+  {cat:'cinetica',diff:'medio',
+   q:"L'equazione di Arrhenius k = Ae^(-Ea/RT) mostra che:",
+   opts:['k è indipendente dalla temperatura','k aumenta esponenzialmente con la temperatura','k dipende linearmente dalla temperatura','k diminuisce all\'aumentare di T'],ans:1,
+   exp:"L'equazione di Arrhenius mostra che la costante di velocità k aumenta esponenzialmente con la temperatura attraverso il termine e^(-Ea/RT)."},
+  {cat:'cinetica',diff:'medio',
+   q:'Cosa si intende per step limitante (rate-determining step)?',
+   opts:['Il passaggio più veloce del meccanismo','Il passaggio con ΔH più negativo','Il passaggio più lento che determina la velocità complessiva','Il primo passaggio del meccanismo'],ans:2,
+   exp:'Lo step limitante è il passaggio più lento nel meccanismo di reazione, che determina la velocità complessiva della reazione.'},
+  {cat:'cinetica',diff:'difficile',
+   q:'In una reazione autocatalitica, il profilo di velocità nel tempo ha forma:',
+   opts:['Lineare','Esponenziale decrescente','Sigmoide (a S)','Iperbolica'],ans:2,
+   exp:'Nelle reazioni autocatalitiche il prodotto funge da catalizzatore; la velocità inizialmente bassa poi accelera (fase sigmoide) e infine rallenta.'},
+  {cat:'cinetica',diff:'difficile',
+   q:'Cosa afferma il principio dello stato stazionario (steady-state approximation)?',
+   opts:['La concentrazione di tutti i reagenti è costante','La concentrazione degli intermedi reattivi è approssimativamente costante nel tempo','La velocità totale è pari alla somma di tutte le velocità parziali','L\'equilibrio è raggiunto rapidamente'],ans:1,
+   exp:"L'approssimazione dello stato stazionario assume che la concentrazione degli intermedi reattivi rimanga approssimativamente costante (d[I]/dt ≈ 0), semplificando le equazioni cinetiche."},
+
+  /* ── STECHIOMETRIA (8) ── */
+  {cat:'stec',diff:'facile',
+   q:'Quante moli di H2O si producono dalla combustione di 2 mol di CH4 (CH4 + 2O2 → CO2 + 2H2O)?',
+   opts:['2','4','1','6'],ans:1,
+   exp:'Dalla combustione di 2 moli di CH4 si producono 2×2 = 4 moli di H2O in base alla stechiometria bilanciata.'},
+  {cat:'stec',diff:'facile',
+   q:'Cosa si intende per reagente limitante?',
+   opts:['Il reagente con massa maggiore','Il reagente che determina la quantità massima di prodotto ottenibile','Il reagente con le moli maggiori','Il reagente più lento a reagire'],ans:1,
+   exp:'Il reagente limitante è quello che si esaurisce per primo e determina il massimo rendimento di prodotto della reazione.'},
+  {cat:'stec',diff:'facile',
+   q:'La resa percentuale di una reazione si calcola come:',
+   opts:['(moli reagente/moli prodotto)×100','(moli ottenute/moli teoriche)×100','(moli teoriche/moli ottenute)×100','(massa/volume)×100'],ans:1,
+   exp:'La resa % = (quantità ottenuta / quantità teorica) × 100, misura l\'efficienza della reazione rispetto al massimo teorico.'},
+  {cat:'stec',diff:'facile',
+   q:'Quanti grammi ci sono in 1 mole di NaCl (Na=23, Cl=35.5)?',
+   opts:['23 g','35.5 g','58.5 g','117 g'],ans:2,
+   exp:'La massa molare di NaCl = 23 + 35.5 = 58.5 g/mol, quindi 1 mole pesa 58.5 grammi.'},
+  {cat:'stec',diff:'medio',
+   q:'In una soluzione 0.5 M di NaOH, quante moli sono presenti in 250 mL?',
+   opts:['0.5 mol','0.125 mol','2 mol','1 mol'],ans:1,
+   exp:'n = C × V = 0.5 mol/L × 0.250 L = 0.125 mol di NaOH.'},
+  {cat:'stec',diff:'medio',
+   q:'Per la reazione N2 + 3H2 → 2NH3, quante moli di H2 occorrono per produrre 4 mol di NH3?',
+   opts:['3 mol','6 mol','4 mol','12 mol'],ans:1,
+   exp:'Dal rapporto stechiometrico: 3 mol H2 / 2 mol NH3 → per 4 mol NH3 servono 4 × (3/2) = 6 mol di H2.'},
+  {cat:'stec',diff:'medio',
+   q:'Quale volume occupa 1 mole di gas ideale a STP (0°C, 1 atm)?',
+   opts:['22.4 L','24.5 L','11.2 L','44.8 L'],ans:0,
+   exp:'A STP (0°C, 1 atm) 1 mole di gas ideale occupa 22.4 L secondo la legge dei gas ideali PV = nRT.'},
+  {cat:'stec',diff:'difficile',
+   q:'Una soluzione è preparata sciogliendo 4.9 g di H2SO4 (MM=98) in 500 mL. Qual è la molarità?',
+   opts:['0.05 M','0.1 M','0.2 M','1 M'],ans:1,
+   exp:'n(H2SO4) = 4.9/98 = 0.05 mol; M = 0.05 mol / 0.5 L = 0.1 M.'},
+  {cat:'stec',diff:'facile',q:'Quante moli di NaOH sono contenute in 200 mL di soluzione 0.5 M?',opts:['0.05 mol','0.1 mol','0.2 mol','1 mol'],ans:1,exp:'n = C × V = 0.5 mol/L × 0.2 L = 0.1 mol di NaOH.'},
+  {cat:'stec',diff:'facile',q:'Qual è la massa molecolare del glucosio (C₆H₁₂O₆)?',opts:['120 g/mol','150 g/mol','180 g/mol','200 g/mol'],ans:2,exp:'MM = 6×12 + 12×1 + 6×16 = 72 + 12 + 96 = 180 g/mol.'},
+  {cat:'stec',diff:'medio',q:'Nella reazione 2H₂ + O₂ → 2H₂O, quanti grammi di H₂O si formano da 4 g di H₂ (MM=2)?',opts:['18 g','36 g','9 g','72 g'],ans:1,exp:'4 g H₂ = 2 mol H₂ → per stechiometria 2 mol H₂ → 2 mol H₂O → 2 × 18 = 36 g H₂O.'},
+  {cat:'stec',diff:'medio',q:'Qual è la resa percentuale se si ottengono 4.5 g di prodotto su 6 g teorici?',opts:['50%','60%','75%','90%'],ans:2,exp:'Resa % = (resa reale / resa teorica) × 100 = (4.5/6) × 100 = 75%.'},
+  {cat:'stec',diff:'medio',q:'Una soluzione di NaCl al 5% (m/v) in 200 mL contiene quanti grammi di NaCl?',opts:['1 g','5 g','10 g','25 g'],ans:2,exp:'5% m/v = 5 g/100 mL; in 200 mL = 10 g di NaCl.'},
+  {cat:'stec',diff:'difficile',q:'Nella titolazione di 25 mL di HCl 0.1 M con NaOH 0.1 M, quanti mL di base occorrono per raggiungere il punto equivalente?',opts:['12.5 mL','25 mL','50 mL','100 mL'],ans:1,exp:'Al punto equivalente: n(HCl) = n(NaOH); 0.025×0.1 = V(NaOH)×0.1 → V(NaOH) = 0.025 L = 25 mL.'},
+  {cat:'stec',diff:'difficile',q:'Quante molecole di CO₂ sono presenti in 11 g di CO₂ (MM=44)?',opts:['1.5×10²³','3.0×10²³','6.0×10²³','1.2×10²⁴'],ans:1,exp:'n(CO₂) = 11/44 = 0.25 mol; N = 0.25 × 6.022×10²³ = 1.506×10²³ ≈ 1.5×10²³ molecole.'},
+
+  /* ── BIOCHIMICA extra ── */
+  {cat:'biochimica',diff:'facile',q:'Qual è la funzione principale delle proteine carrier (trasportatori) nelle membrane biologiche?',opts:['Catalizzare reazioni enzimatiche','Trasportare molecole specifiche attraverso la membrana lipidica impermeabile','Strutturare il citoscheletro','Ricevere segnali ormonali'],ans:1,exp:'Le proteine di trasporto (carrier e canali) facilitano il movimento di ioni e molecole polari attraverso il doppio strato lipidico, che altrimenti sarebbe impermeabile a tali sostanze.'},
+  {cat:'biochimica',diff:'facile',q:'Cosa sono i nucleotidi?',opts:['Monomeri delle proteine','Unità monomeriche degli acidi nucleici (DNA/RNA), composti da base azotata + zucchero + fosfato','Lipidi di membrana','Coenzimi del metabolismo energetico'],ans:1,exp:'I nucleotidi sono composti da una base azotata (purina o pirimidina), uno zucchero a 5 carboni (deossiribosio nel DNA, ribosio nell\'RNA) e uno o più gruppi fosfato; sono i mattoni del DNA e RNA.'},
+  {cat:'biochimica',diff:'facile',q:'Quale enzima catalizza la sintesi del DNA durante la replicazione?',opts:['RNA polimerasi','DNA polimerasi III (in procarioti)','Topoisomerasi','Ligasi'],ans:1,exp:'La DNA polimerasi (DNA pol III nei procarioti, pol α/δ/ε negli eucarioti) catalizza l\'aggiunta di deossinucleotidi al filamento nascente in direzione 5\'→3\', usando il filamento stampo in direzione 3\'→5\'.'},
+  {cat:'biochimica',diff:'medio',q:'Cosa si intende per "codone di stop" nella traduzione proteica?',opts:['Il codone AUG che inizia la traduzione','I codoni UAA, UAG, UGA che terminano la traduzione senza codificare aminoacidi','Il codone che specifica la metionina interna','I codoni per aminoacidi essenziali'],ans:1,exp:'I tre codoni di stop (UAA "ocra", UAG "ambra", UGA "opale") non codificano aminoacidi: quando il ribosoma li incontra, i fattori di rilascio (RF) liberano la catena polipeptidica e il ribosoma si dissocia dall\'mRNA.'},
+  {cat:'biochimica',diff:'medio',q:'Quale base azotata è presente nell\'RNA ma non nel DNA?',opts:['Adenina','Guanina','Uracile (al posto della timina)','Citosina'],ans:2,exp:'L\'RNA contiene uracile (U) al posto della timina (T) del DNA. L\'uracile, come la timina, si appaia con l\'adenina, ma manca del gruppo metile in posizione 5 che caratterizza la timina.'},
+  {cat:'biochimica',diff:'medio',q:'Cosa sono i lipidi di membrana più abbondanti nelle cellule animali?',opts:['Trigliceridi','Glicerofosfolipidi (fosfatidilcolina, fosfatidilserina, ecc.)','Sfingomielina','Colesterolo'],ans:1,exp:'I glicerofosfolipidi (con testa polare fosfocolina/fosfoetanolammina/fosfoserina e due code idrofobiche di acidi grassi) sono i lipidi di membrana più abbondanti nelle cellule animali; formano il doppio strato lipidico.'},
+  {cat:'biochimica',diff:'medio',q:'Cos\'è il "dogma centrale" della biologia molecolare?',opts:['DNA → RNA → Proteina (flusso unidirezionale dell\'informazione genetica)','Proteina → RNA → DNA','RNA → DNA → Proteina','DNA → Proteina direttamente'],ans:0,exp:'Il dogma centrale (Crick, 1958) descrive il flusso dell\'informazione biologica: DNA è trascritto in RNA messaggero (trascrizione), che è tradotto in proteina (traduzione). La retrotrascriptasi dei retrovirus inverte il passo RNA→DNA.'},
+  {cat:'biochimica',diff:'difficile',q:'Quale meccanismo di regolazione post-traduzionale è più comune nelle cascate di segnalazione cellulare?',opts:['Metilazione dell\'istidina','Fosforilazione su residui Ser/Thr/Tyr da parte di chinasi','Acetilazione dell\'N-terminale','Idrossilazione della prolina'],ans:1,exp:'La fosforilazione reversibile su residui Ser, Thr e Tyr, catalizzata da chinasi e annullata da fosfatasi, è il meccanismo post-traduzionale più ubiquo nelle cascate di segnalazione: modifica conformazione, attività e interazioni proteina-proteina.'},
+  {cat:'biochimica',diff:'difficile',q:'Qual è il ruolo dell\'ubiquitina nella degradazione proteica?',opts:['È un coenzima che trasferisce gruppi acetilici','È un piccolo polipeptide (76 aa) che, quando poliubiquitinato (catena K48), marca le proteine per la degradazione nel proteasoma 26S','Forma ponti disolfuro nelle proteine extracellulari','Regola la trascrizione legandosi al DNA'],ans:1,exp:'L\'ubiquitina è un tag di degradazione: la poliubiquitinazione su Lys48 marca le proteine per la degradazione proteolitica nel proteasoma 26S (cilindro catalitico 20S + cappucci 19S). La poliubiquitinazione su K63 ha funzioni non degradative (riparazione DNA, segnalazione).'},
+  {cat:'biochimica',diff:'difficile',q:'Cosa si intende per "punto isoelettrico" (pI) di una proteina?',opts:['Il pH a cui la proteina ha carica netta uguale a zero ed è meno solubile','Il pH a cui la proteina ha massima attività enzimatica','Il pH a cui tutti i residui carichi sono protonati','Il pH a cui la proteina denatura'],ans:0,exp:'Il pI è il pH a cui la carica netta totale della proteina è zero (sommando cariche positive di Lys/Arg/His e negative di Asp/Glu/C-term). Al pI la repulsione elettrostatica è minima: la proteina tende a precipitare (minima solubilità) e non migra in elettroforesi.'},
+  {cat:'biochimica',diff:'facile',q:'Quale biomolelcola fornisce la maggior parte dell\'energia nel regime aerobico a riposo?',opts:['Glucosio dalla glicolisi','Corpi chetonici','Acidi grassi via β-ossidazione','Aminoacidi essenziali'],ans:2,exp:'A riposo e in condizioni aerobiche, il metabolismo di acidi grassi (via β-ossidazione) fornisce la maggior parte dell\'energia (fino al 60-70%) in muscolo cardiaco e scheletrico a riposo, essendo molto più energetici del glucosio per grammo (9 kcal/g vs 4 kcal/g).'},
+  {cat:'biochimica',diff:'medio',q:'Qual è la differenza tra DNA-supercoiling positivo e negativo?',opts:['Il positivo avvolge il DNA in senso orario, facilitando la trascrizione; il negativo in senso antiorario','Il supercoiling positivo (sovratorcitura) tende a chiudere la doppia elica e ostacolare la replicazione; il negativo (sottoavvolgimento) la facilita tendendo ad aprire la doppia elica','Non c\'è differenza funzionale','Il positivo è tipico dei procarioti, il negativo degli eucarioti'],ans:1,exp:'Il DNA in vivo è mantenuto in supercoiling negativo dalle topoisomerasi. Il supercoiling positivo si accumula davanti alla forcella replicativa: la topoisomerasi II (girasi batterica) introduce supercoiling negativo, bersaglio dei fluorochinoloni antibatterici.'},
+
+  /* ── ORGANICA extra ── */
+  {cat:'organica',diff:'facile',q:'Quale tipo di isomeria presentano il 2-butanolo e il 2-metil-1-propanolo?',opts:['Isomeria geometrica','Isomeria di posizione','Isomeria di catena','Isomeria ottica'],ans:2,exp:'Il 2-butanolo (C₄H₉OH, catena lineare) e il 2-metil-1-propanolo (stesso C₄H₁₀O, con ramificazione) sono isomeri di catena: stessa formula molecolare ma diverso scheletro carbonioso.'},
+  {cat:'organica',diff:'facile',q:'Quale reattivo è usato per distinguere aldeidi da chetoni?',opts:['Acido solforico concentrato','Reattivo di Tollens (soluzione ammoniacale di Ag⁺): le aldeidi riducono Ag⁺ a specchio d\'argento','Soluzione di NaOH','Permanganato di potassio'],ans:1,exp:'Il reattivo di Tollens (ione diammino-argentato [Ag(NH₃)₂]⁺) ossida le aldeidi a carbossilati con riduzione di Ag⁺ ad Ag⁰ (specchio d\'argento). I chetoni non reagiscono perché privi del gruppo C-H del carbonile.'},
+  {cat:'organica',diff:'facile',q:'Qual è il prodotto principale della bromurazione del benzene in presenza di FeBr₃?',opts:['Addizione di Br₂ al doppio legame','Sostituzione aromatica elettrofila: bromobenzene + HBr','Ossidazione a chinone','Nessuna reazione'],ans:1,exp:'FeBr₃ è un acido di Lewis che attiva Br₂ formando [Br]⁺ (elettrofilo): la SEAr (Sostituzione Elettrofila Aromatica) sostituisce un H del benzene con Br, producendo bromobenzene + HBr, mantenendo l\'aromaticità.'},
+  {cat:'organica',diff:'medio',q:'Cosa si intende per "effetto induttivo" in chimica organica?',opts:['La trasmissione di carica attraverso il sistema π','La trasmissione della densità elettronica lungo i legami σ per differenza di elettronegatività','L\'effetto mesomerico nei composti aromatici','La rotazione attorno ai legami C-C'],ans:1,exp:'L\'effetto induttivo è la perturbazione della densità elettronica trasmessa attraverso i legami σ per differenza di elettronegatività (es. -F, -Cl sono −I, attraggono elettroni; -CH₃ è +I, dona elettroni). Decresce rapidamente con la distanza.'},
+  {cat:'organica',diff:'medio',q:'Qual è il prodotto principale dell\'addizione di HBr al propene (CH₃-CH=CH₂) secondo la regola di Markovnikov?',opts:['1-bromopropano','2-bromopropano','Bromuro di allile','Propano'],ans:1,exp:'Regola di Markovnikov: l\'elettrofilo (H⁺) si lega al carbonio meno sostituito (C1), formando il carbocatione secondario più stabile (C2⁺), poi Br⁻ attacca C2 → 2-bromopropano (CH₃CHBrCH₃).'},
+  {cat:'organica',diff:'medio',q:'Cosa descrive la stereospecificità della reazione di Diels-Alder?',opts:['Avviene solo in solventi polari','È una cicloaddizione [4+2] suprafaciale-suprafaciale: i sostituenti del dienofilo mantengono la configurazione (endo/exo, sin-addizione)','Forma esclusivamente prodotti trans','Richiede sempre un catalizzatore acido'],ans:1,exp:'La reazione di Diels-Alder è una cicloaddizione pericíclica [4π+2π] concertata che avviene suprafacialmente: la stereochemistry dei sostituenti del dienofilo è ritenuta nel prodotto (addizione sin). La regola endo di Alder favorisce il prodotto endo cinetico.'},
+  {cat:'organica',diff:'medio',q:'Quale reagente converte un alcol primario in aldeide (senza ossidare ulteriormente ad acido carbossilico)?',opts:['KMnO₄ in ambiente basico','CrO₃ in acido solforico','Reattivo di Swern (cloruro di ossalile + DMSO) o reattivo di Dess-Martin','NaBH₄'],ans:2,exp:'I reagenti di Swern, Dess-Martin Periodinane o PCC (clorocromato di piridinio) ossidano selettivamente gli alcol primari ad aldeidi senza sovraidrolisi ad acido. KMnO₄ e CrO₃ in H₂SO₄ ossidano fino ad acido carbossilico.'},
+  {cat:'organica',diff:'difficile',q:'Perché i sistemi aromatici seguono la regola di Hückel (4n+2 elettroni π)?',opts:['Perché solo questi sistemi hanno HOMO completamente occupato','Perché 4n+2 elettroni π completano tutti gli MO leganti nel diagramma di Frost, rendendo il sistema più stabile rispetto alla somma delle doppie obbligazioni localizzate','Per ragioni di simmetria del reticolo cristallino','Perché il numero di legami σ è sempre pari'],ans:1,exp:'Con 4n+2 e π, secondo i calcoli di Hückel, tutti gli orbitali molecolari energeticamente più bassi (leganti e non-leganti) sono completamente occupati, conferendo stabilità aggiuntiva (energia di delocalizzazione). Con 4n e π (antiaromatici), un MO a energia media risulta semioccupato: destabilizzazione.'},
+  {cat:'organica',diff:'difficile',q:'Qual è il meccanismo dell\'acilazione di Friedel-Crafts?',opts:['Sostituzione Radicale','SEAr via ione acilio (RCO⁺) generato da RCOCl + AlCl₃','Addizione-eliminazione su cloruro acilico','Cicloaddizione [2+2]'],ans:1,exp:'AlCl₃ (acido di Lewis) coordina il Cl del cloruro acilico generando lo ione acilio (acilcarbenio RCO⁺), potente elettrofilo. Attacca il benzene in SEAr formando il complesso σ (Wheland), poi perdita di H⁺ ripristina l\'aromaticità. Prodotto: chetone aromatico.'},
+  {cat:'organica',diff:'difficile',q:'Perché la reazione SN1 viene favorita dai solventi polari protici?',opts:['Perché stabilizzano il carbocatione intermedio per solvente/solvatazione','Perché abbassano l\'energia di attivazione della reazione concertata','Perché aumentano la nucleofilicità del solvente','Perché abbassano il pH e protonano il substrato'],ans:0,exp:'I solventi polari protici (acqua, etanoli) stabilizzano i carbocationi intermedi della SN1 attraverso solvatazione (interazioni H-bond e dipolo-ione) e stabilizzano anche l\'anione uscente. Questo abbassa l\'energia del carbocatione, accelerando la ionizzazione (passo limitante).'},
+  {cat:'organica',diff:'facile',q:'Quale classe di composti reagisce con gli acidi carbossilici formando esteri?',opts:['Ammine','Alcoli (Fischer esterification in presenza di H⁺)','Aldeidi','Alcheni'],ans:1,exp:'La reazione di Fischer-esterificazione: RCOOH + R\'OH ⇌ RCOOR\' + H₂O (catalizzata da H⁺) porta alla formazione di esteri. È reversibile; si sposta verso l\'estere rimuovendo l\'acqua o usando alcol in eccesso.'},
+  {cat:'organica',diff:'medio',q:'Cosa distingue la reazione di addizione elettrofila (AE) da quella nucleofila (AN)?',opts:['AE avviene su sistemi ricchi di elettroni (alcheni) con elettrofili; AN su sistemi poveri di elettroni (carbonile) con nucleofili','Non c\'è differenza: entrambe rompono legami σ','AE avviene sempre in solvente acquoso, AN in solvente organico','AE è sempre più veloce di AN'],ans:0,exp:'L\'AE avviene su sistemi π nucleofili (alcheni, areni): l\'elettrofilo attacca per primo il sistema ricco di elettroni. L\'AN avviene su sistemi π elettrofili (carbonile, nitrile): il nucleofilo attacca il carbonio δ+ del C=O o C≡N.'},
+  {cat:'organica',diff:'difficile',q:'Cosa si intende per "reazione pericíclica"?',opts:['Reazione che avviene solo nel periciclo cellulare','Reazione che avviene attraverso un stato di transizione ciclico con riorganizzazione concertata degli elettroni π e σ senza formazione di ioni o radicali','Reazione che avviene nei solventi con alta costante dielettrica','Reazione catalizzata da metalli di transizione'],ans:1,exp:'Le reazioni pericíclare (cicloaddizioni, elettrocicliche, sigmatropiche) avvengono attraverso uno stato di transizione ciclico con riorganizzazione concertata (simultanea) degli elettroni senza intermedi ionici o radicale. Sono regolate dalle regole di Woodward-Hoffmann (simmetria degli orbitali molecolari).'},
+
+  /* ── SPETTRI extra ── */
+  {cat:'spettri',diff:'facile',q:'Quale tecnica spettroscopica si basa sull\'assorbimento di raggi X da parte degli elettroni di core (1s)?',opts:['IR','NMR','XPS (X-ray Photoelectron Spectroscopy)','Raman'],ans:2,exp:'L\'XPS (spettroscopia fotoelettronica a raggi X) misura l\'energia cinetica degli elettroni emessi da livelli di core (1s, 2p) per irraggiamento con raggi X. Le energie di legame caratteristiche identificano gli elementi e il loro stato di ossidazione.'},
+  {cat:'spettri',diff:'facile',q:'In spettroscopia IR, a quale numero d\'onda appare tipicamente lo stretching O-H degli alcoli (legame idrogeno)?',opts:['500-600 cm⁻¹','1000-1200 cm⁻¹','2200-2300 cm⁻¹','3200-3550 cm⁻¹ (banda larga)'],ans:3,exp:'Lo stretching O-H degli alcoli legati a H appare come banda larga a 3200-3550 cm⁻¹. La larghezza è dovuta alle diverse conformazioni e forze del legame idrogeno. Il gruppo O-H libero dà banda stretta attorno a 3620-3640 cm⁻¹.'},
+  {cat:'spettri',diff:'medio',q:'In NMR ¹H, quale fattore causa lo "deshielding" (bassa schermatura) di un protone?',opts:['Vicina presenza di gruppi donatori di elettroni','Vicina presenza di atomi elettronegativi o sistemi π anisotropi che sottraggono densità elettronica al nucleo H','Alta densità elettronica attorno al nucleo','Distanza dal centro molecolare'],ans:1,exp:'Il deshielding (spostamento a δ alto) è causato da atomi elettronegativi vicini (effetto induttivo), da anisotropia magnetica di legami π (anelli aromatici, C=O, C≡C) e da effetti steric. I protoni aromatici risuonano a δ 6.5-8.5 per il cono di deshielding del ciclo aromatico.'},
+  {cat:'spettri',diff:'medio',q:'Cosa si intende per "costante di accoppiamento J" nell\'NMR?',opts:['Il rapporto tra la frequenza di risonanza e il campo magnetico','La distanza in Hz tra le righe di un multipletto, che descrive il trasferimento di informazione di spin attraverso i legami','L\'intensità del segnale NMR','Il numero di protoni equivalenti'],ans:1,exp:'La costante di accoppiamento J (in Hz) è indipendente dal campo magnetico e descrive l\'interazione spin-spin tra nuclei accoppiati attraverso legami. ³J (vicinal coupling) nei sistemi -CH-CH- varia con l\'angolo diedro (equazione di Karplus): J≈0 Hz a 90°, J≈8-10 Hz a 180°.'},
+  {cat:'spettri',diff:'medio',q:'Quale tecnica NMR 2D correla protoni vicinali (H-H, 3 legami) attraverso lo spazio per ≤5 Å?',opts:['COSY (COrrelation SpectroscopY)','NOESY (Nuclear Overhauser Effect SpectroscopY)','HSQC','HMBC'],ans:1,exp:'NOESY (e il suo equivalente per scambio chimico ROESY) mostra correlazioni H-H attraverso lo spazio (NOE, dipendente da r⁻⁶) per protoni a distanza ≤5 Å, indipendentemente dalla connettività. Fondamentale per la determinazione della struttura 3D (conformazione) di proteine e molecole organiche.'},
+  {cat:'spettri',diff:'difficile',q:'Perché la spettroscopia Raman è complementare all\'IR?',opts:['Perché entrambe misurano le stesse vibrazioni ma in modo duplicato','Perché il Raman rivela vibrazioni con cambio di polarizzabilità (simmetrica) inattive all\'IR (che richiede cambio di momento di dipolo), e viceversa; in molecole centrosimmetriche vige la regola di mutua esclusione','Perché il Raman usa UV e l\'IR usa microonde','Perché il Raman è sempre più sensibile dell\'IR'],ans:1,exp:'La regola di selezione IR richiede Δμ≠0 (cambio di momento di dipolo); il Raman richiede Δα≠0 (cambio di polarizzabilità). Per molecole con centro di inversione, una vibrazione non può essere contemporaneamente IR- e Raman-attiva (regola di mutua esclusione). Questo le rende complementari.'},
+  {cat:'spettri',diff:'difficile',q:'Qual è la risoluzione spaziale tipica della Cryo-EM ad alta risoluzione per proteine?',opts:['Risoluzione micrometrica (~1 μm)','Risoluzione sub-angstrom a 1-2 Å, comparabile alla cristallografia a raggi X','Risoluzione nanometrica (~10 nm)','Risoluzione a 0.1 μm, adatta solo per virus'],ans:1,exp:'La Cryo-EM moderna (con microscopi sferici ad aberrazione corretta e ricostruzione al computer con algoritmi di classificazione delle particelle) raggiunge risoluzioni di 1.5-3 Å per proteine solubili e complessi, paragonabili o superiori alla cristallografia a raggi X, senza necessità di cristallizzazione.'},
+  {cat:'spettri',diff:'facile',q:'In spettrometria di massa (MS), cosa misura il rivelatore?',opts:['La massa assoluta delle molecole','Il rapporto massa/carica (m/z) degli ioni in fase gassosa','Il numero di elettroni delle molecole','La lunghezza d\'onda di emissione'],ans:1,exp:'Lo spettrometro di massa separa e rivela ioni in base al loro rapporto massa/carica (m/z). Per ioni con carica z=1 (più comuni), m/z corrisponde alla massa. Per ioni multicarica (frequenti in ESI-MS di proteine) m/z permette di calcolare la massa vera.'},
+  {cat:'spettri',diff:'medio',q:'Cosa si intende per "ion fragment" nello spettro MS di una molecola organica?',opts:['L\'ione molecolare intatto [M]⁺','Frammenti ionici prodotti dalla frammentazione del catione-radicale [M]⁺• nei modi caratteristici della struttura','Addotti con solvente ionico','Ioni di fondo del sistema'],ans:1,exp:'Nello spettro EI-MS, la frammentazione dell\'ione molecolare [M]⁺• produce ioni frammento caratteristici della struttura (perdita di CH₃, CO, H₂O, ecc.). I pattern di frammentazione permettono di dedurre la struttura molecolare.'},
+  {cat:'spettri',diff:'difficile',q:'Quale tecnica MS è più adatta per molecole biologiche di alto peso molecolare come proteine?',opts:['EI (Electron Ionization): standard per molecole piccole','ESI (Electrospray Ionization) o MALDI: ionizzano molecole grandi senza frammentarle ("ionizzazione dolce")','CI (Chemical Ionization)','FAB (Fast Atom Bombardment)'],ans:1,exp:'ESI (Nobel 2002 a Fenn) e MALDI (Nobel 2002 a Tanaka) sono tecniche di ionizzazione soft che permettono di ionizzare peptidi e proteine integri in fase gassosa (senza frammentazione). ESI produce ioni multicarica [(M+nH)^n+], MALDI principalmente [M+H]⁺.'},
+  {cat:'spettri',diff:'facile',q:'In spettroscopia UV-Vis, cosa si intende per "λmax"?',opts:['La lunghezza d\'onda minima assorbita','La lunghezza d\'onda di massimo assorbimento della molecola, caratteristica del suo cromoforo','Il valore massimo della trasmittanza','La lunghezza d\'onda di emissione della fluorescenza'],ans:1,exp:'λmax è la lunghezza d\'onda a cui la molecola mostra il massimo coefficiente di estinzione molare (ε). Dipende dalla struttura del cromoforo (sistema π coniugato o n→π*) e dal solvente. Usato per identificazione e quantificazione (legge di Beer-Lambert).'},
+  {cat:'spettri',diff:'medio',q:'Quale tecnica NMR 2D è usata per assegnare correlazioni ¹H-¹³C a un legame (HSQC)?',opts:['COSY: correlazione H-H vicinale','HMBC: correlazione H-C a 2-3 legami','HSQC: correlazione direttamente legati ¹H-¹³C (¹J_CH)','NOESY: correlazione H-H attraverso lo spazio'],ans:2,exp:'HSQC (Heteronuclear Single Quantum Coherence) rivela le correlazioni tra protoni e i carboni direttamente legati (¹J_CH ≈ 125-160 Hz). Produce uno spettro 2D con δ(¹H) e δ(¹³C) di ogni CH, CH₂ e CH₃, essenziale per l\'assegnazione degli NMR di molecole complesse.'},
+  {cat:'spettri',diff:'difficile',q:'In NMR solido, qual è la principale causa di allargamento delle linee rispetto alla soluzione e come viene eliminata?',opts:['Il paramagnetismo del campione; eliminato con campo magnetico alto','L\'accoppiamento dipolare H-H (in soluzione mediato dalla diffusione; in solido fisso e fortissimo) + interazione quadrupolare + anisotropia chimica; eliminati con MAS (Magic Angle Spinning) a ~54.7°','Il rumore termico; eliminato abbassando la temperatura','Il solvente; eliminato misurando in D₂O'],ans:1,exp:'Nel solido, la diffusione molecolare non media gli accoppiamenti dipolari fissi e le anisotropie chimiche, causando bande larghissime. Il MAS (Magic Angle Spinning) ruota il campione a 54.74° (angolo magico) eliminando i termini (3cos²θ−1) responsabili dell\'allargamento.'},
+
+  /* ── TERMODINAMICA extra ── */
+  {cat:'termo',diff:'facile',q:'Cosa afferma il Primo Principio della Termodinamica?',opts:['L\'entropia di un sistema isolato aumenta','L\'energia si conserva: ΔU = Q + W (calore assorbito + lavoro compiuto sul sistema)','La temperatura assoluta non può raggiungere lo zero','I processi spontanei riducono ΔG del sistema'],ans:1,exp:'Il I principio (legge di conservazione dell\'energia): ΔU = Q + W, dove Q è il calore assorbito dal sistema e W il lavoro compiuto sul sistema. L\'energia interna U è una funzione di stato; Q e W dipendono dal percorso.'},
+  {cat:'termo',diff:'facile',q:'Cosa si intende per "entalpia standard di formazione" (ΔH°f)?',opts:['Il calore richiesto per far evaporare 1 mol di sostanza','Il ΔH della reazione in cui 1 mol di composto è formata dagli elementi nella loro forma standard a 25°C e 1 atm','Il calore di combustione della sostanza','Il calore di soluzione in acqua'],ans:1,exp:'ΔH°f è l\'entalpia di formazione di 1 mol di composto a partire dagli elementi allo stato standard (forma più stabile a 25°C, 1 atm). Per gli elementi nelle loro forme standard ΔH°f = 0. Permette di calcolare ΔH° di qualsiasi reazione via Hess.'},
+  {cat:'termo',diff:'medio',q:'Una reazione ha ΔH = -100 kJ/mol e ΔS = -200 J/(mol·K). A quale temperatura la reazione diventa non spontanea?',opts:['A tutte le temperature','Mai','Sopra T = 500 K (ΔG = ΔH - TΔS > 0 per T > ΔH/ΔS = 100000/200)','Sotto T = 500 K'],ans:2,exp:'ΔG = ΔH - TΔS = -100000 - T×(-200) = -100000 + 200T. La reazione è spontanea (ΔG<0) quando -100000 + 200T < 0 → T < 500 K. Sopra 500 K il termine entropico sfavorevole (TΔS negativo perché ΔS<0) domina e ΔG>0: non spontanea.'},
+  {cat:'termo',diff:'medio',q:'Cosa prevede il Terzo Principio della Termodinamica?',opts:['L\'energia si conserva','L\'entropia di un cristallo perfetto puro a 0 K è uguale a zero (S₀ = 0)','L\'entropia dell\'universo aumenta sempre','Non è possibile raggiungere il calore assoluto zero'],ans:1,exp:'Il III principio (Nernst-Planck): l\'entropia assoluta di un cristallo perfetto (un singolo microstato) a 0 K è S₀ = 0. Questo permette di definire entropie assolute (non relative) e di calcolare le entropie standard S° di qualsiasi composto.'},
+  {cat:'termo',diff:'difficile',q:'Qual è la differenza tra entalpia (H) e energia interna (U)?',opts:['Sono identici','H = U + PV: l\'entalpia include anche il "lavoro PV" di espansione contro la pressione esterna; ΔH = qp (calore a pressione costante)','H = U - PV','H è misurata in J·mol⁻¹ e U in cal·mol⁻¹'],ans:1,exp:'H = U + PV è definita per convenienza nelle reazioni a pressione costante. ΔH = ΔU + Δ(PV) = ΔU + PΔV (per gas ideali PΔV = ΔnRT). In calorimetria a pressione costante (comune in chimica) qp = ΔH; a volume costante (bomba calorimetrica) qv = ΔU.'},
+  {cat:'termo',diff:'difficile',q:'Cosa descrive l\'equazione di Gibbs-Helmholtz: ∂(ΔG/T)/∂T|p = -ΔH/T²?',opts:['La variazione di ΔG con la pressione a T costante','La variazione di ΔG/T con la temperatura a pressione costante, che collega i dati calorimentrici (ΔH) alla dipendenza termica dell\'equilibrio','La definizione di capacità termica','Il legame tra tensione di vapore e temperatura'],ans:1,exp:'L\'equazione di Gibbs-Helmholtz descrive come ΔG/T varia con T. Riscritta come d(ln K)/d(1/T) = -ΔH°/R (equazione di van\'t Hoff), collega la variazione di K con la temperatura all\'entalpia di reazione: fondamentale per predire l\'effetto della temperatura sugli equilibri chimici.'},
+  {cat:'termo',diff:'facile',q:'In calorimetria, se 50 g di acqua si riscaldano da 20°C a 30°C (Cp(H₂O) = 4.18 J/g·K), quanti Joule sono assorbiti?',opts:['209 J','2090 J','418 J','4180 J'],ans:1,exp:'q = m × Cp × ΔT = 50 g × 4.18 J/g·K × (30-20) K = 50 × 4.18 × 10 = 2090 J.'},
+  {cat:'termo',diff:'medio',q:'Cosa afferma la legge di Hess?',opts:['La variazione di entropia è positiva in ogni reazione spontanea','La variazione di entalpia di una reazione è indipendente dal percorso (funzione di stato), quindi ΔH può essere calcolata sommando algebricamente le entalpie di più reazioni','L\'entalpia è sempre negativa nelle reazioni esotermiche','La costante di equilibrio è indipendente dalla temperatura'],ans:1,exp:'La legge di Hess è una conseguenza del fatto che H è una funzione di stato: ΔH di una reazione è la stessa indipendentemente dal percorso, purché stato iniziale e finale siano gli stessi. Permette di calcolare ΔH di reazioni che non si possono misurare direttamente.'},
+  {cat:'termo',diff:'difficile',q:'Cos\'è la "funzione di Gibbs" e perché è utile in chimica?',opts:['È un\'altra definizione dell\'energia interna','G = H - TS è la funzione termodinamica che determina la spontaneità e l\'equilibrio di processi a T e P costante; ΔG < 0 = spontaneo, ΔG = 0 = equilibrio, ΔG > 0 = non spontaneo','È equivalente all\'entropia per i processi irreversibili','G = U + TS - PV'],ans:1,exp:'G (energia libera di Gibbs) = H - TS combina entalpia ed entropia in un unico criterio per la spontaneità a T,P costante (condizioni tipiche di laboratorio). ΔG° = -RT ln K collega G all\'equilibrio chimico, e ΔG° = -nFE° all\'elettrochimica.'},
+  {cat:'termo',diff:'medio',q:'Quale affermazione sull\'entropia è corretta?',opts:['L\'entropia è zero per tutti i liquidi a temperatura ambiente','L\'entropia aumenta con la temperatura, con il grado di libertà molecolare e con la dispersione dell\'energia','L\'entropia è una funzione di percorso, non di stato','L\'entropia diminuisce quando un gas si espande in un vuoto'],ans:1,exp:'L\'entropia S è una funzione di stato che misura la dispersione dell\'energia e il grado di disordine. Aumenta con T, con la transizione solido→liquido→gas, con reazioni che aumentano il numero di moli gassose e con la complessità molecolare. L\'espansione nel vuoto aumenta S (più microstati accessibili).'},
+  {cat:'termo',diff:'difficile',q:'Per un ciclo di Carnot tra due sorgenti a T₁=600 K e T₂=300 K, qual è il rendimento massimo?',opts:['25%','50%','75%','100%'],ans:1,exp:'Il rendimento del ciclo di Carnot (rendimento massimo teorico tra due sorgenti a T₁ e T₂): η = 1 - T₂/T₁ = 1 - 300/600 = 0.5 = 50%. Nessuna macchina reale può superare questo limite per il II principio della termodinamica.'},
+  {cat:'termo',diff:'facile',q:'In quale tipo di processo il sistema non scambia calore con l\'ambiente?',opts:['Processo isotermo','Processo isobaro','Processo adiabatico','Processo isocoro'],ans:2,exp:'In un processo adiabatico q = 0: non c\'è scambio di calore tra sistema e ambiente (es. per isolamento termico perfetto). ΔU = W (tutto il lavoro va a modificare l\'energia interna). Es. espansione adiabatica reversibile di un gas ideale → raffreddamento.'},
+  {cat:'termo',diff:'medio',q:'Per un gas ideale monoatomico (Cv = 3/2 R), come varia la temperatura in un\'espansione adiabatica reversibile?',opts:['Rimane costante','Aumenta','Diminuisce (il gas fa lavoro positivo usando la propria energia interna)','Non si può determinare senza la pressione iniziale'],ans:2,exp:'In un\'espansione adiabatica reversibile, q=0 e il gas fa lavoro W=PΔV sull\'esterno. Poiché ΔU = W < 0 (lavoro fatto dal gas), e per un gas ideale ΔU = nCvΔT, si ha ΔT < 0: la temperatura diminuisce. Questo principio è alla base della refrigerazione a gas.'},
+
+  /* ── CINETICA extra ── */
+  {cat:'cinetica',diff:'facile',q:'Come si definisce la velocità di reazione?',opts:['Come la concentrazione di prodotto al tempo finale','Come la variazione di concentrazione di un reagente o prodotto per unità di tempo: v = -d[R]/dt = +d[P]/dt','Come l\'energia di attivazione divisa per la temperatura','Come il rapporto tra moli di prodotto e di reagente'],ans:1,exp:'La velocità di reazione è la variazione nel tempo della concentrazione di reagenti o prodotti (tenendo conto dei coefficienti stechiometrici): v = -(1/a)d[A]/dt = +(1/b)d[B]/dt per la reazione aA + ... → bB + ...'},
+  {cat:'cinetica',diff:'facile',q:'Cosa è un catalizzatore e come influenza la cinetica?',opts:['Aumenta l\'energia di attivazione della reazione','Abbassa l\'energia di attivazione (Ea) senza essere consumato, aumentando la costante di velocità k senza modificare ΔG della reazione','Sposta l\'equilibrio verso i prodotti','Aumenta la temperatura della reazione'],ans:1,exp:'Il catalizzatore offre un percorso alternativo con Ea inferiore: k aumenta (eq. di Arrhenius: k = Ae^(-Ea/RT)), la reazione è più veloce. Non è consumato, non modifica ΔG o la costante di equilibrio K; solo la velocità con cui si raggiunge l\'equilibrio.'},
+  {cat:'cinetica',diff:'medio',q:'Per una reazione di primo ordine con k = 0.01 s⁻¹, qual è il tempo di emivita (t₁/₂)?',opts:['100 s','69.3 s','10 s','693 s'],ans:1,exp:'Per una reazione del 1° ordine: t₁/₂ = ln2/k = 0.693/0.01 = 69.3 s. Il tempo di emivita è costante (indipendente dalla concentrazione iniziale): una proprietà caratteristica delle reazioni del primo ordine.'},
+  {cat:'cinetica',diff:'medio',q:'Cosa si intende per "step limitante la velocità" in una reazione a più stadi?',opts:['Il passo con il ΔG più negativo','Il passo con la Ea più alta e k più piccola, che determina la velocità complessiva della reazione','Il passo con i più molti reagenti','Il passo finale che produce il prodotto'],ans:1,exp:'In un meccanismo a più stadi, lo step limitante è quello con la minore costante di velocità (Ea più alta): la velocità complessiva della reazione non può superare quella del passo più lento. La legge di velocità osservata riflette la stechiometria dello step limitante.'},
+  {cat:'cinetica',diff:'medio',q:'Come dimostra la distribuzione di Maxwell-Boltzmann il ruolo della temperatura nella cinetica?',opts:['Mostra che tutte le molecole hanno la stessa energia','Mostra che solo poche molecole hanno l\'energia ≥ Ea (area sotto la curva oltre Ea); aumentando T, questa frazione aumenta esponenzialmente','Mostra che la velocità media è proporzionale a T²','Dimostra che la cinetica non dipende dalla temperatura'],ans:1,exp:'La distribuzione di Maxwell-Boltzmann descrive la distribuzione delle energie molecolari: la frazione di molecole con E ≥ Ea è proporzionale a e^(-Ea/RT). Aumentando T, questa "coda" aumenta esponenzialmente, spiega perché k cresce in modo non lineare con T (eq. di Arrhenius).'},
+  {cat:'cinetica',diff:'difficile',q:'Cosa si intende per "principio di stato stazionario" (PSS) in cinetica?',opts:['Tutti i reagenti si trovano a concentrazione costante durante la reazione','La concentrazione di intermedi reattivi (a vita breve) si mantiene pressoché costante nel tempo perché la velocità di formazione ≈ velocità di consumo','Significa che la reazione è all\'equilibrio','Solo i prodotti raggiungono lo stato stazionario'],ans:1,exp:'Il PSS si applica agli intermedi altamente reattivi (radicali, carbocationi, complessi enzima-substrato): poiché si formano e si consumano velocemente, d[I]/dt ≈ 0 → v_formazione = v_consumo. Questo permette di risolvere algebraicamente [I] e derivare leggi di velocità complesse (es. Michaelis-Menten).'},
+  {cat:'cinetica',diff:'difficile',q:'Qual è la differenza tra "catena reazionale" e "ciclo catalitico" in cinetica?',opts:['Sono lo stesso concetto','Una catena reazionale è una sequenza di passi elementari in cui i radicali (o altri intermedi) si propagano senza catalisi; un ciclo catalitico è un meccanismo in cui il catalizzatore è rigenerato alla fine di ogni ciclo','Le catene avvengono in fase gas, i cicli in fase liquida','Le catene producono polimeri, i cicli producono solo gas'],ans:1,exp:'Nelle reazioni a catena (es. alogenazione radicalica), il propagatore (radicale) si rigenera in ogni ciclo propagazione, dando alto resa per ogni step di iniziazione. Nel ciclo catalitico (es. idrogenazione con Pd), il catalizzatore è rigenerato alla fine del ciclo; la distingue la natura del portatore (radicale vs catalizzatore).'},
+  {cat:'cinetica',diff:'difficile',q:'Cosa misura il parametro "fattore A" (pre-esponenziale) nell\'equazione di Arrhenius?',opts:['L\'energia cinetica media dei reagenti','La frequenza dei tentativi di reazione (collisioni con orientazione corretta): A = Z_AB × P (frequenza collisionale × fattore sterico)','La concentrazione iniziale dei reagenti','La temperatura a cui la reazione è più veloce'],ans:1,exp:'Secondo la teoria delle collisioni, A = Z_AB × P: Z_AB è la frequenza di collisioni tra A e B per unità di concentrazione, e P il fattore sterico (probabilità che la collisione abbia l\'orientazione corretta per la reazione). A dipende debolmente da T e contiene informazioni geometriche.'},
+  {cat:'cinetica',diff:'medio',q:'Una reazione A → P ha v = k[A]². Se [A] triplica, di quanto aumenta la velocità?',opts:['3 volte','6 volte','9 volte','27 volte'],ans:2,exp:'v = k[A]²; se [A]\'= 3[A]: v\' = k(3[A])² = 9k[A]² = 9v. La velocità aumenta di 9 volte (al quadrato perché la reazione è del secondo ordine rispetto ad A).'},
+  {cat:'cinetica',diff:'facile',q:'Cosa si intende per "reazione elementare"?',opts:['Una reazione con un solo reagente','Una singola collisione molecolare che porta direttamente da reagenti a prodotti senza intermedi: la molecolarità (mono, bi, termolecolare) corrisponde all\'ordine','Una reazione esotermica senza barriera energetica','Una reazione in fase gassosa'],ans:1,exp:'Una reazione elementare avviene in un singolo step con formazione dello stato di transizione senza intermedi. Per le reazioni elementari, l\'ordine coincide con la molecolarità (unimolecolare → 1° ordine; bimolecolare → 2° ordine). Le reazioni globali multi-step non seguono questa regola.'},
+  {cat:'cinetica',diff:'medio',q:'Come cambia la costante di equilibrio K all\'aumentare della temperatura per una reazione endotermica?',opts:['K diminuisce','K rimane costante','K aumenta (spostamento verso i prodotti)','K diventa negativa'],ans:2,exp:'Per una reazione endotermica (ΔH° > 0), d(lnK)/dT = ΔH°/RT² > 0: K aumenta con T. Fisicamente: l\'aumento di T fornisce energia al sistema favorendo la reazione endotermica (verso i prodotti). Il principio di Le Chatelier prevede lo stesso risultato.'},
+  {cat:'cinetica',diff:'facile',q:'Cosa si intende per "inibizione enzimatica competitiva"?',opts:['L\'inibitore si lega in modo irreversibile al sito attivo','L\'inibitore (strutturalmente simile al substrato) compete con il substrato per il sito attivo dell\'enzima in modo reversibile, aumentando Km apparente senza modificare Vmax','L\'inibitore si lega all\'enzima lontano dal sito attivo riducendo Vmax','L\'inibitore reagisce con il substrato prima che questo raggiunga l\'enzima'],ans:1,exp:'L\'inibitore competitivo (es. metotressato-DHFR, statine-HMG-CoA reduttasi) compete con il substrato per il sito attivo. Aumenta Km (apparente) senza variare Vmax. Può essere superato aumentando [S]. Il Lineweaver-Burk mostra rette con stesso intercetta sull\'asse y ma diversa pendenza.'},
+
+  /* ── CHIMICA INORGANICA extra ── */
+  {cat:'inorganica',diff:'facile',q:'Qual è la configurazione elettronica del Fe²⁺?',opts:['[Ar]3d⁶4s²','[Ar]3d⁶','[Ar]3d⁴','[Ar]3d⁵4s¹'],ans:1,exp:'Fe ha configurazione [Ar]3d⁶4s². Fe²⁺ perde prima gli elettroni 4s (più esterni): Fe²⁺ = [Ar]3d⁶. Fe³⁺ perde un ulteriore elettrone 3d: Fe³⁺ = [Ar]3d⁵ (semiriempimento stabile).'},
+  {cat:'inorganica',diff:'medio',q:'Cosa prevede la teoria del campo cristallino per i complessi ottaedrici?',opts:['I 5 orbitali d rimangono degeneri','I 5 orbitali d si dividono in due gruppi: t₂g (d_xy, d_xz, d_yz, più bassi) e e_g (d_z², d_x²-y², più alti) con separazione Δo','Gli orbitali d ibridizzano con gli orbitali del legante','La degenerazione è rimossa solo nei complessi tetragonali'],ans:1,exp:'Nei complessi ottaedrici, i leganti approcciano lungo gli assi x, y, z e destabilizzano gli orbitali d puntati lungo questi assi (e_g: d_z² e d_x²-y²) rispetto a quelli tra gli assi (t₂g: d_xy, d_xz, d_yz). La separazione è Δo (o 10Dq).'},
+  {cat:'inorganica',diff:'medio',q:'Cosa si intende per "serie spettochimica" dei leganti?',opts:['La serie dei metalli ordinata per elettronegatività','La scala dei leganti ordinata per la loro capacità di dividere gli orbitali d (da debole campo a forte campo): I⁻ < Br⁻ < Cl⁻ < F⁻ < OH⁻ < H₂O < en < CN⁻ < CO','La serie dei colori assorti dagli spettri dei complessi','La serie dei potenziali di ossidoriduzione dei metalli di transizione'],ans:1,exp:'La serie spettochimica ordina i leganti per la loro capacità di dividere il campo cristallino (Δ). Leganti a forte campo (CO, CN⁻) causano Δ grande → complessi a basso spin; leganti a campo debole (I⁻, Br⁻) causano Δ piccola → complessi ad alto spin. Empirica ma utile per prevedere il colore e il comportamento magnetico.'},
+  {cat:'inorganica',diff:'difficile',q:'Perché il [Fe(CN)₆]⁴⁻ è diamagnetico mentre [FeF₆]³⁻ è paramagnetico?',opts:['Perché il Fe ha diverso stato di ossidazione nei due complessi','CN⁻ è un legante a forte campo: Δo > P (energia di accoppiamento), quindi tutti e 6 gli elettroni d del Fe²⁺ entrano nel t₂g (basso spin, diamagnetico). F⁻ è a debole campo: Δo < P, distribuzione ad alto spin con 5 elettroni spaiati (Fe³⁺)','Perché CN⁻ è monodentato e F⁻ è bidentato','Perché il ferro nel cianuro è Fe⁰'],ans:1,exp:'La distinzione basso/alto spin dipende dal confronto tra Δo (determinato dai leganti) e P (energia di accoppiamento degli elettroni). CN⁻ ha Δo grande (forte campo): energia guadagnata dall\'accoppiamento supera P → t₂g⁶ (basso spin, 0 e⁻ spaiati, diamagnetico). F⁻ ha Δo piccolo → distribuzione massima di e⁻ spaiati (Hund, alto spin).'},
+  {cat:'inorganica',diff:'difficile',q:'Cosa si intende per "effetto trans" nei complessi planari quadrati del Pt(II)?',opts:['L\'influenza dei leganti trans sulla velocità di sostituzione: leganti trans-influenzanti forti (CO, CN⁻, H⁻) attivano la posizione trans verso la sostituzione','La capacità di un legante di stare in posizione trans','L\'assorbimento UV dovuto ai leganti in posizione trans','Il rafforzamento dei legami cis'],ans:0,exp:'L\'effetto trans (scoperto da Chernyaev): nei complessi Pt(II) planari quadrati, un legante in posizione trans ai leganti trans-influenzanti forti (alta trans-influence: CO, CN⁻, H⁻ > PR₃ > NH₃ > Cl⁻) viene sostituito molto più velocemente. Sfruttato per la sintesi stereospecifica (es. sintesi del cisplatino).'},
+  {cat:'inorganica',diff:'facile',q:'Qual è la regola dell\'ottetto e quando è violata?',opts:['Tutti gli atomi devono formare 8 legami','Un atomo è stabile quando ha 8 elettroni nel guscio di valenza (configurazione gas nobile); è violata per H (2e), per atomi del 3° periodo (espansione con orbitali d) e per molecole con numero dispari di elettroni','Un atomo deve avere 8 protoni','L\'ottetto si applica solo agli alogeni'],ans:1,exp:'La regola dell\'ottetto prevede 8 elettroni nel guscio esterno. Eccezioni: H e He completano con 2e (doppietto); BF₃ ha solo 6e (ottetto incompleto, acido di Lewis); SF₆, PCl₅ e NO usano orbitali d del 3° periodo (ottetto espanso o dispari). Il F non espande l\'ottetto (no orbitali d disponibili in 2° periodo).'},
+  {cat:'inorganica',diff:'medio',q:'Qual è la geometria del complesso [Ni(CN)₄]²⁻?',opts:['Tetraedrica','Planare quadrata (Ni²⁺ d⁸, forte campo → ibridazione dsp²)','Ottaedrica','Trigonale bipiramidale'],ans:1,exp:'[Ni(CN)₄]²⁻: Ni²⁺ ha configurazione d⁸. CN⁻ è legante a forte campo: Δ grande obbliga i 8 elettroni d a distribuirsi in modo che rimanga libero un orbitale d (d_x²-y²) → ibridazione dsp² → geometria planare quadrata, diamagnetico.'},
+  {cat:'inorganica',diff:'facile',q:'Cosa si intende per "numero di ossidazione"?',opts:['Il numero di legami che un atomo forma','La carica ipotetica che un atomo avrebbe se tutti i legami fossero ionici (assegnando gli elettroni condivisi all\'atomo più elettronegativo)','Il numero di elettroni nel guscio esterno','Il numero atomico meno il numero di massa'],ans:1,exp:'Il numero di ossidazione (n.o.) è un numero formale che indica lo stato di ossidazione di un atomo in un composto, come se tutti i legami fossero ionici. Utile per bilanciare le reazioni di ossidoriduzione: in una redox, uno specie si ossida (n.o. aumenta) e l\'altra si riduce (n.o. diminuisce).'},
+  {cat:'inorganica',diff:'difficile',q:'Qual è la configurazione elettronica dell\'ione Cr³⁺ e quanti elettroni spaiati possiede?',opts:['[Ar]3d³, 3 elettroni spaiati','[Ar]3d⁶, 0 elettroni spaiati','[Ar]3d²4s¹, 3 elettroni spaiati','[Ar]3d⁵, 5 elettroni spaiati'],ans:0,exp:'Cr ha configurazione [Ar]3d⁵4s¹. Cr³⁺ perde 3 elettroni (prima 4s¹, poi due 3d): Cr³⁺ = [Ar]3d³. Per Hund: 3 elettroni in 3 orbitali d distinti con spin paralleli → 3 elettroni spaiati → paramagnetico con μ = √(n(n+2)) = √15 BM.'},
+
+  /* ── CHIMICA ANALITICA extra ── */
+  {cat:'analitica',diff:'facile',q:'Cosa si intende per "sensibilità" di un metodo analitico?',opts:['La concentrazione minima rilevabile','La pendenza della curva di calibrazione (ΔSegnale/ΔConcentrazione): un metodo sensibile produce grande variazione di segnale per piccola variazione di concentrazione','La precisione delle misure ripetute','La selettività del metodo per l\'analita'],ans:1,exp:'La sensibilità analitica è la pendenza della curva di calibrazione (segnale vs concentrazione). Un metodo sensibile ha alta pendenza: piccole variazioni di [analita] producono grandi variazioni di segnale, facilitando la determinazione a basse concentrazioni.'},
+  {cat:'analitica',diff:'facile',q:'Cosa si intende per "limite di rilevabilità" (LOD)?',opts:['La concentrazione a cui il segnale è uguale al segnale del bianco','La concentrazione minima dell\'analita che produce un segnale statisticamente distinguibile dal bianco (segnale_bianco + 3σ_bianco)','La massima concentrazione misurabile','La concentrazione dell\'analita a cui la risposta è lineare'],ans:1,exp:'Il LOD (Limit Of Detection) è convenzionalmente la concentrazione che produce un segnale pari al segnale del bianco + 3σ_bianco (95% CI di differenziazione dal rumore). L\'LOQ (Limit Of Quantitation) è solitamente LOD × 3.3, ovvero segnale_bianco + 10σ_bianco.'},
+  {cat:'analitica',diff:'medio',q:'Che tipo di calibrazione si usa quando la matrice del campione interferisce con il segnale analitico?',opts:['Calibrazione con standard esterni in soluzione acquosa','Metodo della standard addition (aggiunta di standard): si aggiungono quantità note di analita direttamente al campione','Calibrazione con un singolo punto','Calibrazione con standard interni volatili'],ans:1,exp:'Il metodo dell\'aggiunta di standard è usato quando la matrice del campione causa effetti di matrice (enhancement o quenching del segnale): si aggiungono quantità note di analita al campione stesso, costruendo una curva di calibrazione nella matrice reale. Lo zero della curva dà direttamente la concentrazione incognita.'},
+  {cat:'analitica',diff:'medio',q:'Cosa si intende per "potenziale di mezza onda" (E₁/₂) in polarografia?',opts:['Il potenziale a cui la corrente è zero','Il potenziale al quale la corrente è la metà della corrente limite di diffusione: caratteristico dell\'analita e usato per l\'identificazione','Il potenziale standard di riduzione all\'SHE','Il potenziale di picco nella voltammetria a scansione lineare'],ans:1,exp:'E₁/₂ in polarografia (curva corrente-potenziale) è il potenziale a cui la corrente è metà della corrente limite. Per una coppia redox reversibile, E₁/₂ ≈ E° + (RT/nF)ln(D_Red/D_Ox)^0.5. È caratteristico del sistema redox e usato per l\'identificazione qualitativa.'},
+  {cat:'analitica',diff:'difficile',q:'Cosa si intende per "effetto Donnan" nelle membrane a scambio ionico?',opts:['La perdita di selettività della membrana nel tempo','Il potenziale di membrana che si stabilisce tra una soluzione di elettrolita e la membrana carica: la membrana esclude gli ioni di uguale segno alla carica fissa (co-ioni) e trattiene quelli di segno opposto (controioni)','La corrente faradaica che attraversa la membrana','La solvatazione degli ioni attraverso la membrana'],ans:1,exp:'L\'equilibrio di Donnan: una membrana carica negativamente (es. resina a scambio cationico) esclude gli anioni (co-ioni) e arricchisce i cationi (controioni) rispetto alla soluzione. Crea un potenziale di membrana (potenziale di Donnan) sfruttato negli elettrodi a membrana (ISE, es. elettrodo al fluoruro, al nitrato).'},
+  {cat:'analitica',diff:'difficile',q:'Quale tecnica cromatografica è più adatta per analizzare proteine ad alto peso molecolare (>100 kDa)?',opts:['GC (gas cromatografia): non applicabile a proteine','HPLC a fase inversa (RP-HPLC) con colonna C18','SEC (Size Exclusion Chromatography) o Cromatografia ad Esclusione di Dimensione, che separa per peso molecolare','Cromatografia su carta'],ans:2,exp:'La SEC (gel filtration o cromatografia a esclusione) separa le molecole in base alle dimensioni (raggio idrodinamico): le molecole grandi eluiscono prima perché non entrano nei pori della fase stazionaria; le piccole eluiscono dopo perché vi penetrano. Ideale per proteine e polimeri ad alto MW.'},
+  {cat:'analitica',diff:'facile',q:'Cosa è la curva di titolazione acido-base e cosa indica il punto equivalente?',opts:['Grafico pH vs volume base titolante: al punto equivalente le moli di base aggiustate = moli di acido; il pH è determinato dal sale formato','Grafico della concentrazione vs temperatura','Curva che mostra la solubilità del sale in funzione del pH','Grafico della conducibilità vs pH'],ans:0,exp:'Nella titolazione di un acido con una base forte, la curva pH vs V(base) mostra una variazione brusca attorno al punto equivalente (PE). Al PE n(base) = n(acido); il pH al PE dipende dalla natura del sale (acido forte-base forte → pH=7; acido debole-base forte → pH>7).'},
+  {cat:'analitica',diff:'medio',q:'Cosa si intende per "indicatore di pH" e come funziona?',opts:['Un elettrodo che misura direttamente il pH','Un acido debole organico (HIn) il cui acido coniugato e la base coniugata hanno colori diversi: cambia colore nell\'intervallo pH ≈ pKa ± 1','Un composto che cambia colore in funzione della temperatura','Un sale che tampona il pH in qualsiasi soluzione'],ans:1,exp:'Gli indicatori (es. fenolftaleina pKa≈9, rosso fenolo pKa≈7.4) sono acidi deboli dove HIn e In⁻ hanno colori diversi. La transizione di colore avviene nell\'intervallo pH = pKa(In) ± 1. Vanno scelti con pKa vicino al pH del punto equivalente della titolazione.'},
+  {cat:'analitica',diff:'difficile',q:'Cosa si intende per "cromatografia in fase inversa" (RP-HPLC) e come viene usata in chimica farmaceutica?',opts:['Fase stazionaria polare (silice) + fase mobile apolare','Fase stazionaria apolare (es. C18) + fase mobile polare (acqua/metanolo/acetonitrile): i composti più idrofobici ritenuti più a lungo; usata per caratterizzazione e quantificazione di farmaci e metaboliti','Si inverte semplicemente il flusso','La fase stazionaria è liquida e la fase mobile è solida'],ans:1,exp:'In RP-HPLC la fase stazionaria è apolare (C18, C8) e la fase mobile è polare (acqua + modificatore organico: acetonitrile, metanolo). I composti vengono separati per idrofobicità: poco idrofobici eluiscono prima. Standard della farmacopea per determinazione purezza, contenuto e profilo di impurezze dei farmaci.'},
+  {cat:'analitica',diff:'medio',q:'Cosa misura la conducimetria e in quale tipo di titolazioni è utile?',opts:['Misura la conducibilità elettrica della soluzione in funzione del volume di titolante; utile per titolazioni in cui il prodotto ha conducibilità diversa da reagenti (es. acido forte + base forte → sale + H₂O)','Misura l\'assorbanza della soluzione','Misura il potenziale dell\'elettrodo','Misura la variazione di temperatura nella titolazione'],ans:0,exp:'La conducimetria misura la conducibilità elettrica (κ) della soluzione, proporzionale alle concentrazioni e alle mobilità degli ioni. Nelle titolazioni conducimetriche, il punto equivalente è identificato da un minimo o cambio di pendenza nella curva κ vs V(titolante), senza indicatori: utile per soluzioni colorate o torbide.'},
+  {cat:'analitica',diff:'difficile',q:'Cosa si intende per "specificità" e "selettività" in un metodo analitico?',opts:['Sono sinonimi: entrambi indicano che il metodo misura solo l\'analita','La specificità indica che il metodo risponde solo all\'analita (100% selettivo); la selettività è la capacità di determinare l\'analita in presenza di componenti della matrice senza interferenze significative','La specificità è per metodi biologici, la selettività per metodi chimici','La specificità è più importante della selettività per i metodi ICH'],ans:1,exp:'ICH Q2(R1) e USP: la specificità è la capacità di valutare inequivocabilmente l\'analita in presenza di impurezze, prodotti di degradazione e componenti della matrice. La selettività è più generale: un metodo selettivo può misurare più analiti distinguendoli. In pratica spesso usati come sinonimi, ma specificità è un caso limite di selettività perfetta.'},
+
+  /* ── FARMACOLOGIA extra ── */
+  {cat:'farmacologia',diff:'facile',q:'Cosa si intende per "indice terapeutico" (IT) di un farmaco?',opts:['La velocità di metabolizzazione epatica','Il rapporto TD₅₀/ED₅₀: quanto più è alto, tanto più sicuro è il farmaco (margine di sicurezza)','Il tempo che impiega a raggiungere il picco plasmatico','La percentuale di pazienti che risponde al trattamento'],ans:1,exp:'L\'indice terapeutico IT = TD₅₀/ED₅₀ (dose tossica per il 50% / dose efficace per il 50%). Un IT elevato indica ampio margine di sicurezza. Farmaci con IT stretto (es. digossina, warfarin, litio) richiedono monitoraggio plasmatico e aggiustamento individuale della dose.'},
+  {cat:'farmacologia',diff:'medio',q:'Quale tipo di recettore utilizza la morfina?',opts:['Recettore nicotinico ionotropo','Recettore μ-oppioide (GPCR accoppiato a Gi): inibisce l\'adenilato ciclasi, apre i canali K⁺ GIRK e chiude i canali Ca²⁺ N','Recettore tirosin-chinasico','Recettore nucleare degli ormoni steroidei'],ans:1,exp:'I recettori oppioidi (μ, κ, δ) sono GPCR accoppiati a proteine Gi/o. L\'attivazione di μ: (1) riduce cAMP (inibizione adenilato ciclasi), (2) iperpolarizza il neurone (apertura canali K⁺ GIRK), (3) riduce il rilascio di neurotrasmettitori eccitatori (chiusura canali Ca²⁺ N). Meccanismo base dell\'analgesia oppioide.'},
+  {cat:'farmacologia',diff:'difficile',q:'Cosa si intende per "tolleranza" e "dipendenza fisica" in farmacologia?',opts:['Sono sinonimi di tossicità acuta','Tolleranza: riduzione progressiva dell\'effetto farmacologico con uso ripetuto (richiede dose crescente per lo stesso effetto); dipendenza fisica: comparsa di sintomi da astinenza alla sospensione del farmaco','Tolleranza: impossibilità di metabolizzare il farmaco; dipendenza: formazione di anticorpi','La tolleranza è acuta, la dipendenza è cronica'],ans:1,exp:'La tolleranza può essere metabolica (induzione enzimatica CYP), farmacodinamica (downregulation recettoriale, desensibilizzazione) o comportamentale. La dipendenza fisica nasce dall\'adattamento fisiologico del sistema neurotrasmettitoriale all\'esposizione cronica: alla sospensione emerge il "rimbalzo" opposto all\'effetto del farmaco (sindrome da astinenza).'},
+  {cat:'farmacologia',diff:'medio',q:'Quale classe di farmaci inibisce la pompa Na⁺/K⁺-ATPasi cardiaca e aumenta la contrattilità?',opts:['Beta-bloccanti','Glicosidi cardioattivi (digossina): inibiscono la Na/K-ATPasi → [Na⁺]i aumenta → riduzione dello scambio Na/Ca → aumento [Ca²⁺]i → effetto inotropo positivo','ACE-inibitori','Calcio-antagonisti'],ans:1,exp:'La digossina inibisce la Na/K-ATPasi: l\'aumento di Na intracellulare riduce l\'attività dello scambiatore Na/Ca (che normalmente espelle Ca²⁺ in cambio di Na⁺ entrante) → accumulo di Ca²⁺ intracellulare → aumento della contrattilità miocardica (effetto inotropo +). Finestra terapeutica stretta (0.8-2.0 ng/mL).'},
+  {cat:'farmacologia',diff:'facile',q:'Qual è il meccanismo d\'azione dell\'aspirina (acido acetilsalicilico)?',opts:['Blocca i recettori oppioidi','Inibisce irreversibilmente la COX-1 e COX-2 per acetilazione della Ser530, riducendo la sintesi di prostaglandine e trombossano A₂','Antagonista dei recettori H1 dell\'istamina','Inibisce la ricaptazione della serotonina'],ans:1,exp:'L\'aspirina acetila covalentemente (irreversibilmente) il residuo Ser530 nel sito catalitico delle COX-1 e COX-2, inibendo la sintesi di prostaglandine (antinfiammatorio, antipiretico) e di TXA₂ nelle piastrine (antiaggregante). L\'inibizione irreversibile delle piastrine (che non possono rigenerare COX) dura 7-10 giorni.'},
+  {cat:'farmacologia',diff:'medio',q:'Come agiscono gli ACE-inibitori (es. lisinopril) nel trattamento dell\'ipertensione?',opts:['Bloccano i recettori AT1 dell\'angiotensina II','Inibiscono l\'enzima di conversione dell\'angiotensina (ACE, chinasi II), bloccando la conversione di AngI→AngII (vasocostrittore) e riducendo la degradazione della bradichinina (vasodilatatore)','Aumentano l\'escrezione di sodio inibendo l\'aldosterone','Bloccano i canali del calcio nelle cellule muscolari lisce'],ans:1,exp:'Gli ACE-inibitori inibiscono la zinco-metallo-proteasi ACE che converte angiotensina I in angiotensina II (vasocostrittore potente) e degrada la bradichinina (vasodilatatore). Il risultato: riduzione della resistenza periferica → riduzione della pressione arteriosa. L\'accumulo di bradichinina spiega la tosse secca come effetto collaterale.'},
+  {cat:'farmacologia',diff:'difficile',q:'Cosa si intende per "farmacogenomica" e quale rilevanza clinica ha?',opts:['Lo studio dei farmaci derivati dal genoma umano','Lo studio di come le variazioni genetiche individuali (polimorfismi dei CYP450, recettori, trasportatori) influenzano la risposta ai farmaci: base della medicina personalizzata/di precisione','L\'uso di farmaci geneticamente modificati','Lo studio dei geni attivati da ogni farmaco'],ans:1,exp:'La farmacogenomica studia come i polimorfismi genetici (SNP, varianti di CYP2D6, CYP2C19, TPMT, DPYD, VKORC1, ecc.) determinano la risposta variabile ai farmaci. Es: i metabolizzatori ultra-rapidi di CYP2D6 hanno efficacia ridotta dei SSRI; TPMT deficiency → tossicità da azatioprina. Base del dosaggio personalizzato (codeine → morfina: rischio in ultra-rapidi).'},
+  {cat:'farmacologia',diff:'difficile',q:'Quale meccanismo molecolare è alla base dell\'azione degli inibitori della pompa protonica (IPP, es. omeprazolo)?',opts:['Antagonismo competitivo al recettore H2 della cellula parietale','Inibizione covalente irreversibile (sulfenamide) della H⁺/K⁺-ATPasi (pompa protonica) della cellula parietale dopo attivazione in ambiente acido del canalicolo secretore','Blocco della sintesi di gastrina nelle cellule G','Neutralizzazione chimica dell\'acido cloridrico'],ans:1,exp:'Gli IPP (omeprazolo, pantoprazolo) sono profarmaci: la forma basica lipofila attraversa le membrane, si concentra nei canalicoli secretori acidi delle cellule parietali (pH<2) dove si converte in sulfenamide reattiva che alchila covalentemente i residui Cys813 e Cys892 della H⁺/K⁺-ATPasi, inibendola irreversibilmente.'},
+  {cat:'farmacologia',diff:'medio',q:'Quale è la differenza tra antagonista competitivo e non competitivo di un recettore?',opts:['Il competitivo si lega in modo irreversibile, il non competitivo in modo reversibile','Il competitivo si lega al sito ortosterico dell\'agonista (può essere superato da alti [agonista], non modifica Emax); il non competitivo si lega al sito allosterico o in modo covalente (riduce Emax, non superabile)','Non c\'è differenza funzionale','Il competitivo agisce sui recettori nucleari, il non competitivo sui GPCR'],ans:1,exp:'L\'antagonista competitivo si lega reversibilmente al sito attivo (ortosterico): aumenta EC50 (curva si sposta a destra) ma non cambia Emax (aumentando [agonista] si supera). Il non competitivo si lega altrove (allosterico) o covalente: riduce Emax senza spostare EC50 (non superabile con [agonista]).'},
+  {cat:'farmacologia',diff:'facile',q:'Cosa si intende per "beta-bloccante" e quale organo è il principale target?',opts:['Un farmaco che blocca i recettori dopaminergici nel cervello','Un farmaco che blocca i recettori β-adrenergici nel cuore: riduce FC, PA e consumo di O₂ miocardico','Un farmaco che blocca i canali del sodio','Un farmaco che aumenta la frequenza cardiaca'],ans:1,exp:'I beta-bloccanti (es. metoprololo, atenololo, propranololo) bloccano i recettori β-adrenergici (principalmente β₁ nel cuore): riducono la frequenza cardiaca (cronotropismo –), la forza di contrazione (inotropismo –) e la pressione arteriosa. Indicati in ipertensione, angina, scompenso cardiaco, aritmie.'},
+
+  /* ── CHIMICA ANALITICA extra (21→+4 per arrivare a 25) ── */
+  {cat:'analitica',diff:'facile',q:'Cosa si intende per "soluzione tampone" e quali componenti la costituiscono?',opts:['Una soluzione che precipita a qualsiasi pH','Una soluzione che resiste alle variazioni di pH: costituita da un acido debole e il suo sale (base coniugata), o una base debole e il suo sale (acido coniugato)','Una soluzione salina neutra di NaCl','Una soluzione con eccesso di acido forte'],ans:1,exp:'Una soluzione tampone contiene un acido debole HA e la sua base coniugata A⁻ (es. CH₃COOH/CH₃COO⁻). Quando si aggiunge H⁺, viene consumato da A⁻ (HA); aggiungendo OH⁻, viene consumato da HA (→ A⁻). Capacità tampone massima a pH = pKa ± 1.'},
+  {cat:'analitica',diff:'medio',q:'Cosa descrive l\'equazione di Henderson-Hasselbalch per un tampone?',opts:['pH = pKa × [A⁻]/[HA]','pH = pKa + log([A⁻]/[HA])','pH = pKa − log([HA]/[A⁻])','pH = 2 × pKa − [HA]'],ans:1,exp:'pH = pKa + log([A⁻]/[HA]) è la base per il calcolo dei tamponi: a [A⁻] = [HA] → pH = pKa (massima capacità tamponante). Permette di scegliere il rapporto acido/base per ottenere il pH desiderato nell\'intervallo pKa ± 1.'},
+  {cat:'analitica',diff:'difficile',q:'In cromatografia GC, quali proprietà molecolari determinano l\'ordine di eluizione dei composti?',opts:['Principalmente il peso molecolare','Il punto di ebollizione (volatilità) e le interazioni con la fase stazionaria (polare o apolare): i composti meno volatili e/o con più affinità per la fase stazionaria eluiscono più tardi','Solo la polarità','Solo la struttura cristallina'],ans:1,exp:'In GC la separazione dipende dalla volatilità (punto di ebollizione) e dalle interazioni con la fase stazionaria. In colonne apolari (polidimetilsilossano) separazione prevalentemente per p.e.; in colonne polari (PEG) i composti polari sono trattenuti più a lungo. La temperatura del programma GC regola l\'eluizione.'},
+  {cat:'analitica',diff:'medio',q:'Cosa si intende per "recupero" (recovery) in un metodo analitico?',opts:['La quantità di analita recuperata dalla memoria dell\'analizzatore','La percentuale di analita che viene estratto e misurato rispetto alla quantità realmente presente nel campione: recovery ideale = 100%','La riproducibilità delle misure','La velocità dell\'analisi'],ans:1,exp:'Il recovery % = (concentrazione trovata / concentrazione reale) × 100. Un recovery < 100% indica perdite durante l\'estrazione o il trattamento del campione. Un recovery > 100% indica effetti di matrice con enhancement del segnale. Si misura con campioni a cui si aggiunge una quantità nota di analita (spike recovery).'},
+
+  /* ── CHIMICA INORGANICA extra ── */
+  {cat:'inorganica',diff:'facile',
+   q:'Qual è la configurazione elettronica dello ione Fe³⁺?',
+   opts:['[Ar] 3d⁶ 4s²','[Ar] 3d⁵','[Ar] 3d⁴ 4s¹','[Ar] 3d⁶'],ans:1,
+   exp:'Il Fe neutro è [Ar] 3d⁶ 4s²; perdendo 3 elettroni (prima i due 4s, poi uno 3d) si ottiene [Ar] 3d⁵.'},
+  {cat:'inorganica',diff:'facile',
+   q:'Quale proprietà periodica aumenta attraverso un periodo da sinistra a destra?',
+   opts:['Raggio atomico','Energia di prima ionizzazione','Carattere metallico','Reattività con l\'acqua'],ans:1,
+   exp:'L\'energia di prima ionizzazione aumenta lungo un periodo perché la carica nucleare effettiva cresce, attraendo più fortemente gli elettroni.'},
+  {cat:'inorganica',diff:'facile',
+   q:'In quale tipo di legame gli elettroni sono completamente trasferiti da un atomo all\'altro?',
+   opts:['Covalente','Metallico','Ionico','A idrogeno'],ans:2,
+   exp:'Nel legame ionico un atomo cede elettroni all\'altro, formando ioni di carica opposta che si attraggono elettrostaticamente; il trasferimento elettronico è completo.'},
+  {cat:'inorganica',diff:'facile',
+   q:'Quanti elettroni di valenza ha lo zolfo (Z=16)?',
+   opts:['2','4','6','8'],ans:2,
+   exp:'Lo zolfo appartiene al gruppo 16 (VIA) e possiede 6 elettroni nel guscio di valenza (3s² 3p⁴).'},
+  {cat:'inorganica',diff:'facile',
+   q:'Quale geometria molecolare prevede la teoria VSEPR per BeCl₂?',
+   opts:['Piegata','Lineare','Triangolare piana','Tetraedrica'],ans:1,
+   exp:'BeCl₂ ha 2 coppie di legame e nessun lone pair sul Be; la repulsione minima si ottiene con una geometria lineare (180°).'},
+  {cat:'inorganica',diff:'facile',
+   q:'Quale numero di ossidazione ha il Mn in KMnO₄?',
+   opts:['+3','+5','+7','+6'],ans:2,
+   exp:'In KMnO₄: K è +1, O è −2 (×4 = −8); bilanciando: +1 + x − 8 = 0, quindi x = +7 per il Mn.'},
+  {cat:'inorganica',diff:'facile',
+   q:'Quale tipo di solido è caratterizzato da ioni positivi in un mare di elettroni delocalizzati?',
+   opts:['Solido ionico','Solido covalente','Solido metallico','Solido molecolare'],ans:2,
+   exp:'Nei solidi metallici i cationi sono immersi in un reticolo di elettroni di conduzione delocalizzati, responsabili di conducibilità e lucentezza.'},
+  {cat:'inorganica',diff:'facile',
+   q:'Come varia il raggio atomico scendendo lungo un gruppo nella tavola periodica?',
+   opts:['Diminuisce','Rimane costante','Aumenta','Prima aumenta poi diminuisce'],ans:2,
+   exp:'Scendendo lungo un gruppo si aggiungono gusci elettronici, aumentando la distanza degli elettroni di valenza dal nucleo e quindi il raggio atomico.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Quale geometria molecolare ha NH₃ secondo la teoria VSEPR?',
+   opts:['Planare trigonale','Tetraedrica','Piramidale trigonale','Lineare'],ans:2,
+   exp:'NH₃ ha 3 coppie di legame e 1 coppia solitaria; la geometria molecolare (escludendo il lone pair) è piramidale trigonale.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Nel complesso [Fe(CN)₆]³⁻, qual è il numero di coordinazione del ferro?',
+   opts:['3','4','6','8'],ans:2,
+   exp:'Il numero di coordinazione è il numero di ligandi direttamente legati al centro metallico; in [Fe(CN)₆]³⁻ ci sono 6 ligandi CN⁻, quindi NC = 6.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Quale delle seguenti specie è un agente ossidante nella reazione: MnO₄⁻ + Fe²⁺ → Mn²⁺ + Fe³⁺?',
+   opts:['Fe²⁺','Fe³⁺','MnO₄⁻','Mn²⁺'],ans:2,
+   exp:'MnO₄⁻ si riduce (Mn passa da +7 a +2), quindi è l\'agente ossidante; Fe²⁺ si ossida a Fe³⁺ e funge da agente riducente.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Cosa si intende per energia reticolare di un solido ionico?',
+   opts:['Energia necessaria per fondere il solido','Energia rilasciata nella formazione del reticolo a partire da ioni gassosi','Entalpia di solvatazione degli ioni','Energia di legame covalente'],ans:1,
+   exp:'L\'energia reticolare è l\'energia liberata quando ioni gassosi si combinano per formare 1 mole di solido cristallino ionico; è una misura della stabilità del reticolo.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Quale effetto spiega perché l\'elettronegatività aumenta da sinistra a destra in un periodo?',
+   opts:['Effetto schermo crescente','Carica nucleare effettiva crescente','Aumento del raggio atomico','Riempimento di orbitali d'],ans:1,
+   exp:'Procedendo da sinistra a destra in un periodo, la carica nucleare effettiva aumenta (l\'effetto schermo degli elettroni dello stesso guscio è basso), attraendo più fortemente gli elettroni di legame.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Quale tipo di isomeria esiste tra [Co(NH₃)₄Cl₂]⁺ con i Cl in posizione cis e trans?',
+   opts:['Isomeria di legame','Isomeria ottica','Isomeria geometrica (cis-trans)','Isomeria di ionizzazione'],ans:2,
+   exp:'I due isomeri differiscono per la disposizione dei ligandi Cl attorno al cobalto (cis vs trans), caratteristica dell\'isomeria geometrica.'},
+  {cat:'inorganica',diff:'medio',
+   q:'Nella teoria del campo cristallino, quale geometria genera la separazione Δₒ degli orbitali d?',
+   opts:['Tetraedrica','Planare quadrata','Ottaedrica','Lineare'],ans:2,
+   exp:'Nella geometria ottaedrica i sei ligandi si avvicinano lungo gli assi cartesiani, dividendo gli orbitali d in due set: t₂g (più stabili) ed eₓ (meno stabili) con separazione Δₒ.'},
+  {cat:'inorganica',diff:'difficile',
+   q:'Quale fattore determina se un complesso ottaedrico è ad alto o basso spin?',
+   opts:['Raggio ionico del metallo','Forza del campo del ligando rispetto all\'energia di accoppiamento degli spin','Numero di elettroni d totali','Carica del complesso'],ans:1,
+   exp:'Se la separazione del campo cristallino Δₒ supera l\'energia di accoppiamento degli spin (P), i ligandi di campo forte impongono la configurazione a basso spin (spin pairing favorito).'},
+  {cat:'inorganica',diff:'difficile',
+   q:'Quale affermazione descrive correttamente l\'effetto trans nei complessi planari quadrati del Pt(II)?',
+   opts:['I ligandi in posizione cis si sostituiscono più facilmente','Un ligando forte trans labilizza il ligando in posizione trans opposta','L\'effetto trans si osserva solo nei complessi ottaedrici','I ligandi σ-donor forti hanno basso effetto trans'],ans:1,
+   exp:'L\'effetto trans è la capacità di un ligando di aumentare la velocità di sostituzione del ligando in posizione trans opposta; i ligandi con forte trans-influence (es. CN⁻, CO) labilizzano il ligando opposto.'},
+  {cat:'inorganica',diff:'difficile',
+   q:'In quale punto del ciclo di Born-Haber si tiene conto dell\'affinità elettronica dell\'alogeno?',
+   opts:['Sublimazione del metallo','Ionizzazione del metallo','Dissociazione del legame X₂','Cattura dell\'elettrone da parte di X per formare X⁻'],ans:3,
+   exp:'L\'affinità elettronica è l\'energia associata alla cattura di un elettrone da parte dell\'atomo X gassoso (X + e⁻ → X⁻), tappa fondamentale del ciclo di Born-Haber per la formazione di un alogenuro alcalino.'},
+  {cat:'inorganica',diff:'difficile',
+   q:'Quale regola di Hund si applica nel riempimento di orbitali degeneri?',
+   opts:['Gli elettroni riempiono prima gli orbitali di energia più alta','Ogni orbitale degenere riceve un elettrone con spin parallelo prima che un secondo elettrone venga aggiunto','Gli elettroni si appaiono sempre prima','Il principio di esclusione di Pauli non si applica agli orbitali d'],ans:1,
+   exp:'La prima regola di Hund stabilisce che ogni orbitale degenere viene occupato da un elettrone con spin parallelo prima che si formi nessun doppietto, massimizzando la molteplicità di spin.'},
+  {cat:'inorganica',diff:'difficile',
+   q:'Quale ibrido descrive la geometria planare quadrata del Pt(II) nei complessi?',
+   opts:['sp³','sp³d','dsp²','d²sp³'],ans:2,
+   exp:'I complessi planari quadrati del Pt(II) sono descritti dall\'ibridazione dsp² (un orbitale d, uno s e due p), che dà origine a quattro orbitali ibridi nel piano.'},
+
+  /* ── CHIMICA ANALITICA (20) ── */
+  {cat:'analitica',diff:'facile',
+   q:'Qual è il pH di una soluzione di HCl 0.01 M?',
+   opts:['1','2','7','12'],ans:1,
+   exp:'HCl è un acido forte completamente dissociato: [H⁺] = 0.01 M = 10⁻², quindi pH = −log(0.01) = 2.'},
+  {cat:'analitica',diff:'facile',
+   q:'Cosa si intende per punto equivalente in una titolazione acido-base?',
+   opts:['Il punto di massimo cambio di colore','Il punto in cui moli acido = moli base','Il punto di pH 7','Il punto di half-equivalence'],ans:1,
+   exp:'Al punto equivalente il numero di moli di acido e di base si equivalgono stechiometricamente, indipendentemente dal pH raggiunto.'},
+  {cat:'analitica',diff:'facile',
+   q:'Come si calcola il pH di una soluzione tampone contenente acido debole e suo sale secondo Henderson-Hasselbalch?',
+   opts:['pH = pKa − log([A⁻]/[HA])','pH = pKa + log([A⁻]/[HA])','pH = pKa × [A⁻]/[HA]','pH = Ka/[HA]'],ans:1,
+   exp:'L\'equazione di Henderson-Hasselbalch pH = pKa + log([A⁻]/[HA]) descrive il pH di una soluzione tampone in funzione del rapporto base coniugata/acido.'},
+  {cat:'analitica',diff:'facile',
+   q:'Quale indicatore è usato comunemente per titolazioni acido forte-base forte?',
+   opts:['Rosso di metile (vira 4.4-6.2)','Fenolftaleina (vira 8.2-10)','Blu di bromotimolo (vira 6.0-7.6)','Arancio di metile (vira 3.1-4.4)'],ans:1,
+   exp:'La fenolftaleina vira da incolore a rosa intorno a pH 8.2-10, adatta al punto equivalente di titolazioni acido forte-base forte che si trovano a pH ≈ 7.'},
+  {cat:'analitica',diff:'facile',
+   q:'In spettrofotometria UV-Vis, cosa rappresenta l\'assorbanza A?',
+   opts:['Il rapporto I/I₀','−log(I/I₀) = log(I₀/I)','La concentrazione del campione','La lunghezza d\'onda del massimo'],ans:1,
+   exp:'L\'assorbanza A = −log(T) = −log(I/I₀) = log(I₀/I), dove T è la trasmittanza; A è la grandezza proporzionale alla concentrazione secondo Beer-Lambert.'},
+  {cat:'analitica',diff:'facile',
+   q:'Qual è il prodotto di solubilità Ksp per AgCl?',
+   opts:['Ksp = [Ag⁺][Cl⁻]','Ksp = [AgCl]','Ksp = [Ag⁺]²[Cl⁻]','Ksp = [Ag⁺]+[Cl⁻]'],ans:0,
+   exp:'Per un sale 1:1 come AgCl, Ksp = [Ag⁺][Cl⁻]; le attività dei solidi puri non compaiono nell\'espressione del Ksp.'},
+  {cat:'analitica',diff:'facile',
+   q:'Quale tecnica analitica viene utilizzata per determinare l\'acqua in campioni farmaceutici secondo la Ph.Eur.?',
+   opts:['HPLC','Spettrofotometria IR','Titolazione Karl Fischer','Cromatografia su strato sottile'],ans:2,
+   exp:'La titolazione Karl Fischer è il metodo di riferimento farmacopeico per la determinazione del contenuto di acqua nei solidi farmaceutici; sfrutta la riduzione dello iodio in presenza di acqua.'},
+  {cat:'analitica',diff:'facile',
+   q:'In HPLC in fase inversa, quale fase stazionaria è più comunemente utilizzata?',
+   opts:['Silice nuda','C18 (ottadecilsilice)','Allumina','Resina a scambio ionico'],ans:1,
+   exp:'La fase stazionaria C18 (silice funzionalizzata con catene alchiliche C18) è la più comune in HPLC fase inversa, adatta a separare composti di polarità intermedia.'},
+  {cat:'analitica',diff:'medio',
+   q:'Una soluzione tampone è preparata con CH₃COOH (pKa = 4.76) e CH₃COONa in rapporto [sale]/[acido] = 10. Qual è il pH?',
+   opts:['3.76','4.76','5.76','6.76'],ans:2,
+   exp:'pH = pKa + log(10/1) = 4.76 + 1 = 5.76 secondo l\'equazione di Henderson-Hasselbalch.'},
+  {cat:'analitica',diff:'medio',
+   q:'Il Ksp dell\'AgBr è 5×10⁻¹³. Qual è la solubilità molare di AgBr in acqua pura?',
+   opts:['5×10⁻¹³ M','7.1×10⁻⁷ M','2.5×10⁻⁶ M','5×10⁻⁶ M'],ans:1,
+   exp:'Per AgBr: Ksp = s², quindi s = √(5×10⁻¹³) ≈ 7.1×10⁻⁷ mol/L.'},
+  {cat:'analitica',diff:'medio',
+   q:'In una cella elettrochimica, l\'elettrodo su cui avviene la riduzione è chiamato:',
+   opts:['Anodo','Catodo','Elettrodo di riferimento','Elettrodo ausiliario'],ans:1,
+   exp:'Per definizione, al catodo avviene sempre la riduzione (guadagno di elettroni); all\'anodo avviene l\'ossidazione.'},
+  {cat:'analitica',diff:'medio',
+   q:'Quale equazione collega il potenziale di cella alle concentrazioni degli ioni in soluzione?',
+   opts:['Equazione di Henderson-Hasselbalch','Legge di Beer-Lambert','Equazione di Nernst','Equazione di Arrhenius'],ans:2,
+   exp:'L\'equazione di Nernst E = E° − (RT/nF)lnQ permette di calcolare il potenziale di un elettrodo a qualsiasi concentrazione di reagenti e prodotti.'},
+  {cat:'analitica',diff:'medio',
+   q:'Cosa si intende per selettività di un metodo analitico?',
+   opts:['La capacità di rilevare concentrazioni molto basse','La capacità di misurare lo stesso campione più volte','La capacità di misurare l\'analita in presenza di interferenti','La linearità della curva di calibrazione'],ans:2,
+   exp:'La selettività è la capacità di un metodo di determinare l\'analita con accuratezza in presenza di altri componenti della matrice (interferenti).'},
+  {cat:'analitica',diff:'medio',
+   q:'Quale parametro dell\'HPLC descrive l\'efficienza di separazione di una colonna?',
+   opts:['Fattore di ritenzione k\'','Numero di piatti teorici N','Fattore di separazione α','Risoluzione R'],ans:1,
+   exp:'Il numero di piatti teorici N = 16(tR/w)² misura l\'efficienza della colonna: più alto è N, più stretti e simmetrici sono i picchi.'},
+  {cat:'analitica',diff:'medio',
+   q:'Qual è la funzione del tampone fosfato salino (PBS) nel mantenimento del pH biologico?',
+   opts:['Funge da indicatore di pH','Resiste alle variazioni di pH per azione delle sue coppie acido-base coniugate','Precipita i metalli pesanti','Aumenta la forza ionica senza effetto tampone'],ans:1,
+   exp:'Il PBS sfrutta le coppie H₂PO₄⁻/HPO₄²⁻ (pKa ≈ 7.2) come tampone fisiologico, resistendo alle aggiunte di acido o base grazie all\'equilibrio tra le specie coniugate.'},
+  {cat:'analitica',diff:'difficile',
+   q:'Nella titolazione di una base debole con acido forte, dove si trova il punto di semi-equivalenza?',
+   opts:['pH = pKb','pH = 14 − pKb','pH = 7','pOH = pKb, quindi pH = 14 − pKb'],ans:3,
+   exp:'Al punto di semi-equivalenza metà della base è convertita nel suo acido coniugato (BH⁺); in quel punto [B] = [BH⁺] e pOH = pKb, quindi pH = 14 − pKb.'},
+  {cat:'analitica',diff:'difficile',
+   q:'Quale dei seguenti interferisce nell\'analisi Karl Fischer causando falsi positivi di acqua?',
+   opts:['Cetoni alifatici','Chetoni e aldeidi che reagiscono con il metanolo del reagente','Alcoli a catena lunga','Acidi carbossilici alifatici'],ans:1,
+   exp:'Aldeidi e alcuni chetoni reagiscono con il metanolo componente del reagente di Karl Fischer formando acetali con sviluppo di acqua, causando una sovrastima del contenuto idrico.'},
+  {cat:'analitica',diff:'difficile',
+   q:'Cosa descrive il coefficiente di estinzione molare ε nella legge di Beer-Lambert?',
+   opts:['La probabilità di transizione elettronica per unità di concentrazione e cammino ottico (L mol⁻¹ cm⁻¹)','Il cammino ottico della cella','Il rapporto tra I e I₀','La concentrazione dell\'analita'],ans:0,
+   exp:'ε (L mol⁻¹ cm⁻¹) è una costante caratteristica della sostanza a una data λ, proporzionale alla probabilità di assorbimento di un fotone; A = εlc.'},
+  {cat:'analitica',diff:'difficile',
+   q:'In cromatografia HPLC, cosa descrive l\'equazione di van Deemter?',
+   opts:['La risoluzione tra due picchi adiacenti','La dipendenza dell\'altezza del piatto teorico H dalla velocità lineare della fase mobile','Il fattore di ritenzione in funzione della polarità','Il numero di piatti teorici in funzione della lunghezza della colonna'],ans:1,
+   exp:'L\'equazione di van Deemter H = A + B/u + Cu descrive come i contributi di diffusione eddy (A), diffusione longitudinale (B/u) e trasferimento di massa (Cu) determinino l\'efficienza di picco in funzione della velocità u.'},
+  {cat:'analitica',diff:'difficile',
+   q:'Quale condizione deve essere soddisfatta per applicare validamente la legge di Beer-Lambert?',
+   opts:['La soluzione deve essere colorata','La radiazione deve essere monocromatica e la soluzione omogenea e diluita','Il cammino ottico deve essere superiore a 10 cm','La concentrazione deve essere superiore a 1 M'],ans:1,
+   exp:'Beer-Lambert vale rigorosamente con luce monocromatica, soluzioni otticamente omogenee e in assenza di interazioni tra le molecole dell\'analita (regime diluito).'},
+
+  /* ── FARMACOLOGIA (20) ── */
+  {cat:'farmacologia',diff:'facile',
+   q:'Quale meccanismo d\'azione caratterizza i beta-bloccanti?',
+   opts:['Blocco dei recettori α-adrenergici','Antagonismo competitivo sui recettori β-adrenergici','Inibizione dell\'enzima di conversione dell\'angiotensina','Blocco dei canali del Ca²⁺'],ans:1,
+   exp:'I beta-bloccanti (es. propranololo, metoprololo) sono antagonisti competitivi sui recettori β-adrenergici, riducendo frequenza cardiaca e contrattilità.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Quale classe di farmaci inibisce l\'enzima di conversione dell\'angiotensina (ACE)?',
+   opts:['Sartani','Statine','ACE-inibitori','Diuretici tiazidici'],ans:2,
+   exp:'Gli ACE-inibitori (es. ramipril, lisinopril) bloccano l\'ACE impedendo la conversione di angiotensina I in angiotensina II, riducendo la vasocostrizione e la pressione arteriosa.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Quale recettore è accoppiato a proteine G (GPCR)?',
+   opts:['Recettore per l\'insulina','Recettore β₂-adrenergico','Recettore nicotinico dell\'acetilcolina','Recettore NMDA per il glutammato'],ans:1,
+   exp:'Il recettore β₂-adrenergico è un tipico GPCR accoppiato a Gs; la sua attivazione stimola l\'adenilato ciclasi aumentando il cAMP intracellulare.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Come agiscono le statine nella terapia dell\'ipercolesterolemia?',
+   opts:['Inibiscono l\'assorbimento intestinale del colesterolo','Inibiscono competitivamente la HMG-CoA reduttasi','Aumentano il catabolismo delle LDL','Bloccano i recettori per le LDL'],ans:1,
+   exp:'Le statine (es. atorvastatina, simvastatina) inibiscono competitivamente la HMG-CoA reduttasi, enzima chiave della biosintesi del colesterolo epatico.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Quale proprietà definisce un agonista completo rispetto a un agonista parziale?',
+   opts:['Ha maggiore affinità per il recettore','Produce la risposta massima (Emax = 100%) anche con alta affinità','Ha un\'attività intrinseca α < 1','Agisce su più tipi di recettori'],ans:1,
+   exp:'Un agonista completo possiede attività intrinseca α = 1, producendo la risposta massima del sistema; un agonista parziale ha α < 1 e non raggiunge mai l\'Emax del tessuto.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Qual è il meccanismo d\'azione principale dell\'aspirina (acido acetilsalicilico)?',
+   opts:['Inibizione reversibile della COX-1 e COX-2','Inibizione irreversibile delle cicloossigenasi per acetilazione','Antagonismo sui recettori TP per il trombossano','Inibizione della fosfolipasi A₂'],ans:1,
+   exp:'L\'aspirina acetila irreversibilmente la serina nel sito catalitico delle COX-1 e COX-2, inibendo la produzione di prostaglandine e trombossano A₂.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Le benzodiazepine producono i loro effetti ansiolitici e sedativi agendo su:',
+   opts:['Recettori NMDA','Canali del sodio voltaggio-dipendenti','Recettori GABA_A potenziando l\'effetto del GABA','Recettori per le monoamine'],ans:2,
+   exp:'Le benzodiazepine si legano al sito allosterico del recettore GABA_A, aumentando la frequenza di apertura del canale per il Cl⁻ in risposta al GABA endogeno.'},
+  {cat:'farmacologia',diff:'facile',
+   q:'Quale oppioide endogeno si lega preferenzialmente ai recettori μ (mu)?',
+   opts:['Dinorfina','Enkefalina','β-endorfina','Nociceptina'],ans:2,
+   exp:'La β-endorfina ha la maggiore affinità per i recettori μ-oppioidi; i recettori μ mediano l\'analgesia principale, l\'euforia e la depressione respiratoria degli oppioidi.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Cosa misura l\'EC₅₀ in farmacologia?',
+   opts:['La concentrazione che causa il 50% della risposta massima','La concentrazione letale nel 50% degli animali','La dose che inibisce il 50% dell\'enzima bersaglio','La concentrazione plasmatica al picco'],ans:0,
+   exp:'L\'EC₅₀ (Effective Concentration 50) è la concentrazione di farmaco che produce il 50% della risposta massima (Emax); è una misura della potenza del farmaco.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Quale differenza fondamentale esiste tra un antagonista competitivo e un antagonista non competitivo?',
+   opts:['L\'antagonista competitivo riduce l\'Emax; quello non competitivo non modifica l\'Emax','L\'antagonista competitivo aumenta l\'EC₅₀ senza ridurre l\'Emax; quello non competitivo riduce l\'Emax','L\'antagonista competitivo si lega in modo irreversibile','L\'antagonista non competitivo sposta la curva dose-risposta a destra'],ans:1,
+   exp:'Un antagonista competitivo sposta la curva dose-risposta verso destra (aumenta EC₅₀) ma l\'Emax rimane raggiungibile con dosi più alte. Quello non competitivo riduce l\'Emax indipendentemente dalla dose di agonista.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Gli antidepressivi SSRI agiscono bloccando:',
+   opts:['La MAO-A nella fessura sinaptica','Il reuptake della serotonina nel terminale presinaptico','I recettori 5-HT₂A postsinaptici','La sintesi della serotonina dal triptofano'],ans:1,
+   exp:'Gli SSRI (es. fluoxetina, sertralina) bloccano il trasportatore SERT per la serotonina, impedendone il reuptake nel terminale presinaptico e aumentando la disponibilità sinaptica di 5-HT.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Quale antibiotico inibisce la sintesi della parete cellulare batterica legandosi alle PBP (Penicillin-Binding Proteins)?',
+   opts:['Azitromicina','Ciprofloxacina','Ampicillina','Vancomicina'],ans:2,
+   exp:'L\'ampicillina (β-lattamico) si lega covalentemente alle PBP inibendo la transpeptidasi, enzima che cross-lega i peptidoglicani della parete batterica.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Cosa si intende per desensibilizzazione del recettore?',
+   opts:['Aumento della risposta al farmaco nel tempo','Riduzione progressiva della risposta nonostante la continua presenza del farmaco','Spostamento del recettore dal nucleo alla membrana','Aumento del numero di recettori per upregulation'],ans:1,
+   exp:'La desensibilizzazione recettoriale è la riduzione della risposta a un agonista dopo esposizione prolungata, spesso mediata da fosforilazione e internalizzazione del recettore (down-regulation).'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Qual è il meccanismo d\'azione dei sartani (antagonisti AT₁) nella terapia dell\'ipertensione?',
+   opts:['Inibiscono l\'ACE impedendo la formazione di Ang II','Bloccano i recettori AT₁ dell\'angiotensina II impedendone l\'effetto vasocostrittore','Attivano i recettori AT₂ causando vasodilatazione','Inibiscono la renina riducendo la produzione di angiotensinogeno'],ans:1,
+   exp:'I sartani (es. losartan, valsartan) bloccano selettivamente i recettori AT₁ dell\'angiotensina II, impedendo la vasocostrizione e la secrezione di aldosterone indotte da Ang II.'},
+  {cat:'farmacologia',diff:'medio',
+   q:'Quale parametro farmacocinetico descrive il volume apparente di distribuzione (Vd) di un farmaco?',
+   opts:['Il volume plasmatico in cui il farmaco è distribuito','Il rapporto tra dose somministrata e concentrazione plasmatica all\'equilibrio','Il tempo di dimezzamento del farmaco','La clearance del farmaco'],ans:1,
+   exp:'Vd = Dose/Cp₀ è un parametro fittizio che indica quanto il farmaco si distribuisce nei tessuti rispetto al plasma; un Vd elevato indica ampia distribuzione tissutale.'},
+  {cat:'farmacologia',diff:'difficile',
+   q:'Cosa caratterizza un agonista inverso rispetto a un antagonista neutro sullo stesso recettore?',
+   opts:['L\'agonista inverso ha maggiore affinità dell\'antagonista neutro','L\'agonista inverso riduce l\'attività costitutiva del recettore al di sotto del basale, mentre l\'antagonista neutro non modifica l\'attività costitutiva','L\'agonista inverso blocca l\'agonista endogeno; l\'antagonista no','L\'agonista inverso si lega a un sito allosterico'],ans:1,
+   exp:'Un agonista inverso si lega al recettore stabilizzando uno stato inattivo, riducendo l\'attività costitutiva (basale) al di sotto dei livelli non stimolati; l\'antagonista neutro occupa il sito senza modificare l\'attività basale.'},
+  {cat:'farmacologia',diff:'difficile',
+   q:'Quale meccanismo molecolare spiega la resistenza batterica alle penicilline mediata da beta-lattamasi?',
+   opts:['Mutazione delle PBP riducendo l\'affinità','Idrolisi del legame ammidico dell\'anello beta-lattamico ad opera dell\'enzima beta-lattamasi','Efflusso attivo dell\'antibiotico dal batterio','Riduzione della permeabilità della parete batterica'],ans:1,
+   exp:'Le β-lattamasi idrolizzano il legame C-N dell\'anello β-lattamico, inattivando il farmaco prima che raggiunga le PBP bersaglio; è il principale meccanismo di resistenza acquisita ai penicillimi.'},
+  {cat:'farmacologia',diff:'difficile',
+   q:'Quale delle seguenti affermazioni sull\'IC₅₀ di un inibitore enzimatico è corretta?',
+   opts:['L\'IC₅₀ è indipendente dalla concentrazione di substrato per inibitori competitivi','L\'IC₅₀ di un inibitore competitivo aumenta all\'aumentare della concentrazione di substrato','L\'IC₅₀ equivale al Ki in tutte le condizioni','L\'IC₅₀ misura la potenza di un agonista recettoriale'],ans:1,
+   exp:'Per un inibitore competitivo, IC₅₀ = Ki(1 + [S]/Km); all\'aumentare della concentrazione di substrato, competendo con l\'inibitore, l\'IC₅₀ aumenta (la potenza apparente diminuisce).'},
+  {cat:'farmacologia',diff:'difficile',
+   q:'Qual è il meccanismo molecolare con cui la morfina produce analgesia a livello spinale?',
+   opts:['Blocco dei canali Na⁺ voltaggio-dipendenti nei neuroni del corno posteriore','Attivazione dei recettori μ-oppioidi che apre canali K⁺ (iperpolarizzazione) e chiude canali Ca²⁺ (riduzione del rilascio di neurotrasmettitore)','Potenziamento dei recettori GABA_A spinali','Inibizione della COX spinale riducendo la sensibilizzazione centrale'],ans:1,
+   exp:'L\'attivazione dei recettori μ-oppioidi (accoppiati a Gi) apre i canali del K⁺ (GIRK) iperpolarizzando il neurone e inibisce i canali del Ca²⁺ voltaggio-dipendenti, riducendo il rilascio di sostanza P e glutammato.'},
+  {cat:'farmacologia',diff:'difficile',
+   q:'In quale modo il metotressato esercita la sua azione antiproliferativa nelle cellule tumorali?',
+   opts:['Intercalazione nel DNA inibendo la topoisomerasi II','Inibizione competitiva della diidrofolato reduttasi (DHFR) con deplezione di THF e blocco della sintesi dei nucleotidi','Alchilazione del DNA','Inibizione del proteasoma con accumulo di proteine ubiquitinate'],ans:1,
+   exp:'Il metotressato è un analogo strutturale del folato che si lega con alta affinità alla DHFR, impedendo la riduzione del diidrofolato a tetraidrofolato (THF), coffattore essenziale per la sintesi di purine e timidilato, bloccando la proliferazione cellulare.'},
+
+  /* ── CHIMICA FARMACEUTICA (20) ── */
+  {cat:'farmaceutica',diff:'facile',q:'Cosa si intende per "profarmaco"?',opts:['Una molecola attiva somministrata direttamente','Una molecola inattiva che viene convertita in forma attiva in vivo','Un farmaco ritirato dal mercato','Un farmaco con elevata tossicità'],ans:1,exp:'Il profarmaco è una molecola inattiva (o meno attiva) biotrasformata nell\'organismo (es. per idrolisi o ossidazione) nella forma farmacologicamente attiva.'},
+  {cat:'farmaceutica',diff:'facile',q:'Quale proprietà molecolare descrive la regola dei 5 di Lipinski?',opts:['LogP ≤ 5, MW ≤ 500, HBD ≤ 5, HBA ≤ 10','LogP ≥ 5, MW ≥ 500, HBD ≥ 5, HBA ≥ 10','LogP ≤ 2, MW ≤ 300, HBD ≤ 2, HBA ≤ 5','pKa < 7, MW < 400, RotBonds < 5'],ans:0,exp:'La regola di Lipinski predice buona biodisponibilità orale se: MW ≤ 500 Da, LogP ≤ 5, HBD ≤ 5, HBA ≤ 10. Molecole che violano ≥2 regole hanno scarsa assorbibilità orale.'},
+  {cat:'farmaceutica',diff:'facile',q:'Cosa si intende per "farmacoforo"?',opts:['Il gruppo funzionale che causa effetti avversi','L\'insieme minimo di caratteristiche steriche ed elettroniche necessarie per l\'attività biologica','Il cromoforo responsabile del colore del farmaco','Il gruppo che determina la solubilità in acqua'],ans:1,exp:'Il farmacoforo è il modello 3D che descrive le proprietà chimiche (gruppi HBD/HBA, centri ionizzabili, zone idrofobiche) essenziali per il legame al target biologico.'},
+  {cat:'farmaceutica',diff:'facile',q:'Quale enzima è principalmente responsabile del metabolismo di fase I dei farmaci?',opts:['UDP-glucuronosiltransferasi (UGT)','Citocromo P450 (CYP)','N-acetiltransferasi (NAT)','Solfotransferasi (SULT)'],ans:1,exp:'I CYP450 (soprattutto CYP3A4, CYP2D6, CYP2C9) catalizzano la grande maggioranza delle reazioni di fase I (ossidazione, riduzione, idrolisi) nel fegato e nell\'intestino.'},
+  {cat:'farmaceutica',diff:'facile',q:'Cosa produce il metabolismo di fase II?',opts:['Prodotti più lipofili per accumulo nei tessuti','Coniugati idrofili (glucuronidi, solfati, glutatione) per escrezione renale/biliare','Radicali liberi che causano stress ossidativo','Metaboliti attivi con maggiore potenza del farmaco padre'],ans:1,exp:'La fase II (coniugazione) aggiunge gruppi polari (acido glucuronico, solfato, glicina, glutatione) al farmaco o ai metaboliti di fase I, aumentandone l\'idrofilicità e facilitando l\'escrezione.'},
+  {cat:'farmaceutica',diff:'medio',q:'Quale modifica strutturale tipicamente aumenta la durata d\'azione di un farmaco riducendone il metabolismo?',opts:['Introduzione di un gruppo -OH libero in posizione alchemica','Sostituzione di un H aromatico con F (fluorurazione)','Aggiunta di un gruppo -COOH ionizzabile','Riduzione dei legami doppi nel nucleo'],ans:1,exp:'La fluorurazione blocca l\'ossidazione da parte dei CYP450 (l\'F è bioisostero dell\'H ma molto più difficile da ossidare), aumentando la stabilità metabolica e la durata d\'azione.'},
+  {cat:'farmaceutica',diff:'medio',q:'Cosa si intende per "effetto primo passaggio" (first-pass effect)?',opts:['La prima dose che produce effetto terapeutico','L\'estrazione pre-sistemica del farmaco da parte di fegato e intestino prima di raggiungere la circolazione sistemica','La velocità di dissoluzione in stomaco','Il legame con le proteine plasmatiche alla prima somministrazione'],ans:1,exp:'Dopo assorbimento intestinale, il farmaco raggiunge il fegato via vena porta. L\'estrazione epatica (e intestinale) riduce la biodisponibilità orale — es. lidocaina ha F<5% per via orale per effetto primo passaggio.'},
+  {cat:'farmaceutica',diff:'medio',q:'Qual è la differenza tra agonista inverso e antagonista?',opts:['Sono sinonimi: entrambi bloccano il recettore senza effetto','L\'antagonista riduce l\'attività costitutiva del recettore, l\'agonista inverso la blocca completamente','L\'agonista inverso stabilizza la conformazione inattiva del recettore riducendo l\'attività costitutiva; l\'antagonista occupa il sito senza cambiare l\'attività basale','L\'agonista inverso agisce su recettori nucleari, l\'antagonista su recettori di membrana'],ans:2,exp:'Gli agonisti inversi si legano al recettore e spostano l\'equilibrio verso la conformazione inattiva (R), riducendo l\'attività costitutiva. Gli antagonisti (neutri) occupano il sito impedendo l\'agonista endogeno senza modificare l\'attività basale.'},
+  {cat:'farmaceutica',diff:'medio',q:'Quale parametro farmacocinetico indica la percentuale di farmaco che raggiunge la circolazione sistemica?',opts:['Clearance (CL)','Volume di distribuzione (Vd)','Biodisponibilità (F)','Emivita (t½)'],ans:2,exp:'La biodisponibilità F = AUC_orale / AUC_ev × 100%. Dipende dall\'assorbimento e dall\'effetto primo passaggio. Un farmaco completamente assorbito e non estratto dal fegato ha F=100%.'},
+  {cat:'farmaceutica',diff:'medio',q:'Cosa sono gli alert PAINS (Pan-Assay Interference Compounds)?',opts:['Farmaci con elevata tossicità epatica','Sottostrutture chimiche che interferiscono falsamente con molti saggi biologici dando falsi positivi','Molecole con troppi centri chirali che complicano la sintesi','Composti che precipitano in soluzione acquosa'],ans:1,exp:'I PAINS sono sottostrutture (es. catecholi reattivi, chinoni, aldeidi, idrazidi) che falsano i risultati nei saggi HTS perché aggregano, reagiscono in modo aspecifico o interferiscono otticamente con i readout colorimetrici/fluorescenti.'},
+  {cat:'farmaceutica',diff:'medio',q:'Cosa si intende per "window terapeutica"?',opts:['Il periodo di tempo in cui il farmaco è stabile in soluzione','L\'intervallo di concentrazioni plasmatiche tra l\'efficacia minima (MEC) e la tossicità (MTC)','La durata del trattamento raccomandata','La finestra temporale in cui somministrare il farmaco per cronofarmacologia'],ans:1,exp:'La finestra terapeutica è il range di concentrazioni plasmatiche in cui il farmaco è efficace (>MEC) ma non tossico (<MTC). Farmaci con finestra stretta (es. digossina, warfarin, litio) richiedono monitoraggio plasmatico.'},
+  {cat:'farmaceutica',diff:'medio',q:'Quale bioisostero del gruppo carbossilico (-COOH) viene spesso usato per migliorare la permeabilità cellulare?',opts:['Acilsulfonamide (-CONHSO₂R)','Ammide (-CONH₂)','Tetrazolo','Tutte le precedenti sono bioisosteri del -COOH'],ans:3,exp:'Acilsulfonamidi, ammidi, tetrazoli e altri isosteri bioisolettronici del -COOH mimano le proprietà di donazione/accettazione H-bond e la carica negativa a pH fisiologico, spesso con migliore permeabilità.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Quale è il meccanismo di inibizione del proteasoma da parte del bortezomib?',opts:['Alchilazione covalente irreversibile della subunità 20S β5','Inibizione competitiva reversibile tramite legame dell\'acido boronico con la treonina catalitica della subunità 20S β5','Inibizione allosterica della subunità 19S','Legame al sito di ubiquitinazione della proteina substrato'],ans:1,exp:'Bortezomib contiene un acido boronico che forma un legame covalente reversibile con l\'idrossile della Thr1 nel sito catalitico della subunità β5 (attività chemotripsina-simile) del proteasoma 26S, inibendo la proteolisi.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Perché i farmaci con elevato volume di distribuzione (Vd > 1 L/kg) sono difficili da rimuovere con la dialisi?',opts:['Perché precipitano a pH ematico','Perché sono ampiamente distribuiti nei tessuti periferici e non nel plasma, quindi poca quota è disponibile per la filtrazione','Perché si legano irreversibilmente ai recettori','Perché hanno emivita troppo breve'],ans:1,exp:'La dialisi rimuove solo il farmaco nel plasma. Un Vd elevato significa che la maggior parte del farmaco è sequestrata nei tessuti (es. lipofila, lega proteine tissutali): la clearance dialitica è quindi trascurabile rispetto alla dose totale corporea.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Quale tecnica di drug design sfrutta la struttura 3D del sito attivo del target per progettare nuovi ligandi?',opts:['QSAR bidimensionale (2D-QSAR)','Structure-Based Drug Design (SBDD) con docking molecolare','Fragment-Based Drug Discovery (FBDD) senza struttura proteica','High-Throughput Screening (HTS) combinatoriale'],ans:1,exp:'Lo SBDD utilizza strutture cristallografiche o NMR del target (ottenute da PDB) per posizionare in silico una molecola nel sito di legame (docking), valutandone le interazioni H-bond, elettrostatiche e idrofobiche e guidando l\'ottimizzazione.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Cosa descrive l\'equazione di Henderson-Hasselbalch per un farmaco acido debole (HA)?',opts:['pH = pKa + log([HA]/[A⁻])','pH = pKa + log([A⁻]/[HA])','pH = pKa − log([A⁻]/[HA])','pH = 2·pKa − log([HA])'],ans:1,exp:'Henderson-Hasselbalch: pH = pKa + log([A⁻]/[HA]). Permette di calcolare il grado di ionizzazione a diversi pH: a pH=pKa metà molecole sono ionizzate; per acidi a pH gastrico (1.5) prevale la forma non ionizzata (permeabile).'},
+  {cat:'farmaceutica',diff:'difficile',q:'Quale relazione descrive la Teoria dell\'Occupazione Recettoriale per l\'effetto di un agonista?',opts:['Effetto ∝ [farmaco]²','Effetto ∝ [farmaco·R] = Emax × [C]/(EC₅₀ + [C])','Effetto = costante indipendente dalla concentrazione','Effetto ∝ log[farmaco] solo a basse concentrazioni'],ans:1,exp:'La teoria dell\'occupazione (Clark) e il modello operazionale di Black-Leff descrivono la curva dose-risposta come iperbola: E = Emax × [C]/(EC₅₀ + [C]), dove EC₅₀ è la concentrazione che produce metà effetto massimo.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Quale caratteristica strutturale rende un antibiotico β-lattamico resistente alle β-lattamasi?',opts:['La presenza di un doppio legame nel nucleo','Sostituenti ingombranti in posizione 6α (penicilline) o 7α (cefalosporine) che impediscono l\'accesso al sito attivo dell\'enzima','La presenza di un gruppo amminico libero','Un elevato peso molecolare > 600 Da'],ans:1,exp:'I β-lattamici "resistenti alle β-lattamasi" (es. oxacillina, meticillina) hanno catene laterali con sostituenti voluminosi in prossimità dell\'anello β-lattamico che impediscono stericamente il legame al sito catalitico delle β-lattamasi.'},
+  {cat:'farmaceutica',diff:'difficile',q:'Cosa si intende per "selectivity index" (SI) in tossicologia farmaceutica?',opts:['Rapporto tra IC₅₀ su cellule sane e IC₅₀ su cellule target (es. tumorali)','Differenza tra MTC e MEC','Rapporto tra Vd e clearance','Numero di target con cui un farmaco interagisce'],ans:0,exp:'SI = IC₅₀ (cellule normali) / IC₅₀ (cellule target). Un SI > 1 indica maggiore tossicità sulle cellule target rispetto alle sane. Per antivirali SI = CC₅₀/EC₅₀. Valori SI > 10 sono considerati promettenti.'},
+  {cat:'farmaceutica',diff:'difficile',q:'In quale organo avviene principalmente il metabolismo di fase I dei farmaci e qual è l\'enzima predominante?',opts:['Rene — glucuronosiltransferasi','Fegato — CYP3A4 (circa 50% di tutti i farmaci metabolizzati da CYP450)','Polmone — monoaminossidasi (MAO)','Intestino — colinesterasi'],ans:1,exp:'Il fegato è l\'organo principale del metabolismo farmacologico. Il CYP3A4 è il CYP più abbondante nel fegato e nell\'intestino, responsabile del metabolismo di circa il 50% dei farmaci in uso clinico.'},
+  {cat:'farmaceutica',diff:'facile',q:'Cosa indica un coefficiente di partizione ottanolo/acqua (LogP) elevato?',opts:['Alta idrofobicità e buona permeabilità transmembrana','Alta idrofilicità e scarsa permeabilità transmembrana','Alta stabilità metabolica','Elevata capacità di formare legami idrogeno'],ans:0,exp:'LogP alto indica che la molecola preferisce la fase lipidica (ottanolo) rispetto all\'acqua: è idrofobica, penetra facilmente nelle membrane cellulari lipidiche, ma può avere scarsa solubilità acquosa.'},
+
+  /* ── CHIMICA FISICA (20) ── */
+  {cat:'fisica',diff:'facile',q:'Cosa indica la variazione di energia libera di Gibbs (ΔG < 0)?',opts:['La reazione è endotermica','La reazione è spontanea nelle condizioni standard','La reazione è in equilibrio','La reazione richiede apporto di calore'],ans:1,exp:'ΔG < 0 indica che la reazione avviene spontaneamente a pressione costante. ΔG = ΔH − TΔS: una reazione è spontanea quando diminuisce l\'energia libera del sistema.'},
+  {cat:'fisica',diff:'facile',q:'Come varia la costante di equilibrio Kc con la temperatura per una reazione esotermica?',opts:['Aumenta con T','Diminuisce con T (principio di Le Chatelier)','Rimane costante','Dipende solo dalla concentrazione dei reagenti'],ans:1,exp:'Per reazioni esotermiche (ΔH < 0), aumentare la temperatura sposta l\'equilibrio verso i reagenti (principio di Le Chatelier), diminuendo Kc. Descrive l\'equazione di van\'t Hoff: d(ln K)/dT = ΔH°/RT².'},
+  {cat:'fisica',diff:'facile',q:'Quale equazione descrive la dipendenza della costante di velocità dalla temperatura?',opts:['Equazione di Nernst','Equazione di Arrhenius: k = A·e^(-Ea/RT)','Equazione di Henderson-Hasselbalch','Legge di Raoult'],ans:1,exp:'L\'equazione di Arrhenius k = A·exp(−Ea/RT) mostra che la costante di velocità aumenta esponenzialmente con T: A è il fattore pre-esponenziale, Ea è l\'energia di attivazione e R la costante dei gas.'},
+  {cat:'fisica',diff:'facile',q:'Cosa misura il potenziale elettrochimico standard (E°) di una semicella?',opts:['La velocità di una reazione redox','La tendenza di una specie a ridursi (acquistare elettroni) rispetto all\'elettrodo standard a idrogeno (SHE)','La concentrazione degli ioni in soluzione','La conducibilità elettrica della soluzione'],ans:1,exp:'E° (potenziale standard di riduzione) è misurato rispetto all\'SHE (E°=0 V). Valori E° positivi indicano forte tendenza alla riduzione (es. F₂/F⁻: +2.87 V); valori negativi indicano tendenza all\'ossidazione.'},
+  {cat:'fisica',diff:'facile',q:'Qual è la relazione tra ΔG° e la costante di equilibrio K?',opts:['ΔG° = RT·K','ΔG° = −RT·ln K','ΔG° = −nF·K','ΔG° = ΔH° + T·K'],ans:1,exp:'ΔG° = −RT·ln K. Se K > 1 allora ln K > 0 e ΔG° < 0 (prodotti favoriti). K = exp(−ΔG°/RT): la costante di equilibrio dipende esponenzialmente dall\'energia libera standard.'},
+  {cat:'fisica',diff:'medio',q:'Cosa afferma il Secondo Principio della Termodinamica?',opts:['L\'energia si conserva in tutti i processi','L\'entropia di un sistema isolato non può diminuire; per processi spontanei ΔS_universo > 0','Il calore fluisce spontaneamente dal caldo al freddo','La temperatura assoluta non può raggiungere lo zero'],ans:1,exp:'Il II principio stabilisce che l\'entropia totale dell\'universo (sistema + ambiente) aumenta per qualsiasi processo spontaneo irreversibile (ΔS_univ > 0) ed è costante per processi reversibili (ΔS_univ = 0).'},
+  {cat:'fisica',diff:'medio',q:'Qual è l\'ordine di reazione di un processo che ha unità di velocità mol·L⁻¹·s⁻¹ e costante k in s⁻¹?',opts:['Ordine zero','Ordine primo','Ordine secondo','Ordine terzo'],ans:1,exp:'Per una reazione del primo ordine v = k[A], la costante k ha unità di s⁻¹. Ordine zero: k in mol·L⁻¹·s⁻¹; secondo ordine: k in L·mol⁻¹·s⁻¹.'},
+  {cat:'fisica',diff:'medio',q:'Cosa descrive l\'equazione di Nernst?',opts:['La dipendenza della costante di velocità dalla T','Il potenziale di elettrodo in condizioni non standard: E = E° − (RT/nF)·ln Q','La variazione di entalpia con la pressione','La solubilità dei gas in funzione della pressione parziale'],ans:1,exp:'L\'equazione di Nernst E = E° − (RT/nF)·ln Q descrive il potenziale di cella in funzione delle concentrazioni reali (Q = quoziente di reazione). A 25°C: E = E° − (0.0592/n)·log Q.'},
+  {cat:'fisica',diff:'medio',q:'Come si calcola la variazione di entalpia di una reazione dalla legge di Hess?',opts:['ΔH_rx = somma ΔH_f prodotti − somma ΔH_f reagenti','ΔH_rx = ΔH_f prodotti × ΔH_f reagenti','ΔH_rx = ΔG − TΔS','ΔH_rx = Cp × ΔT'],ans:0,exp:'Legge di Hess: ΔH°_rx = Σ ΔH°_f(prodotti) − Σ ΔH°_f(reagenti). L\'entalpia è una funzione di stato: il ΔH è indipendente dal percorso.'},
+  {cat:'fisica',diff:'medio',q:'Cosa si intende per "energia di attivazione" in una reazione chimica?',opts:['L\'energia rilasciata nella reazione esotermica','L\'energia minima che i reagenti devono possedere per superare la barriera energetica e formare lo stato di transizione','La differenza di entalpia tra prodotti e reagenti','L\'energia del legame più debole nei reagenti'],ans:1,exp:'L\'energia di attivazione Ea è l\'altezza della barriera energetica (differenza tra stato di transizione e reagenti). I catalizzatori abbassano Ea senza modificare ΔG della reazione totale.'},
+  {cat:'fisica',diff:'medio',q:'Quale relazione lega ΔG°, E° di cella e n (numero di elettroni trasferiti)?',opts:['ΔG° = nFE°','ΔG° = −nFE°','ΔG° = RT·ln(nFE°)','ΔG° = E°/nF'],ans:1,exp:'ΔG° = −nFE°, dove n = numero di elettroni scambiati e F = costante di Faraday (96485 C/mol). Una cella con E° > 0 ha ΔG° < 0: la reazione redox è spontanea.'},
+  {cat:'fisica',diff:'medio',q:'Cosa indica il calore specifico (Cp) di una sostanza?',opts:['La quantità di calore necessaria per vaporizzare 1 g di sostanza','La quantità di calore necessaria per innalzare di 1°C la temperatura di 1 g di sostanza a pressione costante','La variazione di entalpia di fusione','L\'entalpia di formazione standard della sostanza'],ans:1,exp:'Cp (J g⁻¹ K⁻¹) è il calore specifico a pressione costante. L\'acqua ha Cp = 4.18 J g⁻¹ K⁻¹ (molto elevato), il che la rende ottimo modulatore termico biologico.'},
+  {cat:'fisica',diff:'difficile',q:'Quale teoria spiega perché alcuni catalizzatori omogenei seguono una cinetica di Michaelis-Menten?',opts:['Teoria delle collisioni','Teoria dello stato di transizione (TST) di Eyring','Meccanismo a due step con intermedio e saturazione del sito catalitico a elevato [S]','Teoria RRKM per reazioni unimolecolari'],ans:2,exp:'La cinetica enzima-substrato (e per estensione alcuni catalizzatori con sito di legame) mostra saturazione: v = Vmax·[S]/(Km+[S]). A [S]>>Km il catalizzatore è saturo e v → Vmax, indipendente da [S] (ordine zero apparente).'},
+  {cat:'fisica',diff:'difficile',q:'Cosa predice la teoria della doppia membrana elettrica (EDL) di Gouy-Chapman-Stern?',opts:['La stabilità termica dei polimeri','La distribuzione di ioni nella doppia membrana elettrica attorno a particelle cariche in soluzione colloidale, che include uno strato compatto (Stern) e uno diffuso (Gouy-Chapman)','La velocità di diffusione degli ioni attraverso membrane biologiche','La resistenza elettrica di soluzioni elettrolitiche'],ans:1,exp:'La teoria EDL descrive la struttura dello strato ionico attorno a superfici cariche: strato interno di Stern (ioni fortemente adsorbiti) + strato diffuso di Gouy-Chapman (ioni distribuiti secondo Boltzmann). Fondamentale per formulazioni farmaceutiche colloidali.'},
+  {cat:'fisica',diff:'difficile',q:'Come si deriva l\'equazione di Clausius-Clapeyron?',opts:['Dal I principio applicato a cicli di Carnot','Dall\'uguaglianza dei potenziali chimici delle due fasi μ_liq = μ_vap differenziando rispetto a T lungo la curva di coesistenza','Dalla legge dei gas ideali applicata solo alla fase gassosa','Dal bilancio entropico in sistemi aperti'],ans:1,exp:'dP/dT = ΔH_vap/(T·ΔV) deriva dall\'equilibrio di fase (μ_liq = μ_vap). In forma integrata: ln(P₂/P₁) = (ΔH_vap/R)(1/T₁ − 1/T₂). Descrive la variazione della tensione di vapore con la temperatura.'},
+  {cat:'fisica',diff:'difficile',q:'Cosa misura la funzione di correlazione di coppia g(r) in una simulazione molecolare?',opts:['La distribuzione angolare dei legami','La probabilità di trovare un\'altra molecola a distanza r da una molecola di riferimento, normalizzata rispetto alla densità media','La funzione di energia potenziale in funzione della distanza di legame','La distribuzione delle velocità molecolari (Maxwell-Boltzmann)'],ans:1,exp:'g(r) (radial distribution function) quantifica la struttura locale del liquido: picchi in g(r) indicano shell di solvatazione. È fondamentale per studiare interazioni soluto-solvente nelle simulazioni MD/MC di farmaci in acqua.'},
+  {cat:'fisica',diff:'difficile',q:'Quale è il significato fisico del parametro di Flory-Huggins (χ) per polimeri?',opts:['La densità di reticolazione del polimero','Il parametro di interazione polimero-solvente: χ < 0.5 indica buon solvente, χ > 0.5 indica cattivo solvente (precipitazione)','La massa molecolare media del polimero','Il grado di cristallinità del polimero'],ans:1,exp:'Il parametro χ di Flory-Huggins descrive le interazioni polimero-solvente nella teoria della miscibilità polimerica. χ < 0.5: interazioni favorevoli (buon solvente, polimero solubile); χ > 0.5: il polimero collassa e precipita (cattivo solvente).'},
+  {cat:'fisica',diff:'medio',q:'Cosa si intende per "punto di ebollizione azeotrópico"?',opts:['Il punto di ebollizione di un liquido puro','La temperatura a cui una miscela liquida bolle con composizione costante (vapore = liquido), non separabile per distillazione ordinaria','La temperatura minima di ebollizione di qualsiasi miscela','Il punto in cui la tensione di vapore è uguale alla pressione atmosferica'],ans:1,exp:'Un azeotropo è una miscela di composizione tale che liquido e vapore hanno la stessa composizione: non è separabile per distillazione frazionata. Es. etanolo-acqua (95.6% EtOH, 78.1°C) è un azeotropo a minimo ebolliente.'},
+  {cat:'fisica',diff:'facile',q:'Cosa misura la calorimetria differenziale a scansione (DSC)?',opts:['La viscosità di una soluzione in funzione della temperatura','Il flusso di calore differenziale tra campione e riferimento in funzione della temperatura, rilevando transizioni di fase, fusione e denaturazione','La conducibilità elettrica in funzione della temperatura','La variazione di massa in funzione della temperatura'],ans:1,exp:'La DSC misura la differenza di flusso di calore tra campione e riferimento. Picchi endotermici = fusione/denaturazione/transizioni di fase; picchi esotermici = cristallizzazione/polimerizzazione. Fondamentale per caratterizzare forme polimorfe dei farmaci.'},
+  {cat:'fisica',diff:'facile',q:'Cosa afferma la legge di Beer-Lambert?',opts:['A = ε·c·l: l\'assorbanza è proporzionale alla concentrazione e al cammino ottico','A = ε/c·l','La trasmittanza è proporzionale alla concentrazione','L\'assorbanza dipende solo dalla lunghezza d\'onda'],ans:0,exp:'Legge di Beer-Lambert: A = ε·c·l, dove ε = coefficiente di estinzione molare (L mol⁻¹ cm⁻¹), c = concentrazione (mol/L), l = cammino ottico (cm). Base della spettrofotometria quantitativa in chimica analitica e farmaceutica.'},
+
+  /* ── FISIOLOGIA (20) ── */
+  {cat:'fisiologia',diff:'facile',q:'Quale ormone è prodotto dalle cellule β del pancreas in risposta all\'iperglicemia?',opts:['Glucagone','Insulina','Cortisolo','Adrenalina'],ans:1,exp:'Le cellule β delle isole di Langerhans producono insulina in risposta all\'aumento della glicemia. L\'insulina facilita l\'uptake di glucosio (GLUT4) in muscolo e tessuto adiposo e stimola la glicogenosintesi epatica.'},
+  {cat:'fisiologia',diff:'facile',q:'Qual è il prodotto finale del ciclo di Krebs per ogni acetil-CoA?',opts:['2 ATP, 3 NADH, 1 FADH₂, 2 CO₂','3 NADH, 1 FADH₂, 1 GTP, 2 CO₂','4 NADH, 2 FADH₂, 2 ATP, 4 CO₂','6 NADH, 2 FADH₂, 2 GTP'],ans:1,exp:'Ogni giro del ciclo di Krebs per un acetil-CoA (2C) produce: 3 NADH, 1 FADH₂, 1 GTP e 2 CO₂ (rilasciando i 2 carboni come CO₂). L\'NADH e FADH₂ cedono poi elettroni alla catena respiratoria.'},
+  {cat:'fisiologia',diff:'facile',q:'Dove avviene la β-ossidazione degli acidi grassi?',opts:['Nel citoplasma','Nel reticolo endoplasmatico','Nella matrice mitocondriale','Nel nucleo'],ans:2,exp:'La β-ossidazione avviene nella matrice mitocondriale. Gli acidi grassi vengono attivati ad acil-CoA nel citoplasma, trasportati nel mitocondrio come acilcarnitina (tramite la carnitina-palmitoiltransferasi), e degradati per produrre acetil-CoA, NADH e FADH₂.'},
+  {cat:'fisiologia',diff:'facile',q:'Quale molecola è il carrier centrale dell\'energia nelle cellule?',opts:['NADH','FADH₂','ATP','Glucosio-6-fosfato'],ans:2,exp:'L\'ATP (adenosina trifosfato) è il carrier universale dell\'energia cellulare. L\'idrolisi dell\'ATP → ADP + Pi rilascia circa 30.5 kJ/mol in condizioni standard (ma fino a 50-60 kJ/mol nelle condizioni cellulari), alimentando processi biosintesi, trasporto attivo e lavoro meccanico.'},
+  {cat:'fisiologia',diff:'facile',q:'Quale enzima converte il glucosio in glucosio-6-fosfato nel primo step della glicolisi?',opts:['Fosfofruttochinasi (PFK-1)','Esochinasi (o glucochinasi nel fegato)','Piruvato chinasi','Fosfoglicerato mutasi'],ans:1,exp:'L\'esochinasi (nei tessuti periferici) o la glucochinasi (nel fegato, alta Km, non inibita dal G6P) catalizza il primo step irreversibile della glicolisi: glucosio + ATP → glucosio-6-fosfato + ADP.'},
+  {cat:'fisiologia',diff:'medio',q:'Qual è il ruolo della pompa Na⁺/K⁺-ATPasi nella fisiologia cellulare?',opts:['Trasporta 2 Na⁺ dentro e 3 K⁺ fuori, consumando ATP','Trasporta 3 Na⁺ fuori e 2 K⁺ dentro, consumando ATP e mantenendo il potenziale di membrana','Trasporta Na⁺ e K⁺ passivamente secondo gradiente','Pompa Na⁺ fuori in scambio con H⁺'],ans:1,exp:'La Na⁺/K⁺-ATPasi (P-ATPasi) estrude 3 Na⁺ ed importa 2 K⁺ per ogni ATP idrolizzato. Mantiene alti [K⁺] intracellulari e bassi [Na⁺] intracellulari, essenziali per il potenziale di riposo e per il trasporto accoppiato di nutrienti.'},
+  {cat:'fisiologia',diff:'medio',q:'Quale ormone è secreto dalla midollare del surrene e qual è il suo effetto metabolico principale?',opts:['Cortisolo: gluconeogenesi e immunosoppressione','Adrenalina (epinefrina): glicogenolisi epatica e muscolare, aumento glicemia e mobilizzazione lipidi','Aldosterone: ritenzione di Na⁺ e K⁺','ACTH: stimola la corteccia surrenalica'],ans:1,exp:'L\'adrenalina (secretata dalla midollare del surrene in risposta allo stress) attiva i recettori β-adrenergici: stimola la glicogenolisi via PKA/fosforilasi chinasi, aumenta la glicemia e mobilizza gli acidi grassi (lipolisi) per la risposta "fight-or-flight".'},
+  {cat:'fisiologia',diff:'medio',q:'Quale dei seguenti è un enzima regolatorio chiave della glicolisi e come è regolato?',opts:['Enolasi: inibita dal Mg²⁺','Fosfofruttochinasi-1 (PFK-1): inibita da ATP/citrato, attivata da AMP/fruttosio-2,6-bisfosfato','Fosfoglicerato chinasi: inibita dal NADH','Aldolasi: attivata dal piruvato'],ans:1,exp:'PFK-1 è il principale punto di controllo della glicolisi: è inibita da alti livelli di ATP (segnale energetico) e citrato (eccesso di substrati per il ciclo di Krebs), e attivata da AMP (bassa energia) e fruttosio-2,6-bisfosfato (segnale insulinico).'},
+  {cat:'fisiologia',diff:'medio',q:'Dove viene sintetizzato il colesterolo e qual è l\'enzima limitante?',opts:['Nel mitocondrio — piruvato carbossilasi','Nel reticolo endoplasmatico e citoplasma — HMG-CoA reduttasi (bersaglio delle statine)','Nel nucleo — squalene sintasi','Nel perossisoma — acetil-CoA acetialtransferasi'],ans:1,exp:'La sintesi del colesterolo avviene principalmente nel fegato (ER e citoplasma). L\'enzima limitante è l\'HMG-CoA reduttasi che converte HMG-CoA in mevalonato. Le statine (atorvastatina, rosuvastatina) la inibono competitivamente riducendo la colesterolemia.'},
+  {cat:'fisiologia',diff:'medio',q:'Qual è il meccanismo d\'azione dell\'insulina a livello cellulare?',opts:['Si lega a recettori nucleari e attiva la trascrizione genica','Si lega al recettore tirosin-chinasico → autofosforilazione → cascata IRS/PI3K/Akt → traslocazione GLUT4 alla membrana','Apre canali ionici direttamente per facilitare l\'ingresso del glucosio','Attiva l\'adenilato ciclasi aumentando il cAMP'],ans:1,exp:'Il recettore insulinico è un recettore tirosin-chinasico: il legame dell\'insulina causa autofosforilazione → fosforilazione di IRS-1 → PI3K → PIP3 → PDK1 → Akt → fusione di vescicole con GLUT4 alla membrana plasmatica per uptake del glucosio.'},
+  {cat:'fisiologia',diff:'medio',q:'Cosa si intende per "potenziale d\'azione" nei neuroni?',opts:['La differenza di potenziale basale a riposo (-70 mV)','Una rapida variazione del potenziale di membrana (depolarizzazione e ripolarizzazione) mediata dall\'apertura sequenziale di canali Na⁺ e K⁺ voltaggio-dipendenti','Il gradiente osmotico attraverso la membrana neuronale','La conduttanza di fondo al K⁺ che mantiene il potenziale di riposo'],ans:1,exp:'Il PA inizia con apertura dei canali Na⁺ voltaggio-dipendenti (depolarizzazione rapida fino a +40 mV), seguita dalla loro inattivazione e dall\'apertura ritardata dei canali K⁺ (ripolarizzazione). La pompa Na⁺/K⁺-ATPasi ripristina i gradienti.'},
+  {cat:'fisiologia',diff:'difficile',q:'Quali enzimi sono coinvolti nella β-ossidazione degli acidi grassi insaturi con doppi legami in posizione dispari?',opts:['Solo acil-CoA deidrogenasi','Oltre agli enzimi standard, servono enoil-CoA isomerasi (per doppi legami cis-Δ3) e 2,4-dienoil-CoA reduttasi (per doppi legami in posizione pari)','Solo fosfolipasi A₂','L\'enzima unico "polinsaturo acil-CoA ossidasi"'],ans:1,exp:'I PUFA richiedono enzimi aggiuntivi: l\'enoil-CoA isomerasi sposta i doppi legami cis da posizione Δ3 a trans-Δ2 (substrato per l\'idratasi); la 2,4-dienoil-CoA reduttasi riduce i coniugati 2,4-dienoil-CoA prodotti dai PUFA con doppi in posizione pari.'},
+  {cat:'fisiologia',diff:'difficile',q:'Come è regolata la gluconeogenesi a livello allosterico?',opts:['Inibita da ATP e NADH; attivata da AMP','Attivata da acetil-CoA (che attiva la piruvato carbossilasi) e da fruttosio-1,6-bisfosfatasi; inibita da fruttosio-2,6-bisfosfato (che inibisce F1,6BPasi)','Stimolata dal glucosio-6-fosfato','Regolata esclusivamente a livello trascrizionale dal glucagone'],ans:1,exp:'F-1,6-BPasi è inibita da F-2,6-BP (alto = stato insulinico → glicogenesi) e AMP. L\'acetil-CoA attiva la piruvato carbossilasi (primo step gluconeogenesi). Il glucagone stimola la gluconeogenesi via cAMP inducendo F-2,6-BPasi e PEPCK.'},
+  {cat:'fisiologia',diff:'difficile',q:'Quale è il meccanismo molecolare dell\'accoppiamento eccitazione-contrazione nel muscolo scheletrico?',opts:['L\'onda di depolarizzazione attiva i canali L-type Ca²⁺ del sarcolemma che aprono i recettori rianodinici (RyR1) del reticolo sarcoplasmatico, rilasciando Ca²⁺ che lega la troponina C','Il Ca²⁺ extracellulare entra direttamente dai canali NMDA nel citoplasma','L\'IP3 apre i recettori IP3R del RS rilasciando Ca²⁺ (come nel muscolo liscio)','La calmodulina attiva la miosina chinasi senza Ca²⁺'],ans:0,exp:'Nel muscolo scheletrico: PA → canale DHPR (L-type, voltaggio-sensore) → accoppiamento meccanico con RyR1 → rilascio Ca²⁺ dal RS → Ca²⁺ lega TnC → spostamento tropomiosina → esposizione siti di legame actina → ciclo cross-bridge.'},
+  {cat:'fisiologia',diff:'difficile',q:'Cosa si intende per "ciclo dei substrati" (futile cycle) in biochimica?',opts:['Un ciclo che produce ATP netto partendo da AMP','Due vie metaboliche opposte attive simultaneamente (es. glicolisi + gluconeogenesi) che dissipano ATP/GTP come calore, permettendo una fine regolazione metabolica','Un ciclo che rigenera il NADPH nella via del pentoso fosfato','Il ciclo di Krebs che "sprecherebbe" energia'],ans:1,exp:'I cicli futili (es. PFK/F-1,6-BPasi attivi contemporaneamente) consumano ATP netto dissipando calore. Biologicamente consentono un controllo rapido e fine del flusso metabolico perché piccole variazioni nelle concentrazioni degli effettori allosterici spostano rapidamente l\'equilibrio tra le due attività.'},
+  {cat:'fisiologia',diff:'difficile',q:'Qual è il ruolo della proteina p53 in risposta al danno al DNA?',opts:['Promuove la replicazione del DNA danneggiato','Attiva la trascrizione di p21 (inibitore CDK) causando arresto in G1, e di geni pro-apoptotici (Bax, PUMA) se il danno è irreparabile','Stimola la sintesi di istoni per compattare la cromatina','Inibisce la riparazione del DNA per aumentare la mutagenicità'],ans:1,exp:'p53 ("guardiano del genoma") in risposta al danno al DNA è stabilizzata (non degradata da MDM2): trasattiva p21 (arresto in G1), GADD45 (riparazione NER), e se il danno è irreparabile attiva Bax/PUMA/NOXA (apoptosi) o p16/p21 (senescenza).'},
+  {cat:'fisiologia',diff:'difficile',q:'Come è mantenuta l\'omeostasi del calcio plasmatico?',opts:['Solo dalla calcitonina tiroidea','Da PTH (aumenta Ca²⁺: stimola osteoclasti, riassorbimento renale, attiva vitamina D) e calcitonina (abbassa Ca²⁺: inibisce osteoclasti); la vitamina D3 attiva aumenta l\'assorbimento intestinale','Solo dall\'insulina e dal glucagone','Solo dall\'aldosterone e dal cortisolo'],ans:1,exp:'Il PTH (paratormone) risponde alla ipocalcemia: mobilizza Ca²⁺ dall\'osso (osteoclasti), riassorbe Ca²⁺ nel tubulo renale e converte 25-OH-D₃ in 1,25-(OH)₂-D₃ (calcitriolo) che aumenta l\'assorbimento intestinale. La calcitonina (ipercalcemia) inibisce gli osteoclasti.'},
+  {cat:'fisiologia',diff:'facile',q:'Qual è il prodotto della respirazione aerobica completa di 1 molecola di glucosio?',opts:['2 ATP, 2 lattato','30-32 ATP, 6 CO₂, 6 H₂O','38 ATP, 2 CO₂, 2 H₂O','16 NADH, 4 FADH₂, 2 GTP'],ans:1,exp:'La respirazione aerobica completa (glicolisi + ciclo di Krebs + catena respiratoria) di 1 glucosio produce circa 30-32 ATP (stima moderna), 6 CO₂ e 6 H₂O. La stima classica di 36-38 ATP trascurava i costi di trasporto dei mitocondri.'},
+  {cat:'fisiologia',diff:'facile',q:'Quale ormone tiroideo è biologicamente più attivo?',opts:['T4 (tiroxina)','T3 (triiodotironina)','Calcitonina','TSH'],ans:1,exp:'Il T3 (triiodotironina) è circa 3-5 volte più potente del T4. La ghiandola tiroidea secerne prevalentemente T4 (proormone), che viene convertito in T3 nei tessuti periferici dalla desiodasi tipo 1 e tipo 2. T3 agisce sui recettori nucleari TR aumentando la trascrizione.'},
+  {cat:'fisiologia',diff:'medio',q:'Qual è il significato fisiologico dell\'effetto Bohr nell\'emoglobina?',opts:['L\'O₂ lega l\'Hb in modo indipendente e non cooperativo','A pH basso e alto pCO₂ (tessuti metabolicamente attivi) l\'affinità dell\'Hb per l\'O₂ diminuisce, favorendo il rilascio di O₂ ai tessuti','A pH alto l\'affinità per O₂ diminuisce','Il CO₂ lega l\'Hb al posto dell\'O₂ nello stesso sito'],ans:1,exp:'L\'effetto Bohr: nei tessuti, la produzione di CO₂ e H⁺ (metabolismo) stabilizza la forma deossigenata (T) dell\'Hb abbassando l\'affinità per O₂ (curva di dissociazione sposta a destra), favorendo il rilascio di O₂. Nei polmoni (pH alto, bassa pCO₂) l\'Hb riprende O₂.'},
+
+  /* ── CRISTALLOGRAFIA & STRUTTURA MOLECOLARE (15) ── */
+  {cat:'cristallo',diff:'facile',q:'Qual è l\'ibridazione del carbonio nel benzene?',opts:['sp³','sp²','sp','sp³d'],ans:1,exp:'Il carbonio nel benzene è sp² ibridato: 3 orbitali sp² planari (legami σ con 2C e 1H) + 1 orbitale p puro perpendicolare al piano che partecipa al sistema π aromatico delocalizzato.'},
+  {cat:'cristallo',diff:'facile',q:'Quale geometria molecolare ha una molecola AX₄ senza coppie solitarie (es. CH₄)?',opts:['Planare quadrata','Tetraedrica','Piramidale trigonale','Lineare'],ans:1,exp:'Secondo la teoria VSEPR, 4 coppie di legame e 0 coppie solitarie → geometria tetraedrica con angoli di legame di 109.5°. Es. CH₄, SiH₄, CCl₄.'},
+  {cat:'cristallo',diff:'facile',q:'Quale tipo di forza intermolecolare è responsabile dell\'elevato punto di ebollizione dell\'acqua?',opts:['Forze di dispersione di London','Interazioni ione-dipolo','Legami idrogeno tra molecole H₂O (O—H···O)','Interazioni π-π'],ans:2,exp:'L\'acqua forma una rete di legami idrogeno intermolecolari (O è molto elettronegativo + H è legato a O): ogni molecola può formare fino a 4 H-bond. Questo spiega il punto di ebollizione anomalmente alto (100°C) per una molecola così piccola (M=18).'},
+  {cat:'cristallo',diff:'facile',q:'Cosa descrive la teoria VSEPR?',opts:['La geometria degli orbitali atomici','La geometria molecolare in base alla repulsione delle coppie elettroniche (legame + solitarie) attorno all\'atomo centrale','La distribuzione degli elettroni nei cristalli metallici','La forma degli orbitali ibridi'],ans:1,exp:'VSEPR (Valence Shell Electron Pair Repulsion): le coppie elettroniche (legame e solitarie) si dispongono massimizzando la distanza reciproca. Le coppie solitarie occupano più spazio delle coppie di legame, distorcendo gli angoli (es. H₂O: 104.5° invece di 109.5°).'},
+  {cat:'cristallo',diff:'facile',q:'Quale tipo di legame si forma tra Na⁺ e Cl⁻ nel cristallo di NaCl?',opts:['Legame covalente polare','Legame metallico','Legame ionico','Legame idrogeno'],ans:2,exp:'Il cristallo di NaCl è formato da legami ionici: attrazione elettrostatica tra ioni di carica opposta (Na⁺ e Cl⁻). La struttura cristallina è cubica a facce centrate alternata (coordinazione 6:6) con energia reticolare di ~787 kJ/mol.'},
+  {cat:'cristallo',diff:'medio',q:'Cosa afferma la Legge di Bragg (nλ = 2d·sinθ)?',opts:['La diffrazione dei raggi X avviene quando l\'interferenza costruttiva tra raggi riflessi da piani reticolari a distanza d soddisfa nλ = 2d·sinθ','La velocità della luce è n volte la lunghezza d\'onda divisa per sinθ','La distanza tra atomi è proporzionale alla lunghezza d\'onda usata','L\'angolo di Bragg è sempre 45°'],ans:0,exp:'La legge di Bragg descrive la diffrazione di raggi X dai piani cristallini: interferenza costruttiva si ha quando nλ = 2d·sinθ (n=intero, λ=lunghezza d\'onda, d=distanza interplanare, θ=angolo di Bragg). Base della cristallografia a raggi X (XRD).'},
+  {cat:'cristallo',diff:'medio',q:'Quale ibridazione ha il carbonio del gruppo carbonilico (C=O) nei chetoni?',opts:['sp³','sp²','sp','sp³d²'],ans:1,exp:'Il carbonio del carbonile è sp²: 3 legami σ planari (120°) agli atomi adiacenti + 1 legame π con l\'O formato da orbitali p puri sovrapposti perpendicolarmente al piano. Il doppietto non condiviso dell\'O è in orbitali sp².'},
+  {cat:'cristallo',diff:'medio',q:'Quale tipo di reticolo cristallino ha il diamante?',opts:['Reticolo cubico a corpo centrato (BCC)','Reticolo cubico a facce centrate (FCC)','Reticolo cubico a facce centrate con base tetraedrica (struttura diamante = due FCC interpenetrati)','Reticolo esagonale compatto (HCP)'],ans:2,exp:'Il diamante ha struttura cubica (Fd-3m) equivalente a due reticoli FCC interpenetrati spostati di (1/4,1/4,1/4)a. Ogni C è tetraedrico sp³ con 4 legami C-C covalenti. Questa struttura 3D covalente conferisce al diamante l\'enorme durezza.'},
+  {cat:'cristallo',diff:'medio',q:'Cosa sono le forze di dispersione di London?',opts:['Interazioni tra molecole polari permanenti','Forze tra ioni in soluzione','Attrazioni tra dipoli istantanei e dipoli indotti, presenti in tutte le molecole anche non polari','Legami covalenti deboli tra molecole'],ans:2,exp:'Le forze di London (o forze di dispersione) nascono da fluttuazioni istantanee della distribuzione elettronica che creano dipoli temporanei inducendo dipoli sulle molecole vicine. Aumentano con la polarizzabilità (massa molecolare, superficie): es. I₂ (solido) > F₂ (gas).'},
+  {cat:'cristallo',diff:'medio',q:'Cosa si intende per "polimorfismo" in chimica farmaceutica?',opts:['La presenza di più enantiomeri dello stesso farmaco','La capacità di una sostanza solida di cristallizzare in due o più forme cristalline diverse con stesse proprietà chimiche ma diverse proprietà fisiche','La trasformazione di un farmaco in metaboliti multipli','La solubilità variabile con il pH'],ans:1,exp:'Il polimorfismo cristallino è la capacità di un composto di esistere in più arrangiamenti reticolari (polimorfi). I diversi polimorfi hanno stessa formula ma diversa densità, solubilità, biodisponibilità e stabilità. Es. ritonavir: il polimorfo II aveva biodisponibilità molto inferiore al Form I → crisi nel 1998.'},
+  {cat:'cristallo',diff:'difficile',q:'Come si calcola la densità di un cristallo dalla struttura cristallina?',opts:['ρ = M/V (massa molare / volume cristallino)','ρ = (Z × M) / (NA × Vcella), dove Z è il numero di unità formula per cella, M la massa molare, NA il numero di Avogadro e Vcella il volume della cella unitaria','ρ = NA × M / Vcella','ρ = Z × NA / (M × Vcella)'],ans:1,exp:'La densità cristallina teorica si calcola come ρ = (Z·M)/(NA·Vcella): Z unità formula per cella × massa molare / (Avogadro × volume cella). Si ricava Vcella dai parametri reticolari (a,b,c,α,β,γ) e Z dalla simmetria spaziale del reticolo.'},
+  {cat:'cristallo',diff:'difficile',q:'Cosa sono gli orbitali molecolari di frontiera (HOMO e LUMO)?',opts:['L\'orbitale più basso e più alto dell\'atomo di H','HOMO = Highest Occupied MO (dona elettroni, nucleofilo); LUMO = Lowest Unoccupied MO (accetta elettroni, elettrofilo): governano la reattività chimica secondo la teoria FMO di Fukui','Gli orbitali ibridi sp del carbonio terminale','Gli orbitali che formano i legami σ solo nei sistemi aromatici'],ans:1,exp:'La teoria degli orbitali molecolari di frontiera (FMO, Nobel 1981 a Fukui): la reattività chimica è dominata dall\'interazione HOMO(nucleofilo)-LUMO(elettrofilo). Governa la regioselettività nelle cicloaddizioni (Diels-Alder), nelle reazioni di sostituzione e nel legame farmaco-recettore.'},
+  {cat:'cristallo',diff:'difficile',q:'Quale tecnica permette di determinare la struttura tridimensionale di una proteina a livello atomico?',opts:['Spettroscopia IR','Cristallografia a raggi X su monocristallo (XRD) — la più comune, con risoluzione <2 Å per proteine','Spettrometria di massa MALDI-TOF','Cromatografia HPLC'],ans:1,exp:'La cristallografia a raggi X su monocristallo (XRD) permette di determinare la struttura 3D delle proteine a risoluzione atomica analizzando i pattern di diffrazione e risolvendo la struttura via trasformata di Fourier. Alternative: NMR (proteine <50 kDa) e Cryo-EM (complessi grandi).'},
+  {cat:'cristallo',diff:'difficile',q:'Cosa si intende per "effetto anomerico" in chimica dei carboidrati?',opts:['La preferenza di un sostituente equatoriale rispetto all\'assiale','La preferenza termodinamica del sostituente anomerico (OR) in posizione assiale nei piranoidi, per interazione stereoelecrtonica con gli orbitali n→σ* del ciclo','La mutarotazione osservata nei monosaccaridi sciolti in acqua','La stabilizzazione dell\'anello piranosico dalla tensione di Pitzer'],ans:1,exp:'L\'effetto anomerico: in D-glucopiranosio il sostituente anomerico (OR) preferisce la posizione assiale (α) nonostante la repulsione sterica. La causa è la stabilizzazione stereoelettronica: donazione n(O ring)→σ*(C-OR) è massima quando n e σ* sono antiperiplanari (configurazione α).'},
+  {cat:'cristallo',diff:'medio',q:'Qual è la geometria prevista dalla VSEPR per SF₆?',opts:['Tetraedrica','Ottaedrica','Bipiramide trigonale','Planare quadrata'],ans:1,exp:'SF₆: S centrale con 6 coppie di legame e 0 coppie solitarie → geometria ottaedrica con angoli di 90°. Il S usa ibridazione sp³d² (utilizza gli orbitali d del terzo periodo per ospitare 6 legami).'}
+];
+
+/* ══════════════════════════════════════════════════
+   LEVELS & CONFIG
+══════════════════════════════════════════════════ */
+const LEVELS = [
+  {lv:1,  name:'Molecola',   min:0,    max:100},
+  {lv:2,  name:'Atomo',      min:101,  max:250},
+  {lv:3,  name:'Ione',       min:251,  max:500},
+  {lv:4,  name:'Legame',     min:501,  max:900},
+  {lv:5,  name:'Composto',   min:901,  max:1400},
+  {lv:6,  name:'Formula',    min:1401, max:2100},
+  {lv:7,  name:'Reazione',   min:2101, max:3000},
+  {lv:8,  name:'Meccanismo', min:3001, max:4200},
+  {lv:9,  name:'Struttura',  min:4201, max:5800},
+  {lv:10, name:'Maestro',    min:5801, max:Infinity}
+];
+
+const XP_MAP    = {facile:5, medio:10, difficile:20};
+const TIMER_MAP = {facile:45, medio:30, difficile:20};
+
+const CATS = [
+  {id:'biochimica', label:'Biochimica',       icon:'🧬', color:'var(--accent)', desc:'Molecole e metabolismo'},
+  {id:'organica',   label:'Chimica Organica', icon:'⚗️',  color:'var(--coral)',  desc:'Struttura e reattività'},
+  {id:'spettri',    label:'Spettroscopia',    icon:'📊', color:'var(--violet)', desc:'IR, NMR, MS, UV-Vis'},
+  {id:'termo',      label:'Termodinamica',    icon:'🔥', color:'var(--amber)',  desc:'Energia e spontaneità'},
+  {id:'cinetica',   label:'Cinetica',         icon:'⏱️',  color:'#60a5fa',      desc:'Velocità di reazione'},
+  {id:'stec',       label:'Stechiometria',    icon:'⚖️',  color:'#34d399',      desc:'Calcoli e resa'},
+  {id:'inorganica', label:'Chimica Inorganica',icon:'⚛️',  color:'#f97316',      desc:'Struttura, legami e complessi'},
+  {id:'analitica',  label:'Chimica Analitica', icon:'🔬', color:'#22d3ee',      desc:'Equilibri, titolazioni e strumentale'},
+  {id:'farmacologia',label:'Farmacologia',     icon:'💊', color:'#e879f9',      desc:'Meccanismi d\'azione e farmaci prototipo'},
+  {id:'farmaceutica',label:'Chimica Farmaceutica',icon:'🔭',color:'#fb923c',   desc:'SAR, profarmaci, ADME e design molecolare'},
+  {id:'fisica',      label:'Chimica Fisica',   icon:'⚡', color:'#a78bfa',      desc:'Termodinamica, cinetica ed elettrochimica avanzata'},
+  {id:'fisiologia',  label:'Fisiologia',       icon:'🫀', color:'#f43f5e',      desc:'Metabolismo, ormoni e fisiologia cellulare'},
+  {id:'cristallo',   label:'Cristallografia',  icon:'💎', color:'#67e8f9',      desc:'Ibridazione, VSEPR, forze intermolecolari e reticoli'}
+];
+
+/* ══════════════════════════════════════════════════
+   STATE & PERSISTENCE
+══════════════════════════════════════════════════ */
+const LS_KEY = 'bsi_academy_v2';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(_) {}
+  return {xp:0, streak:0, lastDate:null, catStats:{}};
+}
+
+function saveState(s) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch(_) {}
+}
+
+let state = loadState();
+
+/* Check and update streak on page load */
+(function initStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (!state.lastDate) return;
+  const diffMs   = new Date(today) - new Date(state.lastDate);
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays > 1) { state.streak = 0; saveState(state); }
+})();
+
+function recordPlay() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (state.lastDate === today) return;
+  if (state.lastDate) {
+    const diff = Math.round((new Date(today) - new Date(state.lastDate)) / 86400000);
+    state.streak = diff === 1 ? state.streak + 1 : 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastDate = today;
+  saveState(state);
+}
+
+function getMultiplier() {
+  if (state.streak >= 7) return 2.0;
+  if (state.streak >= 3) return 1.5;
+  return 1.0;
+}
+
+function getLevelInfo(xp) {
+  for (const lv of LEVELS) {
+    if (xp <= lv.max) return lv;
+  }
+  return LEVELS[LEVELS.length - 1];
+}
+
+/* ══════════════════════════════════════════════════
+   VIEW MANAGEMENT
+══════════════════════════════════════════════════ */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════
+   TOP-BAR / XP BAR UPDATES
+══════════════════════════════════════════════════ */
+function updateTopBar() {
+  const lv = getLevelInfo(state.xp);
+  document.getElementById('streak-val').textContent  = state.streak;
+  document.getElementById('level-badge').textContent = 'Lv' + lv.lv + ' ' + lv.name;
+  document.getElementById('stat-total-xp').textContent = state.xp;
+  document.getElementById('stat-streak').textContent   = state.streak;
+
+  let total = 0, right = 0;
+  for (const k of Object.keys(state.catStats || {})) {
+    total += (state.catStats[k].total || 0);
+    right += (state.catStats[k].right || 0);
+  }
+  document.getElementById('stat-accuracy').textContent =
+    total > 0 ? Math.round(right / total * 100) + '%' : '–';
+
+  updateXPBar();
+}
+
+function updateXPBar() {
+  const lv    = getLevelInfo(state.xp);
+  const isMax = lv.lv === 10;
+  const xpIn  = state.xp - lv.min;
+  const range = isMax ? 1 : (lv.max - lv.min + 1);
+  const pct   = isMax ? 100 : Math.min(100, Math.round(xpIn / range * 100));
+  document.getElementById('xp-bar-inner').style.width = pct + '%';
+  document.getElementById('xp-bar-text').textContent  = state.xp + ' XP';
+  document.getElementById('xp-bar-next').textContent  = isMax
+    ? '🏆 Livello massimo!'
+    : (lv.max - state.xp + 1) + ' XP al prossimo livello';
+}
+
+/* ══════════════════════════════════════════════════
+   XP POPUP
+══════════════════════════════════════════════════ */
+function showXPPopup(amount) {
+  const el = document.getElementById('xp-popup');
+  el.textContent = '+' + amount + ' XP';
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+/* ══════════════════════════════════════════════════
+   LEVEL-UP OVERLAY
+══════════════════════════════════════════════════ */
+function showLevelUp(lvName) {
+  document.getElementById('lvlup-name').textContent = lvName;
+  document.getElementById('lvlup-ov').classList.add('show');
+}
+document.getElementById('lvlup-close').addEventListener('click', () => {
+  document.getElementById('lvlup-ov').classList.remove('show');
+});
+
+/* ══════════════════════════════════════════════════
+   CATEGORY GRID
+══════════════════════════════════════════════════ */
+function buildCatGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  for (const cat of CATS) {
+    const cs    = state.catStats[cat.id] || {total:0, right:0};
+    const pct   = cs.total > 0 ? Math.round(cs.right / cs.total * 100) : 0;
+    const count = QUESTIONS.filter(q => q.cat === cat.id).length;
+    const card  = document.createElement('div');
+    card.className = 'cat-card';
+    card.style.borderTop = '3px solid ' + cat.color;
+    card.innerHTML =
+      '<div class="cat-icon">' + cat.icon + '</div>' +
+      '<div class="cat-name">' + cat.label + '</div>' +
+      '<div class="cat-sub">'  + cat.desc  + ' · ' + count + ' domande</div>' +
+      '<div class="cat-prog-bar"><div class="cat-prog-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="cat-score">' + (cs.total > 0 ? pct + '% accuratezza' : 'Non ancora giocato') + '</div>';
+    card.addEventListener('click', () => openCategory(cat));
+    grid.appendChild(card);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   CATEGORY VIEW
+══════════════════════════════════════════════════ */
+let currentCat  = null;
+
+function openCategory(cat) {
+  currentCat = cat;
+  document.getElementById('cat-view-title').textContent = cat.icon + ' ' + cat.label;
+  document.getElementById('cat-view-desc').textContent  = cat.desc;
+  showView('category-view');
+}
+
+document.getElementById('cat-back').addEventListener('click', () => {
+  buildCatGrid();
+  updateTopBar();
+  showView('dashboard-view');
+});
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const diff = btn.dataset.diff;
+    const pool = QUESTIONS.filter(q => q.cat === currentCat.id && q.diff === diff);
+    startQuiz(pool, diff, currentCat.id);
+  });
+});
+
+document.getElementById('start-all-btn').addEventListener('click', () => {
+  const pool = QUESTIONS.filter(q => q.cat === currentCat.id);
+  startQuiz(pool, 'misto', currentCat.id);
+});
+
+/* ══════════════════════════════════════════════════
+   QUIZ ENGINE
+══════════════════════════════════════════════════ */
+let quizState     = null;
+let timerInterval = null;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function startQuiz(pool, diff, catId) {
+  if (!pool.length) { alert('Nessuna domanda disponibile per questa selezione!'); return; }
+  const questions = shuffle(pool).slice(0, Math.min(10, pool.length));
+  quizState = {
+    questions,
+    catId,
+    diff,
+    index:    0,
+    correct:  0,
+    wrong:    0,
+    totalXP:  0,
+    answered: false
+  };
+  recordPlay();
+  showView('quiz-view');
+  renderQuestion();
+}
+
+// ── Modalità Esame: 20 domande miste da tutte le categorie, a tempo ──
+function startExam(){
+  var pool=shuffle(QUESTIONS.slice());
+  var questions=pool.slice(0,Math.min(20,pool.length));
+  if(!questions.length){alert('Nessuna domanda disponibile!');return;}
+  quizState={questions:questions,catId:'exam',diff:'esame',index:0,correct:0,wrong:0,totalXP:0,answered:false,isExam:true};
+  recordPlay(); showView('quiz-view'); renderQuestion();
+}
+// ── Sfida Veloce: 5 domande difficili, tempo ridotto ──
+function startChallenge(){
+  var hard=QUESTIONS.filter(function(q){return q.diff==='difficile'||q.diff==='media';});
+  if(hard.length<5) hard=QUESTIONS.slice();
+  var questions=shuffle(hard).slice(0,5);
+  quizState={questions:questions,catId:'challenge',diff:'sfida',index:0,correct:0,wrong:0,totalXP:0,answered:false,isChallenge:true};
+  recordPlay(); showView('quiz-view'); renderQuestion();
+}
+
+
+function renderQuestion() {
+  const q     = quizState.questions[quizState.index];
+  const total = quizState.questions.length;
+  quizState.answered = false;
+
+  /* progress bar */
+  const progPct = quizState.index / total * 100;
+  document.getElementById('quiz-progress-inner').style.width = progPct + '%';
+  document.getElementById('quiz-counter').textContent = (quizState.index + 1) + ' / ' + total;
+
+  /* difficulty badge */
+  const badge = document.getElementById('quiz-diff-badge');
+  badge.textContent = q.diff.toUpperCase();
+  const bgMap   = {facile:'rgba(34,197,94,0.18)', medio:'rgba(255,180,84,0.18)', difficile:'rgba(255,107,107,0.18)'};
+  const colMap  = {facile:'#86efac', medio:'var(--amber)', difficile:'var(--coral)'};
+  badge.style.background = bgMap[q.diff]  || bgMap.medio;
+  badge.style.color      = colMap[q.diff] || colMap.medio;
+
+  /* question text */
+  document.getElementById('quiz-question').textContent = q.q;
+
+  /* options */
+  const wrap   = document.getElementById('opts-wrap');
+  wrap.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className   = 'opt';
+    btn.textContent = labels[i] + '. ' + opt;
+    btn.addEventListener('click', () => answerQuestion(i, q));
+    wrap.appendChild(btn);
+  });
+
+  /* explanation */
+  const expBox = document.getElementById('explanation-box');
+  expBox.textContent = '';
+  expBox.classList.remove('visible');
+
+  /* next button */
+  document.getElementById('next-btn').style.display = 'none';
+
+  /* timer */
+  startTimer(q.diff);
+}
+
+function startTimer(diff) {
+  clearInterval(timerInterval);
+  const maxT   = TIMER_MAP[diff] || 30;
+  let remaining = maxT;
+  const timerVal = document.getElementById('timer-val');
+  const timerBar = document.getElementById('timer-bar-inner');
+
+  function tick() {
+    timerVal.textContent        = remaining;
+    timerBar.style.width        = (remaining / maxT * 100) + '%';
+    if (remaining <= 5) {
+      timerVal.style.color   = 'var(--coral)';
+      timerBar.style.background = 'var(--coral)';
+    } else {
+      timerVal.style.color   = 'var(--text)';
+      timerBar.style.background = 'var(--accent)';
+    }
+    if (remaining <= 0) { clearInterval(timerInterval); if (!quizState.answered) timeOut(); }
+    remaining--;
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+function timeOut() {
+  quizState.answered = true;
+  quizState.wrong++;
+  const q    = quizState.questions[quizState.index];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.ans) btn.classList.add('correct');
+  });
+  updateCatStats(quizState.catId, false);
+  showExplanation('⏱ Tempo scaduto! ' + q.exp);
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function answerQuestion(chosen, q) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  clearInterval(timerInterval);
+
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.ans)                           btn.classList.add('correct');
+    else if (i === chosen && chosen !== q.ans) btn.classList.add('wrong');
+  });
+
+  const isCorrect = chosen === q.ans;
+  updateCatStats(quizState.catId, isCorrect);
+
+  if (isCorrect) {
+    quizState.correct++;
+    const baseXP = XP_MAP[q.diff] || 10;
+    const mult   = getMultiplier();
+    const earned = Math.round(baseXP * mult);
+    quizState.totalXP += earned;
+
+    const prevLv = getLevelInfo(state.xp).lv;
+    state.xp    += earned;
+    saveState(state);
+
+    const newLv  = getLevelInfo(state.xp).lv;
+    showXPPopup(earned);
+    updateTopBar();
+
+    if (newLv > prevLv) {
+      const info = getLevelInfo(state.xp);
+      setTimeout(() => showLevelUp('Lv' + info.lv + ' ' + info.name), 600);
+    }
+  } else {
+    quizState.wrong++;
+    updateTopBar();
+  }
+
+  showExplanation(q.exp);
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function updateCatStats(catId, correct) {
+  if (!state.catStats[catId]) state.catStats[catId] = {total:0, right:0};
+  state.catStats[catId].total++;
+  if (correct) state.catStats[catId].right++;
+  saveState(state);
+}
+
+function showExplanation(text) {
+  const box = document.getElementById('explanation-box');
+  box.textContent = text;
+  box.classList.add('visible');
+}
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  quizState.index++;
+  if (quizState.index >= quizState.questions.length) endQuiz();
+  else renderQuestion();
+});
+
+/* ══════════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════════ */
+let lastReplayCat  = null;
+let lastReplayPool = null;
+
+function endQuiz() {
+  clearInterval(timerInterval);
+  const total  = quizState.questions.length;
+  const pct    = Math.round(quizState.correct / total * 100);
+  const mult   = getMultiplier();
+
+  lastReplayCat  = currentCat;
+  lastReplayPool = QUESTIONS.filter(q => q.cat === quizState.catId);
+
+  document.getElementById('res-pct').textContent         = pct + '%';
+  document.getElementById('res-correct').textContent     = quizState.correct;
+  document.getElementById('res-wrong').textContent       = quizState.wrong;
+  document.getElementById('res-streak-bonus').textContent = '×' + mult.toFixed(1);
+  document.getElementById('res-xp').textContent          = '+' + quizState.totalXP + ' XP guadagnati';
+
+  if (pct >= 80) {
+    document.getElementById('res-title').textContent = '🎉 Ottimo lavoro!';
+    launchConfetti();
+  } else if (pct >= 50) {
+    document.getElementById('res-title').textContent = '👍 Buon tentativo!';
+  } else {
+    document.getElementById('res-title').textContent = '📚 Riprova, puoi farcela!';
+  }
+
+  document.getElementById('quiz-progress-inner').style.width = '100%';
+  showView('results-view');
+  updateTopBar();
+}
+
+document.getElementById('res-again').addEventListener('click', () => {
+  if (lastReplayCat) {
+    currentCat = lastReplayCat;
+    startQuiz(lastReplayPool || QUESTIONS.filter(q => q.cat === lastReplayCat.id), 'misto', lastReplayCat.id);
+  }
+});
+
+document.getElementById('res-home').addEventListener('click', () => {
+  buildCatGrid();
+  updateTopBar();
+  showView('dashboard-view');
+});
+
+/* ══════════════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════════════ */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#00c9b7','#ffb454','#ff6b6b','#b794f6','#60a5fa','#34d399','#ffffff'];
+  const pieces = [];
+
+  for (let i = 0; i < 130; i++) {
+    pieces.push({
+      x:   Math.random() * canvas.width,
+      y:   Math.random() * canvas.height - canvas.height,
+      w:   Math.random() * 10 + 5,
+      h:   Math.random() * 6  + 3,
+      col: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      vy:  Math.random() * 3 + 2,
+      vx:  (Math.random() - 0.5) * 2.5,
+      vr:  (Math.random() - 0.5) * 0.15
+    });
+  }
+
+  let frame = 0;
+  const MAX  = 240;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const alpha = Math.max(0, 1 - frame / MAX);
+    for (const p of pieces) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.y  += p.vy;
+      p.x  += p.vx;
+      p.rot += p.vr;
+    }
+    frame++;
+    if (frame < MAX) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  requestAnimationFrame(draw);
+}
+
+/* ══════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════ */
+buildCatGrid();
+updateTopBar();
+</script>
+</body>
+</html>

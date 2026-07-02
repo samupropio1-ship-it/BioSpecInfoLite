@@ -49,6 +49,9 @@ tr:nth-child(even) td{background:rgba(7,18,33,.4)}
 .widget{background:#071221;border:1px solid #1c3a57;border-radius:7px;padding:12px;margin:.7em 0}
 .wt{color:#00c9b7;font-weight:700;font-size:.88rem;margin-bottom:8px}
 canvas{display:block;margin:0 auto;background:#0a1b2e;border-radius:5px}
+.mol-row{display:flex;gap:8px;flex-wrap:wrap;margin:.7em 0 .4em}
+.mol-box{background:#071221;border:1px solid #1c3a57;border-radius:7px;padding:7px 8px;text-align:center;flex-shrink:0}
+.mol-lbl{font-size:.7rem;color:#9fb3c8;margin-top:3px;text-align:center}
 .cr{display:flex;align-items:center;gap:9px;margin-top:9px;flex-wrap:wrap}
 .cr label{color:#9fb3c8;font-size:.8rem}
 input[type=range]{-webkit-appearance:none;height:4px;background:#1c3a57;border-radius:2px;flex:1;min-width:100px}
@@ -79,6 +82,8 @@ select{background:#0d2236;color:#e8eef4;border:1px solid #1c3a57;border-radius:4
   <a class="nav-s" onclick="goS('s15')"><span class="nav-num">15</span>Amminoacidi &amp; Proteine</a>
   <a class="nav-s" onclick="goS('s16')"><span class="nav-num">16</span>Lipidi</a>
   <a class="nav-s" onclick="goS('s17')"><span class="nav-num">17</span>Nucleosidi &amp; Nucleotidi</a>
+  <a class="nav-s" onclick="goS('s18')"><span class="nav-num">18</span>Sintesi Animate ✨</a>
+  <a class="nav-s" onclick="goS('s19')"><span class="nav-num">19</span>Reazioni Nominali 📖</a>
 </nav>
 <div id="main">
 <h1>⚗️ Chimica Organica 1 + 2</h1>
@@ -87,6 +92,8 @@ select{background:#0d2236;color:#e8eef4;border:1px solid #1c3a57;border-radius:4
 <!-- S1 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s1">
 <h2>1 · Fondamenti della Chimica Organica</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 160 80" width="160" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="80.0" y1="40.0" x2="56.2" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="40.0" x2="103.8" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="40.0" x2="80.0" y2="16.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="40.0" x2="80.0" y2="63.8" stroke="#a0b8cc" stroke-width="1.5"/><rect x="74.5" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">C</text><rect x="50.7" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="56.2" y="40.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="98.3" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="103.8" y="40.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="74.5" y="8.7" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="16.2" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="74.5" y="56.3" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="63.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">CH₄ (sp³)</div></div><div class="mol-box"><svg viewBox="0 0 160 80" width="160" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="64.6" y1="42.3" x2="95.4" y2="42.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="37.7" x2="95.4" y2="37.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="40.0" x2="45.0" y2="23.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="40.0" x2="45.0" y2="56.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="95.4" y1="40.0" x2="115.0" y2="23.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="95.4" y1="40.0" x2="115.0" y2="56.8" stroke="#a0b8cc" stroke-width="1.5"/><rect x="59.1" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="64.6" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">C</text><rect x="89.9" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="95.4" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">C</text><rect x="39.5" y="15.7" width="11" height="15" fill="#0a1b2e"/><text x="45.0" y="23.2" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="39.5" y="49.3" width="11" height="15" fill="#0a1b2e"/><text x="45.0" y="56.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="109.5" y="15.7" width="11" height="15" fill="#0a1b2e"/><text x="115.0" y="23.2" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="109.5" y="49.3" width="11" height="15" fill="#0a1b2e"/><text x="115.0" y="56.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">C₂H₄ (sp²)</div></div><div class="mol-box"><svg viewBox="0 0 160 70" width="160" height="70" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="64.6" y1="35.0" x2="95.4" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="38.8" x2="95.4" y2="38.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="31.2" x2="95.4" y2="31.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="64.6" y1="35.0" x2="46.4" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="95.4" y1="35.0" x2="113.6" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="59.1" y="27.5" width="11" height="15" fill="#0a1b2e"/><text x="64.6" y="35.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">C</text><rect x="89.9" y="27.5" width="11" height="15" fill="#0a1b2e"/><text x="95.4" y="35.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">C</text><rect x="40.9" y="27.5" width="11" height="15" fill="#0a1b2e"/><text x="46.4" y="35.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="108.1" y="27.5" width="11" height="15" fill="#0a1b2e"/><text x="113.6" y="35.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">C₂H₂ (sp)</div></div></div>
+
 <h3>1.1 Orbitali ibridi e geometria</h3>
 <div class="card">
 <table>
@@ -239,6 +246,8 @@ H–C–OH   →  D-gliceraldeide (R)
 <!-- S4 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s4">
 <h2>4 · Alcheni e Alchini</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 175 90" width="175" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="71.5" y1="47.3" x2="103.5" y2="47.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="42.7" x2="103.5" y2="42.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="45.0" x2="44.3" y2="24.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="45.0" x2="44.3" y2="65.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.5" y1="45.0" x2="130.7" y2="24.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.5" y1="45.0" x2="130.7" y2="65.8" stroke="#a0b8cc" stroke-width="1.5"/><rect x="31.8" y="16.7" width="25" height="15" fill="#0a1b2e"/><text x="44.3" y="24.2" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="38.8" y="58.3" width="11" height="15" fill="#0a1b2e"/><text x="44.3" y="65.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="125.2" y="16.7" width="11" height="15" fill="#0a1b2e"/><text x="130.7" y="24.2" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="118.2" y="58.3" width="25" height="15" fill="#0a1b2e"/><text x="130.7" y="65.8" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text></svg><div class="mol-lbl">(E)-but-2-ene</div></div><div class="mol-box"><svg viewBox="0 0 175 90" width="175" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="71.5" y1="47.3" x2="103.5" y2="47.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="42.7" x2="103.5" y2="42.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="45.0" x2="44.3" y2="24.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.5" y1="45.0" x2="44.3" y2="65.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.5" y1="45.0" x2="130.7" y2="24.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.5" y1="45.0" x2="130.7" y2="65.8" stroke="#a0b8cc" stroke-width="1.5"/><rect x="31.8" y="16.7" width="25" height="15" fill="#0a1b2e"/><text x="44.3" y="24.2" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="38.8" y="58.3" width="11" height="15" fill="#0a1b2e"/><text x="44.3" y="65.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text><rect x="118.2" y="16.7" width="25" height="15" fill="#0a1b2e"/><text x="130.7" y="24.2" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="125.2" y="58.3" width="11" height="15" fill="#0a1b2e"/><text x="130.7" y="65.8" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">(Z)-but-2-ene</div></div><div class="mol-box"><svg viewBox="0 0 160 70" width="160" height="70" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="62.0" y1="35.0" x2="98.0" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="62.0" y1="38.8" x2="98.0" y2="38.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="62.0" y1="31.2" x2="98.0" y2="31.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="62.0" y1="35.0" x2="39.5" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="98.0" y1="35.0" x2="125.0" y2="50.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="112.5" y="42.5" width="25" height="15" fill="#0a1b2e"/><text x="125.0" y="50.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="34.0" y="27.5" width="11" height="15" fill="#0a1b2e"/><text x="39.5" y="35.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">1-butino</div></div></div>
+
 <h3>4.1 Isomeria E/Z e Markovnikov</h3>
 <div class="card">
 <p><strong>E/Z</strong>: priorità CIP; E = gruppi ad alta priorità su lati opposti; Z = stesso lato.</p>
@@ -274,6 +283,8 @@ R–C≡C⁻ + R'–X (1°)  →  R–C≡C–R'  (allungamento catena)</div>
 <!-- S5 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s5">
 <h2>5 · Aromatici e Sostituzione Elettrofila (SEA)</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="13.0" x2="72.7" y2="29.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="29.0" x2="72.7" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="61.0" x2="45.0" y2="77.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.0" y1="77.0" x2="17.3" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="17.3" y1="61.0" x2="17.3" y2="29.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="17.3" y1="29.0" x2="45.0" y2="13.0" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="45.0" cy="45.0" r="19.8" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/></svg><div class="mol-lbl">Benzene</div></div><div class="mol-box"><svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="13.0" x2="72.7" y2="29.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="29.0" x2="72.7" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="61.0" x2="45.0" y2="77.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.0" y1="77.0" x2="17.3" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="17.3" y1="61.0" x2="17.3" y2="29.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="17.3" y1="29.0" x2="45.0" y2="13.0" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="45.0" cy="45.0" r="19.8" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><rect x="39.5" y="5.5" width="11" height="15" fill="#0a1b2e"/><text x="45.0" y="13.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text></svg><div class="mol-lbl">Piridina</div></div><div class="mol-box"><svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="21.0" x2="70.9" y2="39.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="68.7" y1="39.1" x2="58.8" y2="69.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="73.1" y1="40.5" x2="63.2" y2="70.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="61.0" y1="70.2" x2="29.0" y2="70.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="31.2" y1="69.5" x2="21.3" y2="39.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="26.8" y1="70.9" x2="16.9" y2="40.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="19.1" y1="39.8" x2="45.0" y2="21.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="36.0" y="13.5" width="18" height="15" fill="#0a1b2e"/><text x="45.0" y="21.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH</text></svg><div class="mol-lbl">Pirrolo</div></div><div class="mol-box"><svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="21.0" x2="70.9" y2="39.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="68.7" y1="39.1" x2="58.8" y2="69.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="73.1" y1="40.5" x2="63.2" y2="70.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="61.0" y1="70.2" x2="29.0" y2="70.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="31.2" y1="69.5" x2="21.3" y2="39.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="26.8" y1="70.9" x2="16.9" y2="40.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="19.1" y1="39.8" x2="45.0" y2="21.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="39.5" y="13.5" width="11" height="15" fill="#0a1b2e"/><text x="45.0" y="21.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Furano</div></div><div class="mol-box"><svg viewBox="0 0 200 90" width="200" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="100.0" y1="33.0" x2="79.2" y2="21.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="79.2" y1="21.0" x2="58.4" y2="33.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.4" y1="33.0" x2="58.4" y2="57.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.4" y1="57.0" x2="79.2" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="79.2" y1="69.0" x2="100.0" y2="57.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="57.0" x2="100.0" y2="33.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="33.0" x2="120.8" y2="21.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="120.8" y1="21.0" x2="141.6" y2="33.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="141.6" y1="33.0" x2="141.6" y2="57.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="141.6" y1="57.0" x2="120.8" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="120.8" y1="69.0" x2="100.0" y2="57.0" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="79.2" cy="45.0" r="13.2" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><circle cx="120.8" cy="45.0" r="13.2" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/></svg><div class="mol-lbl">Naftalene</div></div></div>
+
 <h3>5.1 Regola di Hückel</h3>
 <div class="card">
 <p>Aromatico se: ciclico + planare + sistema π continuo + <strong>4n+2 elettroni π</strong> (n=0,1,2,…).</p>
@@ -381,6 +392,8 @@ R–C≡C⁻ + R'–X (1°)  →  R–C≡C–R'  (allungamento catena)</div>
 <!-- S7 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s7">
 <h2>7 · Alcoli, Eteri ed Epossidi</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 150 80" width="150" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="23.0" x2="75.0" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.0" y1="40.0" x2="104.4" y2="23.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="15.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="23.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="62.5" y="32.5" width="25" height="15" fill="#0a1b2e"/><text x="75.0" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="98.9" y="15.5" width="11" height="15" fill="#0a1b2e"/><text x="104.4" y="23.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Etanolo</div></div><div class="mol-box"><svg viewBox="0 0 190 80" width="190" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="43.0" y1="55.0" x2="69.0" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.0" y1="40.0" x2="95.0" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="95.0" y1="55.0" x2="121.0" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="121.0" y1="40.0" x2="147.0" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="30.5" y="47.5" width="25" height="15" fill="#0a1b2e"/><text x="43.0" y="55.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="89.5" y="47.5" width="11" height="15" fill="#0a1b2e"/><text x="95.0" y="55.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="134.5" y="47.5" width="25" height="15" fill="#0a1b2e"/><text x="147.0" y="55.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text></svg><div class="mol-lbl">Dietil etere</div></div><div class="mol-box"><svg viewBox="0 0 110 80" width="110" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="37.0" y1="50.8" x2="73.0" y2="50.8" stroke="#a0b8cc" stroke-width="1.5"/><line x1="37.0" y1="50.8" x2="55.0" y2="22.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="73.0" y1="50.8" x2="55.0" y2="22.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="49.5" y="14.5" width="11" height="15" fill="#0a1b2e"/><text x="55.0" y="22.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Epossido</div></div><div class="mol-box"><svg viewBox="0 0 90 110" width="90" height="110" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="27.0" x2="69.2" y2="41.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="41.0" x2="69.2" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="69.0" x2="45.0" y2="83.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.0" y1="83.0" x2="20.8" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="69.0" x2="20.8" y2="41.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="41.0" x2="45.0" y2="27.0" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="45.0" cy="55.0" r="17.4" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><line x1="45.0" y1="-24.8" x2="45.0" y2="27.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="36.0" y="-32.3" width="18" height="15" fill="#0a1b2e"/><text x="45.0" y="-24.8" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">Fenolo</div></div></div>
+
 <h3>7.1 Proprietà e reazioni degli alcoli</h3>
 <div class="card">
 <p><strong>Legami H:</strong> punti di ebollizione molto più alti degli alcani analoghi. Solubilità decresce con la catena (C1–C3 miscibili, &gt;C4 parzialmente, &gt;C6 immiscibili).</p>
@@ -410,6 +423,8 @@ R–O⁻ + R'–X (1°) → R–O–R' + X⁻   (SN2)</div>
 <!-- S8 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s8">
 <h2>8 · Aldeidi e Chetoni</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 150 80" width="150" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="57.0" x2="75.0" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="73.8" y1="42.0" x2="103.2" y2="59.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="76.2" y1="38.0" x2="105.6" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="49.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="57.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="66.0" y="32.5" width="18" height="15" fill="#0a1b2e"/><text x="75.0" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH</text><rect x="98.9" y="49.5" width="11" height="15" fill="#0a1b2e"/><text x="104.4" y="57.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Acetaldeide</div></div><div class="mol-box"><svg viewBox="0 0 150 90" width="150" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="28.0" x2="75.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.3" y1="45.0" x2="77.3" y2="7.6" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="45.0" x2="72.7" y2="7.6" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.0" y1="45.0" x2="104.4" y2="28.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="20.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="28.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="69.5" y="0.1" width="11" height="15" fill="#0a1b2e"/><text x="75.0" y="7.6" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="91.9" y="20.5" width="25" height="15" fill="#0a1b2e"/><text x="104.4" y="28.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text></svg><div class="mol-lbl">Acetone</div></div><div class="mol-box"><svg viewBox="0 0 90 115" width="90" height="115" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="29.5" x2="69.2" y2="43.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="43.5" x2="69.2" y2="71.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="71.5" x2="45.0" y2="85.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.0" y1="85.5" x2="20.8" y2="71.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="71.5" x2="20.8" y2="43.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="43.5" x2="45.0" y2="29.5" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="45.0" cy="57.5" r="17.4" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><line x1="45.0" y1="-22.3" x2="45.0" y2="29.5" stroke="#a0b8cc" stroke-width="1.5"/><rect x="32.5" y="-29.8" width="25" height="15" fill="#0a1b2e"/><text x="45.0" y="-22.3" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CHO</text></svg><div class="mol-lbl">Benzaldeide</div></div><div class="mol-box"><svg viewBox="0 0 95 105" width="95" height="105" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="47.5" y1="30.1" x2="71.7" y2="44.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.7" y1="44.1" x2="71.7" y2="72.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.7" y1="72.1" x2="47.5" y2="86.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="47.5" y1="86.1" x2="23.3" y2="72.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="23.3" y1="72.1" x2="23.3" y2="44.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="23.3" y1="44.1" x2="47.5" y2="30.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="49.8" y1="30.1" x2="49.8" y2="-0.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.2" y1="30.1" x2="45.2" y2="-0.7" stroke="#a0b8cc" stroke-width="1.5"/><rect x="42.0" y="-8.2" width="11" height="15" fill="#0a1b2e"/><text x="47.5" y="-0.7" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Cicloesanone</div></div></div>
+
 <h3>8.1 Addizioni nucleofile al C=O</h3>
 <div class="card">
 <table>
@@ -455,6 +470,8 @@ pKₐ(α-H chetone) ~ 20   pKₐ(α-H estere) ~ 25</div>
 <!-- S9 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s9">
 <h2>9 · Acidi Carbossilici e Derivati</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 150 90" width="150" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="62.0" x2="75.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.0" y1="45.0" x2="104.4" y2="62.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.3" y1="45.0" x2="77.3" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="45.0" x2="72.7" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="54.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="62.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="95.4" y="54.5" width="18" height="15" fill="#0a1b2e"/><text x="104.4" y="62.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="69.5" y="3.5" width="11" height="15" fill="#0a1b2e"/><text x="75.0" y="11.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Ac. acetico</div></div><div class="mol-box"><svg viewBox="0 0 190 90" width="190" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="50.0" y1="60.0" x2="80.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="45.0" x2="110.0" y2="60.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="110.0" y1="60.0" x2="140.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.3" y1="45.0" x2="82.3" y2="15.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.7" y1="45.0" x2="77.7" y2="15.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="37.5" y="52.5" width="25" height="15" fill="#0a1b2e"/><text x="50.0" y="60.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="104.5" y="52.5" width="11" height="15" fill="#0a1b2e"/><text x="110.0" y="60.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="127.5" y="37.5" width="25" height="15" fill="#0a1b2e"/><text x="140.0" y="45.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="74.5" y="7.5" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="15.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Estere (CH₃COOMe)</div></div><div class="mol-box"><svg viewBox="0 0 150 90" width="150" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="62.0" x2="75.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.0" y1="45.0" x2="104.4" y2="62.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.3" y1="45.0" x2="77.3" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="45.0" x2="72.7" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="54.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="62.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="91.9" y="54.5" width="25" height="15" fill="#0a1b2e"/><text x="104.4" y="62.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH₂</text><rect x="69.5" y="3.5" width="11" height="15" fill="#0a1b2e"/><text x="75.0" y="11.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Acetammide</div></div><div class="mol-box"><svg viewBox="0 0 150 90" width="150" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.6" y1="62.0" x2="75.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.0" y1="45.0" x2="104.4" y2="62.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.3" y1="45.0" x2="77.3" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="72.7" y1="45.0" x2="72.7" y2="11.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="33.1" y="54.5" width="25" height="15" fill="#0a1b2e"/><text x="45.6" y="62.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="95.4" y="54.5" width="18" height="15" fill="#0a1b2e"/><text x="104.4" y="62.0" fill="#4caf80" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">Cl</text><rect x="69.5" y="3.5" width="11" height="15" fill="#0a1b2e"/><text x="75.0" y="11.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Cloruro acilico</div></div></div>
+
 <h3>9.1 Scala di reattività</h3>
 <div class="card">
 <div class="formula">Alogenuri acilici &gt; Anidridi &gt; Esteri ≈ Acidi &gt; Ammidi &gt;&gt; Carbossilato⁻
@@ -486,6 +503,8 @@ Un derivato più reattivo può formare uno meno reattivo, NON viceversa direttam
 <!-- S10 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s10">
 <h2>10 · Ammine e Diazotazione</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 140 70" width="140" height="70" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="44.8" y1="35.0" x2="95.2" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="32.3" y="27.5" width="25" height="15" fill="#0a1b2e"/><text x="44.8" y="35.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="82.7" y="27.5" width="25" height="15" fill="#0a1b2e"/><text x="95.2" y="35.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH₂</text></svg><div class="mol-lbl">Metilamina</div></div><div class="mol-box"><svg viewBox="0 0 160 80" width="160" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="80.0" y1="40.0" x2="50.6" y2="23.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="40.0" x2="109.4" y2="23.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.0" y1="40.0" x2="80.0" y2="74.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="74.5" y="32.5" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="40.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="38.1" y="15.5" width="25" height="15" fill="#0a1b2e"/><text x="50.6" y="23.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="96.9" y="15.5" width="25" height="15" fill="#0a1b2e"/><text x="109.4" y="23.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="74.5" y="66.5" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="74.0" fill="#7a93a8" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H</text></svg><div class="mol-lbl">Dimetilamina</div></div><div class="mol-box"><svg viewBox="0 0 90 110" width="90" height="110" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="45.0" y1="27.0" x2="69.2" y2="41.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="41.0" x2="69.2" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.2" y1="69.0" x2="45.0" y2="83.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="45.0" y1="83.0" x2="20.8" y2="69.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="69.0" x2="20.8" y2="41.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="20.8" y1="41.0" x2="45.0" y2="27.0" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="45.0" cy="55.0" r="17.4" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><line x1="45.0" y1="-24.8" x2="45.0" y2="27.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="32.5" y="-32.3" width="25" height="15" fill="#0a1b2e"/><text x="45.0" y="-24.8" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH₂</text></svg><div class="mol-lbl">Anilina</div></div><div class="mol-box"><svg viewBox="0 0 100 115" width="100" height="115" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="50.0" y1="29.5" x2="74.2" y2="43.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="74.2" y1="43.5" x2="74.2" y2="71.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="74.2" y1="71.5" x2="50.0" y2="85.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="50.0" y1="85.5" x2="25.8" y2="71.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="25.8" y1="71.5" x2="25.8" y2="43.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="25.8" y1="43.5" x2="50.0" y2="29.5" stroke="#a0b8cc" stroke-width="1.5"/><circle cx="50.0" cy="57.5" r="17.4" fill="none" stroke="#a0b8cc" stroke-width="1.1" stroke-dasharray="3,2"/><line x1="50.0" y1="-22.3" x2="50.0" y2="29.5" stroke="#a0b8cc" stroke-width="1.5"/><rect x="34.0" y="-29.8" width="32" height="15" fill="#0a1b2e"/><text x="50.0" y="-22.3" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N⁺≡N</text></svg><div class="mol-lbl">Sale diazonio</div></div></div>
+
 <h3>10.1 Basicità delle ammine</h3>
 <div class="card">
 <table>
@@ -528,6 +547,8 @@ Un derivato più reattivo può formare uno meno reattivo, NON viceversa direttam
 <!-- S11 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s11">
 <h2>11 · Reazioni di formazione C–C</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 180 70" width="180" height="70" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="42.0" y1="37.3" x2="74.0" y2="37.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="42.0" y1="32.7" x2="74.0" y2="32.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="74.0" y1="35.0" x2="106.0" y2="35.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.0" y1="37.3" x2="138.0" y2="37.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.0" y1="32.7" x2="138.0" y2="32.7" stroke="#a0b8cc" stroke-width="1.5"/><rect x="29.5" y="27.5" width="25" height="15" fill="#0a1b2e"/><text x="42.0" y="35.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="125.5" y="27.5" width="25" height="15" fill="#0a1b2e"/><text x="138.0" y="35.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text></svg><div class="mol-lbl">1,3-Butadiene</div></div><div class="mol-box"><svg viewBox="0 0 95 95" width="95" height="95" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="46.3" y1="21.5" x2="70.5" y2="35.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="48.7" y1="17.5" x2="72.9" y2="31.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.7" y1="33.5" x2="71.7" y2="61.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="71.7" y1="61.5" x2="47.5" y2="75.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="47.5" y1="75.5" x2="23.3" y2="61.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="23.3" y1="61.5" x2="23.3" y2="33.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="23.3" y1="33.5" x2="47.5" y2="19.5" stroke="#a0b8cc" stroke-width="1.5"/></svg><div class="mol-lbl">Cicloesene (D-A)</div></div><div class="mol-box"><svg viewBox="0 0 180 90" width="180" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="42.0" y1="61.0" x2="67.6" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="67.6" y1="45.0" x2="67.6" y2="13.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="67.6" y1="45.0" x2="106.0" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="108.3" y1="61.0" x2="108.3" y2="19.4" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.7" y1="61.0" x2="103.7" y2="19.4" stroke="#a0b8cc" stroke-width="1.5"/><rect x="29.5" y="53.5" width="25" height="15" fill="#0a1b2e"/><text x="42.0" y="61.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="58.6" y="5.5" width="18" height="15" fill="#0a1b2e"/><text x="67.6" y="13.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="100.5" y="11.9" width="11" height="15" fill="#0a1b2e"/><text x="106.0" y="19.4" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">β-idrossichetone</div></div></div>
+
 <h3>11.1 Condensazione di Claisen</h3>
 <div class="card">
 <div class="formula">2 CH₃COOEt →[NaOEt]→ CH₃COCH₂COOEt + EtOH   (acetoacetato di etile)</div>
@@ -626,6 +647,8 @@ Annellazione di Robinson = Addizione di Michael + Condensazione aldolica + Deidr
 <!-- S13 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s13">
 <h2>13 · Carboidrati</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 165 115" width="165" height="115" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="82.5" y1="31.5" x2="105.0" y2="44.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.0" y1="44.5" x2="105.0" y2="70.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.0" y1="70.5" x2="82.5" y2="83.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="83.5" x2="60.0" y2="70.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="70.5" x2="60.0" y2="44.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="44.5" x2="82.5" y2="31.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="44.5" x2="75.6" y2="23.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="31.5" x2="61.7" y2="53.6" stroke="#a0b8cc" stroke-width="1.5"/><rect x="99.5" y="37.0" width="11" height="15" fill="#0a1b2e"/><text x="105.0" y="44.5" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="56.1" y="16.2" width="39" height="15" fill="#0a1b2e"/><text x="75.6" y="23.7" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂OH</text><rect x="52.7" y="46.1" width="18" height="15" fill="#0a1b2e"/><text x="61.7" y="53.6" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">α-D-Glucosio</div></div><div class="mol-box"><svg viewBox="0 0 165 115" width="165" height="115" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="82.5" y1="31.5" x2="105.0" y2="44.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.0" y1="44.5" x2="105.0" y2="70.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.0" y1="70.5" x2="82.5" y2="83.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="83.5" x2="60.0" y2="70.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="70.5" x2="60.0" y2="44.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="44.5" x2="82.5" y2="31.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="60.0" y1="44.5" x2="75.6" y2="23.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="31.5" x2="61.7" y2="9.4" stroke="#a0b8cc" stroke-width="1.5"/><rect x="99.5" y="37.0" width="11" height="15" fill="#0a1b2e"/><text x="105.0" y="44.5" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="56.1" y="16.2" width="39" height="15" fill="#0a1b2e"/><text x="75.6" y="23.7" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂OH</text><rect x="52.7" y="1.9" width="18" height="15" fill="#0a1b2e"/><text x="61.7" y="9.4" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">β-D-Glucosio</div></div><div class="mol-box"><svg viewBox="0 0 160 115" width="160" height="115" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="80.0" y1="36.5" x2="102.7" y2="52.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="102.7" y1="52.9" x2="94.0" y2="79.6" stroke="#a0b8cc" stroke-width="1.5"/><line x1="94.0" y1="79.6" x2="66.0" y2="79.6" stroke="#a0b8cc" stroke-width="1.5"/><line x1="66.0" y1="79.6" x2="57.3" y2="52.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="57.3" y1="52.9" x2="80.0" y2="36.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="66.0" y1="79.6" x2="40.8" y2="96.4" stroke="#a0b8cc" stroke-width="1.5"/><line x1="102.7" y1="52.9" x2="125.1" y2="36.1" stroke="#a0b8cc" stroke-width="1.5"/><rect x="74.5" y="29.0" width="11" height="15" fill="#0a1b2e"/><text x="80.0" y="36.5" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="21.3" y="88.9" width="39" height="15" fill="#0a1b2e"/><text x="40.8" y="96.4" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂OH</text><rect x="105.6" y="28.6" width="39" height="15" fill="#0a1b2e"/><text x="125.1" y="36.1" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂OH</text></svg><div class="mol-lbl">D-Fruttosio</div></div></div>
+
 <h3>13.1 Classificazione e serie D/L</h3>
 <div class="card">
 <p><strong>Formula generale:</strong> (CH₂O)ₙ. Aldosi: gruppo aldeidico in C1. Chetosi: chetone in C2. La serie D/L dipende dalla configurazione del centro chirale più lontano dal carbonile (confronto con D/L-gliceraldeide).</p>
@@ -798,6 +821,8 @@ H ── C ── OH    ← C5 (R) → OH a destra = serie D
 <!-- S15 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s15">
 <h2>15 · Amminoacidi &amp; Proteine</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 200 105" width="200" height="105" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="61.6" y1="52.5" x2="100.0" y2="52.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="52.5" x2="138.4" y2="36.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="139.8" y1="38.3" x2="165.4" y2="19.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="137.0" y1="34.7" x2="162.6" y2="15.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="138.4" y1="36.5" x2="164.0" y2="58.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="52.5" x2="100.0" y2="90.9" stroke="#a0b8cc" stroke-width="1.5"/><rect x="49.1" y="45.0" width="25" height="15" fill="#0a1b2e"/><text x="61.6" y="52.5" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H₂N</text><rect x="158.5" y="9.8" width="11" height="15" fill="#0a1b2e"/><text x="164.0" y="17.3" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="155.0" y="51.4" width="18" height="15" fill="#0a1b2e"/><text x="164.0" y="58.9" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="94.5" y="83.4" width="11" height="15" fill="#0a1b2e"/><text x="100.0" y="90.9" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">R</text></svg><div class="mol-lbl">AA generico</div></div><div class="mol-box"><svg viewBox="0 0 200 90" width="200" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="64.0" y1="57.0" x2="100.0" y2="45.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="45.0" x2="136.0" y2="33.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="137.5" y1="34.7" x2="161.5" y2="13.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="134.5" y1="31.3" x2="158.5" y2="10.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="136.0" y1="33.0" x2="160.0" y2="51.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="51.5" y="49.5" width="25" height="15" fill="#0a1b2e"/><text x="64.0" y="57.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H₂N</text><rect x="87.5" y="37.5" width="25" height="15" fill="#0a1b2e"/><text x="100.0" y="45.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="154.5" y="4.5" width="11" height="15" fill="#0a1b2e"/><text x="160.0" y="12.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="151.0" y="43.5" width="18" height="15" fill="#0a1b2e"/><text x="160.0" y="51.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">Glicina</div></div><div class="mol-box"><svg viewBox="0 0 200 100" width="200" height="100" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="64.0" y1="62.0" x2="100.0" y2="50.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="50.0" x2="136.0" y2="38.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="137.5" y1="39.7" x2="161.5" y2="18.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="134.5" y1="36.3" x2="158.5" y2="15.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="136.0" y1="38.0" x2="160.0" y2="56.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="50.0" x2="100.0" y2="20.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="51.5" y="54.5" width="25" height="15" fill="#0a1b2e"/><text x="64.0" y="62.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H₂N</text><rect x="154.5" y="9.5" width="11" height="15" fill="#0a1b2e"/><text x="160.0" y="17.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="151.0" y="48.5" width="18" height="15" fill="#0a1b2e"/><text x="160.0" y="56.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="87.5" y="12.5" width="25" height="15" fill="#0a1b2e"/><text x="100.0" y="20.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text></svg><div class="mol-lbl">Alanina</div></div><div class="mol-box"><svg viewBox="0 0 200 110" width="200" height="110" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="64.0" y1="67.0" x2="100.0" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="55.0" x2="136.0" y2="43.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="137.5" y1="44.7" x2="161.5" y2="23.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="134.5" y1="41.3" x2="158.5" y2="20.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="136.0" y1="43.0" x2="160.0" y2="61.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="55.0" x2="100.0" y2="25.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.0" y1="25.0" x2="74.0" y2="-0.5" stroke="#a0b8cc" stroke-width="1.5"/><rect x="51.5" y="59.5" width="25" height="15" fill="#0a1b2e"/><text x="64.0" y="67.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">H₂N</text><rect x="154.5" y="14.5" width="11" height="15" fill="#0a1b2e"/><text x="160.0" y="22.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="151.0" y="53.5" width="18" height="15" fill="#0a1b2e"/><text x="160.0" y="61.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="87.5" y="17.5" width="25" height="15" fill="#0a1b2e"/><text x="100.0" y="25.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="65.0" y="-8.0" width="18" height="15" fill="#0a1b2e"/><text x="74.0" y="-0.5" fill="#ffd54f" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">SH</text></svg><div class="mol-lbl">Cisteina</div></div></div>
+
 <h3>15.1 I 20 amminoacidi proteinogenici</h3>
 <div class="card">
 <p>Tutti gli α-amminoacidi hanno la struttura generale H₂N–CHR–COOH. Sono in serie <strong>L</strong> (equivalente alla configurazione <em>S</em> tranne Cys che è <em>R</em> per priorità del gruppo tiolico).</p>
@@ -898,6 +923,8 @@ H₂N–CHR₁–CO–NH–CHR₂–COOH
 <!-- S16 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s16">
 <h2>16 · Lipidi</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 240 80" width="240" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="120.0" y1="40.0" x2="140.8" y2="52.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="140.8" y1="52.0" x2="161.6" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="161.6" y1="40.0" x2="182.4" y2="52.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="182.4" y1="52.0" x2="203.1" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="203.1" y1="40.0" x2="223.9" y2="52.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="223.9" y1="52.0" x2="244.7" y2="40.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="247.0" y1="40.0" x2="247.0" y2="16.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="242.4" y1="40.0" x2="242.4" y2="16.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="244.7" y1="40.0" x2="265.5" y2="52.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="107.5" y="32.5" width="25" height="15" fill="#0a1b2e"/><text x="120.0" y="40.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text><rect x="239.2" y="8.5" width="11" height="15" fill="#0a1b2e"/><text x="244.7" y="16.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="256.5" y="44.5" width="18" height="15" fill="#0a1b2e"/><text x="265.5" y="52.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">Acido palmitico (C16:0)</div></div><div class="mol-box"><svg viewBox="0 0 130 110" width="130" height="110" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="65.0" y1="25.0" x2="65.0" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="65.0" y1="55.0" x2="65.0" y2="85.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="65.0" y1="25.0" x2="29.0" y2="25.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="65.0" y1="55.0" x2="29.0" y2="55.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="65.0" y1="85.0" x2="29.0" y2="85.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="52.5" y="17.5" width="25" height="15" fill="#0a1b2e"/><text x="65.0" y="25.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="56.0" y="47.5" width="18" height="15" fill="#0a1b2e"/><text x="65.0" y="55.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH</text><rect x="52.5" y="77.5" width="25" height="15" fill="#0a1b2e"/><text x="65.0" y="85.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₂</text><rect x="20.0" y="17.5" width="18" height="15" fill="#0a1b2e"/><text x="29.0" y="25.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="20.0" y="47.5" width="18" height="15" fill="#0a1b2e"/><text x="29.0" y="55.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text><rect x="20.0" y="77.5" width="18" height="15" fill="#0a1b2e"/><text x="29.0" y="85.0" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">OH</text></svg><div class="mol-lbl">Glicerolo</div></div></div>
+
 <h3>16.1 Acidi grassi: classificazione e struttura</h3>
 <div class="card">
 <p>Gli acidi grassi (AG) sono acidi carbossilici a catena lineare con numero pari di carboni. Nomenclatura: <code>Cn:m Δa,b…</code> (n = C totali, m = n° doppi legami, Δa = posizione dal C1).</p>
@@ -975,6 +1002,8 @@ CH₂–O–PO₃⁻–O–CH₂CH₂N⁺(CH₃)₃
 <!-- S17 ─────────────────────────────────────────────────────── -->
 <section class="sec" id="s17">
 <h2>17 · Nucleosidi &amp; Nucleotidi</h2>
+<div class="mol-row"><div class="mol-box"><svg viewBox="0 0 180 130" width="180" height="130" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="57.0" y1="41.0" x2="69.0" y2="68.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="69.0" y1="68.0" x2="93.0" y2="83.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="93.0" y1="83.0" x2="117.0" y2="62.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="117.0" y1="62.0" x2="108.0" y2="32.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="107.6" y1="29.7" x2="56.6" y2="38.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="108.4" y1="34.3" x2="57.4" y2="43.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="108.0" y1="32.0" x2="72.0" y2="17.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="117.9" y1="64.1" x2="144.9" y2="52.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="116.1" y1="59.9" x2="143.1" y2="47.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="144.0" y1="50.0" x2="138.0" y2="20.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="138.0" y1="20.0" x2="112.5" y2="5.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="112.5" y1="5.0" x2="108.0" y2="32.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="59.5" y="9.5" width="25" height="15" fill="#0a1b2e"/><text x="72.0" y="17.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH₂</text><rect x="51.5" y="33.5" width="11" height="15" fill="#0a1b2e"/><text x="57.0" y="41.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="87.5" y="75.5" width="11" height="15" fill="#0a1b2e"/><text x="93.0" y="83.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="138.5" y="42.5" width="11" height="15" fill="#0a1b2e"/><text x="144.0" y="50.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="103.5" y="-2.5" width="18" height="15" fill="#0a1b2e"/><text x="112.5" y="5.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH</text></svg><div class="mol-lbl">Adenina</div></div><div class="mol-box"><svg viewBox="0 0 165 130" width="165" height="130" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="82.5" y1="37.0" x2="106.7" y2="51.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.7" y1="51.0" x2="106.7" y2="79.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.7" y1="79.0" x2="82.5" y2="93.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="93.0" x2="58.3" y2="79.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.3" y1="79.0" x2="58.3" y2="51.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.3" y1="51.0" x2="82.5" y2="37.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="108.3" y1="52.7" x2="129.3" y2="33.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.1" y1="49.3" x2="126.1" y2="29.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="80.9" y1="94.7" x2="101.9" y2="114.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="84.1" y1="91.3" x2="105.1" y2="110.9" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.3" y1="79.0" x2="82.1" y2="79.0" stroke="#a0b8cc" stroke-width="1.5"/><rect x="73.5" y="29.5" width="18" height="15" fill="#0a1b2e"/><text x="82.5" y="37.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH</text><rect x="101.2" y="71.5" width="11" height="15" fill="#0a1b2e"/><text x="106.7" y="79.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="122.2" y="23.9" width="11" height="15" fill="#0a1b2e"/><text x="127.7" y="31.4" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="98.0" y="105.1" width="11" height="15" fill="#0a1b2e"/><text x="103.5" y="112.6" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="69.6" y="71.5" width="25" height="15" fill="#0a1b2e"/><text x="82.1" y="79.0" fill="#e8eef4" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">CH₃</text></svg><div class="mol-lbl">Timina</div></div><div class="mol-box"><svg viewBox="0 0 165 125" width="165" height="125" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="82.5" y1="34.5" x2="106.7" y2="48.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.7" y1="48.5" x2="106.7" y2="76.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="106.7" y1="76.5" x2="82.5" y2="90.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="90.5" x2="58.3" y2="76.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.3" y1="76.5" x2="58.3" y2="48.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="58.3" y1="48.5" x2="82.5" y2="34.5" stroke="#a0b8cc" stroke-width="1.5"/><line x1="108.3" y1="50.2" x2="129.3" y2="30.6" stroke="#a0b8cc" stroke-width="1.5"/><line x1="105.1" y1="46.8" x2="126.1" y2="27.2" stroke="#a0b8cc" stroke-width="1.5"/><line x1="82.5" y1="90.5" x2="106.3" y2="107.3" stroke="#a0b8cc" stroke-width="1.5"/><rect x="73.5" y="27.0" width="18" height="15" fill="#0a1b2e"/><text x="82.5" y="34.5" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH</text><rect x="101.2" y="69.0" width="11" height="15" fill="#0a1b2e"/><text x="106.7" y="76.5" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="122.2" y="21.4" width="11" height="15" fill="#0a1b2e"/><text x="127.7" y="28.9" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="93.8" y="99.8" width="25" height="15" fill="#0a1b2e"/><text x="106.3" y="107.3" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH₂</text></svg><div class="mol-lbl">Citosina</div></div><div class="mol-box"><svg viewBox="0 0 155 120" width="155" height="120" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="77.5" y1="32.0" x2="101.7" y2="46.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="101.7" y1="46.0" x2="101.7" y2="74.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="101.7" y1="74.0" x2="77.5" y2="88.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="77.5" y1="88.0" x2="53.3" y2="74.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="53.3" y1="74.0" x2="53.3" y2="46.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="53.3" y1="46.0" x2="77.5" y2="32.0" stroke="#a0b8cc" stroke-width="1.5"/><line x1="103.3" y1="47.7" x2="124.3" y2="28.1" stroke="#a0b8cc" stroke-width="1.5"/><line x1="100.1" y1="44.3" x2="121.1" y2="24.7" stroke="#a0b8cc" stroke-width="1.5"/><line x1="75.9" y1="89.7" x2="96.9" y2="109.3" stroke="#a0b8cc" stroke-width="1.5"/><line x1="79.1" y1="86.3" x2="100.1" y2="105.9" stroke="#a0b8cc" stroke-width="1.5"/><rect x="68.5" y="24.5" width="18" height="15" fill="#0a1b2e"/><text x="77.5" y="32.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">NH</text><rect x="96.2" y="66.5" width="11" height="15" fill="#0a1b2e"/><text x="101.7" y="74.0" fill="#64b5f6" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">N</text><rect x="117.2" y="18.9" width="11" height="15" fill="#0a1b2e"/><text x="122.7" y="26.4" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text><rect x="93.0" y="100.1" width="11" height="15" fill="#0a1b2e"/><text x="98.5" y="107.6" fill="#ff6b6b" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="bold" font-family="sans-serif">O</text></svg><div class="mol-lbl">Uracile</div></div></div>
+
 <h3>17.1 Basi azotate</h3>
 <div class="card">
 <table>
@@ -1049,15 +1078,16 @@ CH₂–O–PO₃⁻–O–CH₂CH₂N⁺(CH₃)₃
 <script>
 // Navigation
 function goS(id){
-  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
-  document.querySelectorAll('.nav-s').forEach(function(el){
-    el.classList.toggle('active',el.getAttribute('onclick')==="goS('"+id+"')");
+  var el=document.getElementById(id);
+  if(el){el.style.display='';el.scrollIntoView({behavior:'smooth',block:'start'});}
+  document.querySelectorAll('.nav-s').forEach(function(e){
+    e.classList.toggle('active',e.getAttribute('onclick')==="goS('"+id+"')");
   });
 }
 window.addEventListener('scroll',function(){
   var mid=window.scrollY+window.innerHeight/2;
   var active='s1';
-  ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17'].forEach(function(id){
+  ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17','s18'].forEach(function(id){
     var el=document.getElementById(id);
     if(el&&el.offsetTop<=mid)active=id;
   });
@@ -1259,14 +1289,492 @@ window.addEventListener('load',function(){drawNm();drawCh();drawSN();});
 })();
 </script>
 
+<!-- ─── Section 18: Sintesi Animate ──────────────────────────────────── -->
 <style>
-#bsi-co-back{position:fixed;bottom:16px;right:14px;z-index:9997;display:none}
+.acard{background:#0d2236;border:1px solid #1c3a57;border-radius:10px;padding:14px;margin:10px 0}
+.atitle{color:#00c9b7;font-weight:700;font-size:.93rem;margin-bottom:8px}
+.astage{background:#071221;border-radius:7px;margin:8px 0;display:block;width:100%;overflow:hidden}
+.astage svg{display:block;width:100%;height:auto;max-height:160px}
+.adots{display:flex;gap:6px;margin:6px 0;align-items:center}
+.adot{width:9px;height:9px;border-radius:50%;background:#1c3a57;transition:background .3s;cursor:pointer}
+.adot.on{background:#00c9b7}
+.adesc{color:#9fb3c8;font-size:.82rem;min-height:30px;margin-top:4px;padding:4px 6px;border-left:2px solid #1c3a57;transition:opacity .25s}
+.abtns{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.abtn{padding:6px 14px;border-radius:8px;border:1px solid #1c3a57;background:#071221;color:#9fb3c8;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .15s}
+.abtn:hover{border-color:#00c9b7;color:#00c9b7}
+.abtn.playing{border-color:#00c9b7;color:#00c9b7;background:rgba(0,201,183,.08)}
+</style>
+
+<section class="sec" id="s18" style="display:none">
+<h2>18 · Sintesi Animate — Meccanismi Passo per Passo</h2>
+<p style="color:#9fb3c8;font-size:.84rem;margin-bottom:14px">Animazioni interattive dei meccanismi fondamentali. Premi <strong style="color:#00c9b7">▶ Avvia</strong> o <strong style="color:#00c9b7">⏭ Passo</strong> per procedere.</p>
+
+<!-- SVG arrow markers shared by all animations -->
+<svg width="0" height="0" style="position:absolute">
+<defs>
+  <marker id="amY" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#ffb454"/>
+  </marker>
+  <marker id="amG" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#4caf80"/>
+  </marker>
+  <marker id="amR" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#ff6b6b"/>
+  </marker>
+</defs>
+</svg>
+
+<!-- ── Reaction 1: SN2 ─────────────────────────────────────── -->
+<div class="acard">
+<div class="atitle">⚡ Reazione 1 — SN2: Sostituzione Nucleofila Bimolecolare</div>
+<div class="astage" id="ar1-stage">
+
+<svg viewBox="0 0 460 130" xmlns="http://www.w3.org/2000/svg">
+<!-- Frame 0: Reagenti -->
+<g id="ar1-f0">
+  <!-- CH₃Br -->
+  <text x="68" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="72" y1="35" x2="100" y2="55" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="46" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="58" y1="66" x2="90" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="68" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="72" y1="97" x2="100" y2="77" stroke="#5a7a99" stroke-width="1.5"/>
+  <circle cx="106" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="106" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="120" y1="66" x2="155" y2="66" stroke="#e05050" stroke-width="2.5"/>
+  <circle cx="170" cy="66" r="16" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="170" y="66" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <text x="106" y="44" fill="#ff9070" font-size="9" text-anchor="middle">δ+</text>
+  <text x="186" y="44" fill="#e05050" font-size="9" text-anchor="middle">δ−</text>
+  <!-- + -->
+  <text x="240" y="72" fill="#9fb3c8" font-size="20" text-anchor="middle" font-weight="700">+</text>
+  <!-- OH⁻ -->
+  <circle cx="330" cy="66" r="14" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+  <text x="330" y="66" fill="#4cce80" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="344" y1="58" x2="354" y2="50" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="362" y="47" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <text x="316" y="48" fill="#4cce80" font-size="13" text-anchor="middle">⊖</text>
+  <!-- lone pairs -->
+  <circle cx="316" cy="67" r="2" fill="#4cce80"/><circle cx="321" cy="67" r="2" fill="#4cce80"/>
+  <!-- electron-pushing curved arrow: O → C -->
+  <path d="M318,58 Q260,15 188,57" stroke="#ffb454" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amY)"/>
+  <!-- electron-pushing arrow: C-Br → Br (bond breaks) -->
+  <path d="M148,58 Q165,30 170,48" stroke="#ff6b6b" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amR)"/>
+  <!-- label -->
+  <text x="230" y="115" fill="#9fb3c8" font-size="10" text-anchor="middle">Il nucleofilo OH⁻ attacca il carbonio elettrofilo</text>
+</g>
+
+<!-- Frame 1: Transition State -->
+<g id="ar1-f1" opacity="0">
+  <!-- H atoms pointing up (flap) -->
+  <text x="195" y="18" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="195" y1="24" x2="210" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="222" y="12" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="220" y1="18" x2="218" y2="50" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="248" y="18" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="244" y1="24" x2="228" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <!-- HO on left -->
+  <circle cx="58" cy="65" r="14" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+  <text x="58" y="65" fill="#4cce80" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="44" y1="57" x2="34" y2="49" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="26" y="46" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <text x="75" y="46" fill="#ff9070" font-size="9">δ−</text>
+  <!-- dashed O···C bond forming -->
+  <line x1="72" y1="65" x2="200" y2="65" stroke="#4cce80" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- C atom (pentacoordinate) -->
+  <circle cx="216" cy="65" r="14" fill="#0e2040" stroke="#00c9b7" stroke-width="2"/>
+  <text x="216" y="65" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <!-- dashed C···Br bond breaking -->
+  <line x1="230" y1="65" x2="350" y2="65" stroke="#e05050" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Br on right -->
+  <circle cx="366" cy="65" r="16" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="366" y="65" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <text x="386" y="46" fill="#ff9070" font-size="9">δ−</text>
+  <!-- brackets -->
+  <text x="28" y="72" fill="#9fb3c8" font-size="22" font-weight="300">[</text>
+  <text x="400" y="72" fill="#9fb3c8" font-size="22" font-weight="300">]</text>
+  <text x="416" y="55" fill="#ffb454" font-size="13" font-weight="700">‡</text>
+  <!-- label -->
+  <text x="215" y="110" fill="#9fb3c8" font-size="10" text-anchor="middle">Stato di transizione: C pentacoordinato — Inversione di Walden</text>
+</g>
+
+<!-- Frame 2: Prodotti -->
+<g id="ar1-f2" opacity="0">
+  <!-- CH₃OH -->
+  <text x="68" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="72" y1="35" x2="100" y2="55" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="46" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="58" y1="66" x2="90" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="68" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="72" y1="97" x2="100" y2="77" stroke="#5a7a99" stroke-width="1.5"/>
+  <circle cx="106" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="106" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <!-- C-O bond (formed, green) -->
+  <line x1="120" y1="66" x2="152" y2="66" stroke="#4cce80" stroke-width="3"/>
+  <circle cx="166" cy="66" r="14" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+  <text x="166" y="66" fill="#4cce80" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="180" y1="58" x2="192" y2="50" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="200" y="47" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- CH₃OH label -->
+  <text x="120" y="100" fill="#4cce80" font-size="10" text-anchor="middle">CH₃OH</text>
+  <!-- + -->
+  <text x="255" y="72" fill="#9fb3c8" font-size="20" text-anchor="middle" font-weight="700">+</text>
+  <!-- Br⁻ -->
+  <circle cx="340" cy="66" r="16" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="340" y="66" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <text x="360" y="47" fill="#4cce80" font-size="13" text-anchor="middle">⊖</text>
+  <text x="340" y="100" fill="#c9a0f5" font-size="10" text-anchor="middle">Br⁻</text>
+  <!-- result label -->
+  <text x="230" y="120" fill="#4cce80" font-size="10" text-anchor="middle">✓ Configurazione invertita (S→R o R→S) — reazione stereospecifica</text>
+</g>
+</svg>
+
+</div><!-- astage -->
+<div class="adots" id="ar1-dots"></div>
+<div class="adesc" id="ar1-desc">OH⁻ nucleofilo si avvicina al carbonio di CH₃Br sul lato opposto al gruppo uscente Br</div>
+<div class="abtns">
+  <button class="abtn" id="ar1-play" onclick="animPlay('ar1',3)">▶ Avvia</button>
+  <button class="abtn" onclick="animStep('ar1',3)">⏭ Passo</button>
+  <button class="abtn" onclick="animReset('ar1',3)">↺ Reset</button>
+</div>
+</div>
+
+<!-- ── Reaction 2: HBr addition to alkene ─────────────────── -->
+<div class="acard">
+<div class="atitle">🔴 Reazione 2 — Addizione Elettrofila HBr all'Etene (Markovnikov)</div>
+<div class="astage" id="ar2-stage">
+
+<svg viewBox="0 0 460 130" xmlns="http://www.w3.org/2000/svg">
+<!-- Frame 0: Reagenti -->
+<g id="ar2-f0">
+  <!-- CH₂=CH₂ -->
+  <text x="46" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="35" x2="70" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="46" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="97" x2="70" y2="80" stroke="#5a7a99" stroke-width="1.5"/>
+  <circle cx="82" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="82" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <!-- double bond -->
+  <line x1="96" y1="62" x2="136" y2="62" stroke="#00c9b7" stroke-width="2.5"/>
+  <line x1="96" y1="70" x2="136" y2="70" stroke="#00c9b7" stroke-width="2.5"/>
+  <circle cx="148" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="148" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <text x="175" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="170" y1="35" x2="154" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="175" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="170" y1="97" x2="154" y2="80" stroke="#5a7a99" stroke-width="1.5"/>
+  <!-- π label -->
+  <text x="116" y="50" fill="#00c9b7" font-size="10" text-anchor="middle">π</text>
+  <!-- + -->
+  <text x="220" y="72" fill="#9fb3c8" font-size="20" text-anchor="middle" font-weight="700">+</text>
+  <!-- HBr -->
+  <text x="280" y="72" fill="#e8eef4" font-size="14" text-anchor="middle" font-weight="700">H</text>
+  <line x1="290" y1="66" x2="310" y2="66" stroke="#5a7a99" stroke-width="2"/>
+  <circle cx="325" cy="66" r="14" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="325" y="66" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <text x="281" y="52" fill="#ff9070" font-size="9" text-anchor="middle">δ+</text>
+  <text x="340" y="52" fill="#e05050" font-size="9">δ−</text>
+  <!-- electron arrow: π → H (electrophilic addition) -->
+  <path d="M115,56 Q150,10 260,55" stroke="#ffb454" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amY)"/>
+  <text x="230" y="115" fill="#9fb3c8" font-size="10" text-anchor="middle">Il legame π attacca H⁺ — addizione elettrofila</text>
+</g>
+
+<!-- Frame 1: Carbocatione intermedio -->
+<g id="ar2-f1" opacity="0">
+  <!-- CH₃-CH₂⁺ carbocation -->
+  <text x="46" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="35" x2="76" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="30" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="40" y1="66" x2="76" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="46" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="97" x2="76" y2="80" stroke="#5a7a99" stroke-width="1.5"/>
+  <circle cx="88" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="88" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <!-- single bond now (π broke) -->
+  <line x1="102" y1="66" x2="140" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="152" cy="66" r="14" fill="#2a1a08" stroke="#6a3a00" stroke-width="2"/>
+  <text x="152" y="66" fill="#ffb454" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <!-- carbocation + charge -->
+  <text x="172" y="46" fill="#ffb454" font-size="15" text-anchor="middle">⊕</text>
+  <text x="190" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="186" y1="35" x2="164" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="210" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="200" y1="66" x2="168" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <!-- + -->
+  <text x="250" y="72" fill="#9fb3c8" font-size="20" text-anchor="middle" font-weight="700">+</text>
+  <!-- Br⁻ -->
+  <circle cx="340" cy="66" r="16" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="340" y="66" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <text x="320" y="48" fill="#4cce80" font-size="13" text-anchor="middle">⊖</text>
+  <!-- arrow: Br attacks carbocation -->
+  <path d="M324,62 Q280,30 220,58" stroke="#4cce80" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amG)"/>
+  <text x="230" y="115" fill="#9fb3c8" font-size="10" text-anchor="middle">Carbocatione intermedio — Br⁻ attacca il C caricato positivamente</text>
+</g>
+
+<!-- Frame 2: Prodotto -->
+<g id="ar2-f2" opacity="0">
+  <!-- CH₃CH₂Br bromoethane -->
+  <text x="46" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="35" x2="76" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="30" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="40" y1="66" x2="76" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="46" y="102" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="50" y1="97" x2="76" y2="80" stroke="#5a7a99" stroke-width="1.5"/>
+  <circle cx="88" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="88" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="102" y1="66" x2="140" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="152" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="152" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <text x="190" y="30" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="186" y1="35" x2="164" y2="52" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="210" y="66" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <line x1="200" y1="66" x2="168" y2="66" stroke="#5a7a99" stroke-width="1.5"/>
+  <!-- C-Br bond (formed, green) -->
+  <line x1="166" y1="66" x2="204" y2="66" stroke="#4cce80" stroke-width="3"/>
+  <circle cx="220" cy="66" r="16" fill="#1a0a22" stroke="#4a1a60" stroke-width="1.5"/>
+  <text x="220" y="66" fill="#c9a0f5" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">Br</text>
+  <!-- product label -->
+  <text x="155" y="110" fill="#4cce80" font-size="11" text-anchor="middle" font-weight="700">Bromoetano CH₃CH₂Br</text>
+  <text x="310" y="75" fill="#9fb3c8" font-size="10" text-anchor="middle">Regola di Markovnikov:</text>
+  <text x="310" y="90" fill="#ffb454" font-size="10" text-anchor="middle">H+ si lega al C con più H</text>
+  <text x="310" y="105" fill="#9fb3c8" font-size="10" text-anchor="middle">(C primario → etene: simmetrico)</text>
+</g>
+</svg>
+
+</div>
+<div class="adots" id="ar2-dots"></div>
+<div class="adesc" id="ar2-desc">Il legame π dell'etene attacca il protone H⁺ di HBr — addizione elettrofila</div>
+<div class="abtns">
+  <button class="abtn" id="ar2-play" onclick="animPlay('ar2',3)">▶ Avvia</button>
+  <button class="abtn" onclick="animStep('ar2',3)">⏭ Passo</button>
+  <button class="abtn" onclick="animReset('ar2',3)">↺ Reset</button>
+</div>
+</div>
+
+<!-- ── Reaction 3: Aldol condensation ─────────────────────── -->
+<div class="acard">
+<div class="atitle">🟡 Reazione 3 — Condensazione Aldolica (NaOH/H₂O)</div>
+<div class="astage" id="ar3-stage">
+
+<svg viewBox="0 0 460 140" xmlns="http://www.w3.org/2000/svg">
+<!-- Frame 0: Reagenti — 2 acetaldeidi + NaOH -->
+<g id="ar3-f0">
+  <!-- Acetaldehyde 1: CH₃-CHO -->
+  <text x="50" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH₃</text>
+  <line x1="70" y1="66" x2="90" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="103" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="103" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="117" y1="62" x2="140" y2="62" stroke="#ffb454" stroke-width="2.5"/>
+  <line x1="117" y1="70" x2="140" y2="70" stroke="#ffb454" stroke-width="2.5"/>
+  <text x="150" y="66" fill="#ff9070" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="103" y1="52" x2="103" y2="36" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="103" y="29" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- α-H label -->
+  <text x="52" y="92" fill="#ffb454" font-size="10" text-anchor="middle">α-H</text>
+  <!-- NaOH -->
+  <text x="200" y="66" fill="#4cce80" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">NaOH</text>
+  <!-- + -->
+  <text x="240" y="72" fill="#9fb3c8" font-size="20" text-anchor="middle" font-weight="700">+</text>
+  <!-- Acetaldehyde 2 -->
+  <text x="280" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH₃</text>
+  <line x1="300" y1="66" x2="320" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="333" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="333" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="347" y1="62" x2="370" y2="62" stroke="#ffb454" stroke-width="2.5"/>
+  <line x1="347" y1="70" x2="370" y2="70" stroke="#ffb454" stroke-width="2.5"/>
+  <text x="380" y="66" fill="#ff9070" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="333" y1="52" x2="333" y2="36" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="333" y="29" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- arrow: NaOH takes α-H -->
+  <path d="M58,68 Q100,100 185,70" stroke="#4cce80" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amG)"/>
+  <text x="230" y="125" fill="#9fb3c8" font-size="10" text-anchor="middle">NaOH sottrae l'H alfa: si forma l'enolato carboanione</text>
+</g>
+
+<!-- Frame 1: Enolate + electrophile -->
+<g id="ar3-f1" opacity="0">
+  <!-- Enolate: ⁻CH₂-CHO -->
+  <text x="36" y="66" fill="#4cce80" font-size="13" font-weight="700" text-anchor="middle">⁻</text>
+  <circle cx="54" cy="66" r="14" fill="#0d2a16" stroke="#1a4a24" stroke-width="2"/>
+  <text x="54" y="66" fill="#4cce80" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH₂</text>
+  <line x1="70" y1="66" x2="90" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="103" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="103" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="117" y1="62" x2="140" y2="62" stroke="#ffb454" stroke-width="2.5"/>
+  <line x1="117" y1="70" x2="140" y2="70" stroke="#ffb454" stroke-width="2.5"/>
+  <text x="150" y="66" fill="#ff9070" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="103" y1="52" x2="103" y2="36" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="103" y="29" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- + -->
+  <text x="195" y="72" fill="#9fb3c8" font-size="16" text-anchor="middle" font-weight="700">+</text>
+  <!-- Second CHO (electrophile) -->
+  <text x="230" y="66" fill="#e8eef4" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH₃</text>
+  <line x1="252" y1="66" x2="272" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="285" cy="66" r="14" fill="#2a1a00" stroke="#5a3a00" stroke-width="2"/>
+  <text x="285" y="66" fill="#ffb454" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="299" y1="62" x2="322" y2="62" stroke="#ffb454" stroke-width="2.5"/>
+  <line x1="299" y1="70" x2="322" y2="70" stroke="#ffb454" stroke-width="2.5"/>
+  <text x="332" y="66" fill="#ff9070" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <text x="285" y="44" fill="#ffb454" font-size="9" text-anchor="middle">elettrofilo</text>
+  <line x1="285" y1="52" x2="285" y2="36" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="285" y="29" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- arrow: ⁻CH₂ attacks CHO carbon -->
+  <path d="M70,60 Q160,15 268,57" stroke="#ffb454" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#amY)"/>
+  <text x="230" y="125" fill="#9fb3c8" font-size="10" text-anchor="middle">Enolato nucleofilo attacca il C=O elettrofilo — legame C–C nuovo</text>
+</g>
+
+<!-- Frame 2: Prodotto aldolico -->
+<g id="ar3-f2" opacity="0">
+  <!-- Aldol product: CH₃-CH(OH)-CH₂-CHO -->
+  <text x="36" y="66" fill="#e8eef4" font-size="12" font-weight="700" text-anchor="middle">CH₃</text>
+  <line x1="56" y1="66" x2="76" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="89" cy="66" r="14" fill="#0e2040" stroke="#4cce80" stroke-width="2"/>
+  <text x="89" y="66" fill="#e8eef4" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH</text>
+  <!-- OH group -->
+  <line x1="89" y1="52" x2="89" y2="36" stroke="#4cce80" stroke-width="2.5"/>
+  <text x="89" y="29" fill="#4cce80" font-size="12" text-anchor="middle" font-weight="700">OH</text>
+  <!-- C–C bond (new, green!) -->
+  <line x1="103" y1="66" x2="143" y2="66" stroke="#4cce80" stroke-width="3"/>
+  <circle cx="156" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="156" y="66" fill="#e8eef4" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">CH₂</text>
+  <line x1="170" y1="66" x2="200" y2="66" stroke="#6a8aaa" stroke-width="2"/>
+  <circle cx="213" cy="66" r="14" fill="#0e2040" stroke="#1c3a57" stroke-width="1.5"/>
+  <text x="213" y="66" fill="#e8eef4" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">C</text>
+  <line x1="227" y1="62" x2="250" y2="62" stroke="#ffb454" stroke-width="2.5"/>
+  <line x1="227" y1="70" x2="250" y2="70" stroke="#ffb454" stroke-width="2.5"/>
+  <text x="262" y="66" fill="#ff9070" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">O</text>
+  <line x1="213" y1="52" x2="213" y2="36" stroke="#5a7a99" stroke-width="1.5"/>
+  <text x="213" y="29" fill="#9fb3c8" font-size="11" text-anchor="middle">H</text>
+  <!-- new bond label -->
+  <text x="124" y="88" fill="#4cce80" font-size="10" text-anchor="middle" font-weight="700">↑ Nuovo C–C</text>
+  <!-- product name -->
+  <text x="155" y="112" fill="#4cce80" font-size="11" text-anchor="middle" font-weight="700">3-idrossibutanale (Aldol)</text>
+  <!-- condensation note -->
+  <text x="370" y="60" fill="#9fb3c8" font-size="10" text-anchor="middle">Poi deidratazione</text>
+  <text x="370" y="75" fill="#ffb454" font-size="10" text-anchor="middle">→ crotonaldeide</text>
+  <text x="370" y="90" fill="#9fb3c8" font-size="10" text-anchor="middle">(aldol condensation)</text>
+</g>
+</svg>
+
+</div>
+<div class="adots" id="ar3-dots"></div>
+<div class="adesc" id="ar3-desc">NaOH sottrae un H in posizione α (accanto al C=O) formando un enolato carbanionico</div>
+<div class="abtns">
+  <button class="abtn" id="ar3-play" onclick="animPlay('ar3',3)">▶ Avvia</button>
+  <button class="abtn" onclick="animStep('ar3',3)">⏭ Passo</button>
+  <button class="abtn" onclick="animReset('ar3',3)">↺ Reset</button>
+</div>
+</div>
+
+<div class="tip" style="margin-top:14px">
+  <strong>🎯 Osserva i colori:</strong>
+  <span style="color:#4cce80">Verde</span> = legame che si <strong>forma</strong> ·
+  <span style="color:#e05050">Rosso</span> = legame che si <strong>rompe</strong> ·
+  <span style="color:#ffb454">Giallo</span> = frecce elettroniche (pushing) ·
+  <span style="color:#c9a0f5">Viola</span> = atomo di Br
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<section class="sec" id="s19">
+<h2>19 · Reazioni Nominali (Named Reactions)</h2>
+<p style="opacity:.8;margin-bottom:12px">Riferimento rapido delle reazioni nominali più importanti per la sintesi organica e gli esami. Organizzate per tipo di trasformazione.</p>
+<h3>Formazione di legami C–C</h3><div class="card"><table><tr><th>Reazione</th><th>Trasformazione</th><th>Descrizione</th></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Grignard</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">R–MgX + C=O → alcol</td><td style="font-size:.9em">Reattivo di Grignard (organomagnesiaco) addiziona a carbonili → alcoli. Fondamentale per allungare catene.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Wittig</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">R₃P=CR₂ + C=O → C=C</td><td style="font-size:.9em">Ilide di fosforo + aldeide/chetone → alchene. Controllo della posizione del doppio legame.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Aldolica</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">2 carbonili → β-idrossicarbonile</td><td style="font-size:.9em">Enolato attacca un secondo carbonile. Con disidratazione → enone (condensazione aldolica).</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Diels-Alder</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">diene + dienofilo → cicloesene</td><td style="font-size:.9em">Cicloaddizione [4+2] concertata. Crea due legami C–C e un anello a 6 in un colpo.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Michael</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">nucleofilo + enone → addotto 1,4</td><td style="font-size:.9em">Addizione coniugata di un nucleofilo a un sistema α,β-insaturo.</td></tr></table></div><h3>Cross-coupling (Pd)</h3><div class="card"><table><tr><th>Reazione</th><th>Trasformazione</th><th>Descrizione</th></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Suzuki</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">R–B(OH)₂ + R'–X → R–R'</td><td style="font-size:.9em">Accoppiamento con acido boronico. Premio Nobel 2010. Cardine della sintesi moderna.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Heck</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alchene + R–X → alchene sostituito</td><td style="font-size:.9em">Arilazione/vinilazione di alcheni catalizzata da Pd.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Stille</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">R–SnR₃ + R'–X → R–R'</td><td style="font-size:.9em">Accoppiamento con organostannani. Tollera molti gruppi funzionali.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Negishi</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">R–ZnX + R'–X → R–R'</td><td style="font-size:.9em">Con organozinco. Alta selettività.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Sonogashira</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alchino terminale + R–X → alchino interno</td><td style="font-size:.9em">Accoppiamento Pd/Cu per formare legami C(sp)–C(sp²).</td></tr></table></div><h3>Ossidazioni e Riduzioni</h3><div class="card"><table><tr><th>Reazione</th><th>Trasformazione</th><th>Descrizione</th></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Jones/PCC</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alcol → aldeide/chetone/acido</td><td style="font-size:.9em">PCC ferma all'aldeide; Jones (CrO₃) ossida fino ad acido.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Swern</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alcol → aldeide (blando)</td><td style="font-size:.9em">Ossidazione con DMSO attivato, condizioni delicate.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Wacker</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alchene → chetone</td><td style="font-size:.9em">Ossidazione Pd-catalizzata di alcheni terminali a metilchetoni.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Idroborazione</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">alchene → alcol anti-Markovnikov</td><td style="font-size:.9em">BH₃ poi H₂O₂/OH⁻. Regiochimica opposta all'idratazione acida.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Birch</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">arene → 1,4-cicloesadiene</td><td style="font-size:.9em">Riduzione con Na/NH₃. Riduce parzialmente gli aromatici.</td></tr></table></div><h3>Riarrangiamenti e altre</h3><div class="card"><table><tr><th>Reazione</th><th>Trasformazione</th><th>Descrizione</th></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">McMurry</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">2 C=O → C=C</td><td style="font-size:.9em">Accoppiamento riduttivo di due carbonili (Ti). Forma alcheni tetrasostituiti.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Nazarov</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">dienone → ciclopentenone</td><td style="font-size:.9em">Ciclizzazione elettrociclica 4π catalizzata da acidi.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Claisen</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">allil vinil etere → γ,δ-enone</td><td style="font-size:.9em">Riarrangiamento sigmatropico [3,3] concertato.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Mannich</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">ammina + CH₂O + enolo → β-amminochetone</td><td style="font-size:.9em">Amminometilazione, chiave nella sintesi di alcaloidi.</td></tr><tr><td style="font-weight:700;color:#00c9b7;white-space:nowrap">Fischer</td><td style="font-family:monospace;font-size:.85em;white-space:nowrap">fenilidrazina + chetone → indolo</td><td style="font-size:.9em">Sintesi classica dell'anello indolico.</td></tr></table></div>
+<div class="card" style="border-left:3px solid #f5a623">
+<b style="color:#f5a623">💡 Come usarle in retrosintesi:</b> per costruire un legame C–C pensa a Grignard, Wittig, aldolica, Diels-Alder o cross-coupling. Per introdurre gruppi funzionali usa ossidazioni/riduzioni. Ragiona a ritroso dal prodotto (disconnessioni) verso reagenti semplici.
+</div>
+</section>
+
+
+<script>
+// Generic animation controller for chimorga section 18
+(function(){
+var _state={};
+var _descs={
+  ar1:['OH⁻ nucleofilo si avvicina al carbonio di CH₃Br sul lato opposto al gruppo uscente Br','Stato di transizione: C pentacoordinato con 5 legami — Inversione di Walden in corso','Prodotto: CH₃OH + Br⁻. La configurazione è stata invertita (reazione stereospecifica)'],
+  ar2:['Il legame π dell\'etene attacca il protone H⁺ di HBr — addizione elettrofila al doppio legame','Carbocatione intermedio CH₃CH₂⁺ — Br⁻ si avvicina al carbonio caricato positivamente','Prodotto: bromoetano (simmetrico → Markovnikov non determina regioisomeri qui)'],
+  ar3:['NaOH sottrae un H in posizione α (accanto al C=O) formando un enolato carbanionico','Enolato nucleofilo attacca il carbonile della seconda acetaldeide — si forma il legame C–C','Prodotto aldolico: 3-idrossibutanale. Ulterior deidratazione → crotonaldeide (condensazione aldolica)']
+};
+function initAnim(id,n){
+  _state[id]={cur:0,n:n,timer:null,playing:false};
+  var dotsEl=document.getElementById(id+'-dots');
+  if(!dotsEl)return;
+  dotsEl.innerHTML='';
+  for(var i=0;i<n;i++){
+    var d=document.createElement('span');
+    d.className='adot'+(i===0?' on':'');
+    d.setAttribute('data-i',i);
+    (function(idx){d.onclick=function(){animGoto(id,idx,n);};})(i);
+    dotsEl.appendChild(d);
+  }
+  showFrame(id,0);
+}
+function showFrame(id,idx){
+  var n=(_state[id]||{}).n||3;
+  for(var i=0;i<n;i++){
+    var fr=document.getElementById(id+'-f'+i);
+    if(fr){
+      fr.style.transition='opacity 0.4s';
+      fr.style.opacity=i===idx?'1':'0';
+      fr.style.pointerEvents=i===idx?'auto':'none';
+    }
+  }
+  var dots=document.querySelectorAll('#'+id+'-dots .adot');
+  dots.forEach(function(d,i){d.classList.toggle('on',i===idx);});
+  var desc=document.getElementById(id+'-desc');
+  if(desc&&_descs[id]&&_descs[id][idx]){
+    desc.style.opacity='0';
+    setTimeout(function(){desc.textContent=_descs[id][idx];desc.style.opacity='1';},200);
+  }
+}
+window.animPlay=function(id,n){
+  if(!_state[id]) initAnim(id,n);
+  var s=_state[id];
+  if(s.playing){clearInterval(s.timer);s.playing=false;document.getElementById(id+'-play').textContent='▶ Avvia';document.getElementById(id+'-play').classList.remove('playing');return;}
+  s.playing=true;
+  document.getElementById(id+'-play').textContent='⏸ Pausa';
+  document.getElementById(id+'-play').classList.add('playing');
+  function tick(){
+    s.cur=(s.cur+1)%n;
+    showFrame(id,s.cur);
+    if(s.cur===n-1){clearInterval(s.timer);s.playing=false;document.getElementById(id+'-play').textContent='▶ Avvia';document.getElementById(id+'-play').classList.remove('playing');}
+  }
+  s.timer=setInterval(tick,2200);
+  tick();
+};
+window.animStep=function(id,n){
+  if(!_state[id]) initAnim(id,n);
+  var s=_state[id];
+  if(s.playing){clearInterval(s.timer);s.playing=false;document.getElementById(id+'-play').textContent='▶ Avvia';document.getElementById(id+'-play').classList.remove('playing');}
+  s.cur=(s.cur+1)%n;
+  showFrame(id,s.cur);
+};
+window.animReset=function(id,n){
+  if(_state[id]&&_state[id].timer)clearInterval(_state[id].timer);
+  _state[id]={cur:0,n:n,timer:null,playing:false};
+  var pb=document.getElementById(id+'-play');if(pb){pb.textContent='▶ Avvia';pb.classList.remove('playing');}
+  showFrame(id,0);
+};
+window.animGoto=function(id,idx,n){
+  if(!_state[id]) initAnim(id,n);
+  if(_state[id].playing){clearInterval(_state[id].timer);_state[id].playing=false;var pb=document.getElementById(id+'-play');if(pb){pb.textContent='▶ Avvia';pb.classList.remove('playing');}}
+  _state[id].cur=idx;
+  showFrame(id,idx);
+};
+// Init all on load
+document.addEventListener('DOMContentLoaded',function(){
+  initAnim('ar1',3);initAnim('ar2',3);initAnim('ar3',3);
+});
+})();
+</script>
+
+<style>
+#bsi-co-back{position:fixed;bottom:16px;left:14px;z-index:9997;display:none}
 #bsi-co-back>button{background:#071221;border:2px solid #00c9b7;color:#00c9b7;border-radius:22px;padding:10px 22px;font-size:.82rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.65),0 0 14px rgba(0,201,183,.15);letter-spacing:.025em;transition:background .15s,transform .12s}
 #bsi-co-back>button:hover{background:rgba(0,201,183,.1);transform:scale(1.05)}
 #bsi-co-back>button:active{transform:scale(.95)}
 </style>
 <div id="bsi-co-back">
-  <button onclick="try{window.parent.document.getElementById('bsi-chimorga-ov').style.display='none';}catch(e){}" title="Torna all\'app">◀ Indietro</button>
+  <button onclick="try{window.parent.document.getElementById('bsi-chimorga-ov').style.display='none';}catch(e){}" title="Torna all\'app">↩ Indietro</button>
 </div>
 </body>
 </html>

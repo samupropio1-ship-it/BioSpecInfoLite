@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RDKit Cheminformatics Lab — BioSpecInfo</title>
+<script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.7/dist/smiles-drawer.min.js" crossorigin="anonymous" onerror="var s=document.createElement('script');s.src='https://unpkg.com/smiles-drawer@2.1.7/dist/smiles-drawer.min.js';document.head.appendChild(s)"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0a1b2e;color:#d4e0ec;line-height:1.55;min-height:100vh}
@@ -21,6 +22,17 @@ th{background:#071221;color:#00c9b7;padding:5px 9px;text-align:left;border:1px s
 td{padding:4px 9px;border:1px solid #1c3a57;color:#d4e0ec;vertical-align:top}
 tr:nth-child(even) td{background:rgba(7,18,33,.35)}
 kbd{display:inline-block;background:#071221;border:1px solid #1c3a57;border-radius:3px;padding:1px 6px;font-size:.8em;color:#e8eef4;font-family:monospace}
+
+
+/* Preset molecule categories */
+.ptab{padding:5px 10px;font-size:.75rem;font-weight:600;color:#9fb3c8;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;user-select:none;flex-shrink:0}
+.ptab.active{color:#00c9b7;border-bottom-color:#00c9b7}
+.ptab:hover:not(.active){color:#e2e8f0}
+.pcat{display:none;margin-top:7px}
+.pcat.active{display:block}
+.pcat-sub{margin-bottom:6px}
+.pcat-sub-lbl{font-size:.68rem;color:#64b5f6;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.pcat-btns{display:flex;gap:4px;flex-wrap:wrap}
 
 /* Layout */
 #app{display:flex;flex-direction:column;min-height:100vh}
@@ -166,6 +178,12 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
 .inchi-lbl{color:#9fb3c8;font-size:.72rem;min-width:65px;flex-shrink:0}
 .inchi-val{font-family:monospace;font-size:.73rem;color:#d4e0ec;word-break:break-all;flex:1}
 @media(max-width:500px){.cmp-grid{grid-template-columns:1fr}}
+/* ── Spectral Lab ── */
+.spec-cw{position:relative;background:#07111f;border-radius:7px;border:1px solid #1c3a57;overflow:hidden;margin:.5em 0;line-height:0}
+.spec-cw canvas{display:block;width:100%;cursor:crosshair}
+.spec-tip{position:absolute;background:rgba(10,25,45,.97);border:1px solid #2a4a6b;border-radius:5px;padding:4px 9px;font-size:.74rem;color:#d4e0ec;pointer-events:none;white-space:normal;line-height:1.4;z-index:20;max-width:260px;display:none}
+.sptb{padding:4px 11px;font-size:.77rem;font-weight:700;border-radius:4px;cursor:pointer;transition:background .12s,color .12s,border-color .12s}
+.sptb.on{background:#0a7a71!important;color:#fff!important;border-color:transparent!important}
 /* ── Floating back button ── */
 #bsi-float-back{position:fixed;bottom:16px;right:14px;z-index:9997;display:none}
 #bsi-float-back>button{background:#071221;border:2px solid #00c9b7;color:#00c9b7;border-radius:22px;padding:10px 22px;font-size:.82rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.65),0 0 14px rgba(0,201,183,.15);letter-spacing:.025em;transition:background .15s,transform .12s,box-shadow .15s}
@@ -182,6 +200,27 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
 .meter-fill{transition:width .75s cubic-bezier(.4,0,.2,1)}
 .fp-fill{transition:width .65s cubic-bezier(.4,0,.2,1)}
 .qed-bar-fill{transition:width .8s cubic-bezier(.4,0,.2,1)}
+/* ── Pharma Pro ── */
+.adme-card{background:#071221;border:1px solid #1c3a57;border-radius:8px;padding:10px 12px}
+.adme-val{font-size:1.1rem;font-weight:800;margin-bottom:2px}
+.adme-key{font-size:.73rem;color:#9fb3c8}
+.adme-bar{height:6px;background:#1c3a57;border-radius:3px;overflow:hidden;margin:4px 0}
+.adme-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.tox-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #1c3a57;font-size:.82rem}
+.tox-row:last-child{border-bottom:none}
+.tox-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.tox-text{flex:1}
+.tox-lvl{font-size:.7rem;padding:2px 8px;border-radius:8px;font-weight:700;flex-shrink:0}
+.cmp-drug-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1c3a57;font-size:.81rem}
+.cmp-drug-row:last-child{border-bottom:none}
+.cmp-drug-name{min-width:90px;color:#e8eef4;font-weight:600}
+.cmp-sim-bar{flex:1;height:6px;background:#1c3a57;border-radius:3px;overflow:hidden}
+.cmp-sim-fill{height:100%;border-radius:3px;transition:width .6s}
+/* ── Quantum Lab ── */
+#q-canvas{image-rendering:crisp-edges}
+.q-orbit-label{display:inline-block;background:#071221;border:1px solid #1c3a57;border-radius:4px;padding:2px 8px;font-family:monospace;font-size:.8em;color:#b794f6;margin:2px}
+.q-shell{margin:.3em 0;padding:6px 10px;border-radius:6px;background:#071221;border-left:3px solid #00c9b7;font-family:monospace;font-size:.84rem}
+.q-electron{color:#00c9b7;font-weight:700}
 </style>
 </head>
 <body>
@@ -189,7 +228,8 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
 
 <div id="topbar">
   <div class="logo">🧪 RDKit Lab</div>
-  <div class="tab active" data-panel="p-mol" onclick="showPanel(this,'p-mol')">🔬 Molecola</div>
+  <div class="tab active" data-panel="p-intro" onclick="showPanel(this,'p-intro')">📋 Intro</div>
+  <div class="tab" data-panel="p-mol" onclick="showPanel(this,'p-mol')">🔬 Molecola</div>
   <div class="tab" data-panel="p-desc" onclick="showPanel(this,'p-desc')">📊 Descrittori</div>
   <div class="tab" data-panel="p-drug" onclick="showPanel(this,'p-drug')">💊 Drug-likeness</div>
   <div class="tab" data-panel="p-qsar" onclick="showPanel(this,'p-qsar')">🔮 QSAR</div>
@@ -198,6 +238,9 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
   <div class="tab" data-panel="p-cmp" onclick="showPanel(this,'p-cmp')">⚖️ Confronto</div>
   <div class="tab" data-panel="p-lib" onclick="showPanel(this,'p-lib')">📚 Libreria</div>
   <div class="tab" data-panel="p-guide" onclick="showPanel(this,'p-guide')">📖 Guida</div>
+  <div class="tab" data-panel="p-speclive" onclick="showPanel(this,'p-speclive');if(!window._spLivInit){SpectralLab.init();window._spLivInit=1;}">🎬 Spettri</div>
+  <div class="tab" data-panel="p-pharma" onclick="showPanel(this,'p-pharma')">🔬 Pharma Pro</div>
+  <div class="tab" data-panel="p-quantum" onclick="showPanel(this,'p-quantum');initQuantum()">⚛️ Quantum</div>
 </div>
 
 <div id="content">
@@ -206,11 +249,105 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
   <div class="spinner" id="rdk-spin"></div>
   <span id="rdk-msg" class="s-loading">Caricamento RDKit.js…</span>
   <span id="rdk-ver" style="color:#1c3a57;font-size:.73rem;margin-left:auto"></span>
+  <button id="rdk-retry-btn" class="btn btn-outline btn-sm" style="display:none;margin-left:8px;font-size:.73rem" onclick="retryRDKit()">↺ Ricarica</button>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: INTRO -->
+<div class="panel active" id="p-intro">
+<h2>📋 Che cos'è questo Lab?</h2>
+
+<div class="card">
+<h3>🧪 RDKit — la libreria di cheminformatica</h3>
+<p><strong>RDKit</strong> è una libreria open-source di <em>cheminformatica</em> scritta in C++ e Python, sviluppata da Greg Landrum e mantenuta da una grande comunità scientifica. È lo standard industriale in aziende farmaceutiche (Novartis, Roche, AstraZeneca…) e in ambito accademico.</p>
+<p style="margin-top:.5em">In questo lab utilizziamo <strong>RDKit.js</strong>, la versione WebAssembly (WASM) che gira direttamente nel browser — nessun server, nessun dato inviato a terzi.</p>
+<div class="tip" style="margin-top:.7em">
+  <strong>SMILES</strong> (Simplified Molecular Input Line Entry System) è il linguaggio testuale per descrivere molecole. Esempio: <span class="smiles-eg" onclick="_loadSmi(this.textContent);showPanelById('p-mol')">CC(=O)Nc1ccc(O)cc1</span> = Paracetamolo. Clicca per caricarlo.
+</div>
+</div>
+
+<div class="card">
+<h3>📊 Descrittori molecolari — cosa sono?</h3>
+<p>I <strong>descrittori molecolari</strong> sono proprietà numeriche calcolate dalla struttura di una molecola. Sono fondamentali in farmacologia, QSAR e scoperta di farmaci:</p>
+<div class="desc-grid" style="margin-top:.5em">
+  <div class="di"><div class="dv">MW</div><div class="dk">Peso molecolare (Da)</div><div class="dh">Massa in Dalton. &lt;500 Da per farmaci orali (Lipinski)</div></div>
+  <div class="di"><div class="dv">LogP</div><div class="dk">Lipofilicità (partizione)</div><div class="dh">Misura quanto è lipofilica/idrofila una molecola. Ideale 0–3 per farmaci</div></div>
+  <div class="di"><div class="dv">HBD</div><div class="dk">Donatori H-bond</div><div class="dh">N-H e O-H. &lt;5 (Lipinski). Influenza assorbimento orale</div></div>
+  <div class="di"><div class="dv">HBA</div><div class="dk">Accettori H-bond</div><div class="dh">N e O. &lt;10 (Lipinski). Influenza solubilità e permeabilità</div></div>
+  <div class="di"><div class="dv">TPSA</div><div class="dk">Sup. polare topologica</div><div class="dh">Somma delle aree polari. &lt;140 Å² per buona biodisponibilità orale</div></div>
+  <div class="di"><div class="dv">RotB</div><div class="dk">Legami rotabili</div><div class="dh">&lt;10 per farmaci orali. Influenza conformazione e flessibilità</div></div>
+  <div class="di"><div class="dv">Rings</div><div class="dk">N° di anelli</div><div class="dh">Anelli aromatici e alifatici. Influenza rigidità e metabolismo</div></div>
+  <div class="di"><div class="dv">FSP3</div><div class="dk">Frazione sp³</div><div class="dh">C sp³ / totale C. Correlato con solubilità e successo clinico</div></div>
+</div>
+</div>
+
+<div class="card">
+<h3>💊 Drug-likeness — Regola di Lipinski (Ro5)</h3>
+<p>La <strong>Regola dei Cinque di Lipinski</strong> (1997) predice se una molecola ha buona biodisponibilità orale. Una molecola <em>drug-like</em> rispetta <strong>al massimo 1 violazione</strong>:</p>
+<div style="margin:.5em 0">
+  <div class="rule-row"><span class="rbadge rb-ok">✓</span><span>MW ≤ 500 Da</span></div>
+  <div class="rule-row"><span class="rbadge rb-ok">✓</span><span>LogP ≤ 5</span></div>
+  <div class="rule-row"><span class="rbadge rb-ok">✓</span><span>Donatori H-bond ≤ 5 (N-H + O-H)</span></div>
+  <div class="rule-row"><span class="rbadge rb-ok">✓</span><span>Accettori H-bond ≤ 10 (N + O)</span></div>
+</div>
+<p>Esistono regole aggiuntive: <strong>Regola di Veber</strong> (TPSA ≤ 140 Å², RotBond ≤ 10), <strong>Regola di Ghose</strong> (LogP –0.4/5.6, MW 160–480), <strong>Regola di Egan</strong>.</p>
+<div class="note">Il <strong>QED</strong> (Quantitative Estimate of Drug-likeness) è un punteggio 0–1 che integra tutte le proprietà in un unico numero. QED &gt; 0.5 è considerato farmaco-simile.</div>
+</div>
+
+<div class="card">
+<h3>🔮 QSAR — Relazioni Struttura-Attività</h3>
+<p>Il <strong>QSAR</strong> (Quantitative Structure–Activity Relationship) mette in relazione descrittori molecolari con attività biologica o tossicità. Questo lab calcola predizioni empiriche basate su correlazioni note dalla letteratura:</p>
+<ul style="margin:.4em 0 .4em 1.2em;font-size:.85rem;color:#d4e0ec">
+  <li><strong>pIC50 stimato</strong>: potenza inibitoria predetta (IC50 = concentrazione che inibisce al 50%)</li>
+  <li><strong>LogS (ESOL)</strong>: solubilità acquosa predetta (modello di Delaney)</li>
+  <li><strong>Tossicità Ames</strong>: predizione di mutagenicità batterica</li>
+  <li><strong>hERG alert</strong>: rischio di blocco canale K⁺ cardiaco (QT prolongation)</li>
+  <li><strong>ADMET</strong>: predizioni di assorbimento, distribuzione, metabolismo, escrezione, tossicità</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>🔗 Fingerprints molecolari e Tanimoto</h3>
+<p>Un <strong>fingerprint molecolare</strong> è una rappresentazione binaria (stringa di bit 0/1) della struttura chimica. Ogni bit rappresenta la presenza/assenza di un sottostruttura.</p>
+<p style="margin-top:.4em">La <strong>similarità di Tanimoto</strong> (Jaccard coefficient) tra due molecole A e B è:</p>
+<div style="text-align:center;font-size:1.05rem;font-family:monospace;color:#00c9b7;margin:.5em 0;padding:8px;background:#071221;border-radius:6px">
+  T(A,B) = |A ∩ B| / |A ∪ B| = bit_comuni / (bit_A + bit_B − bit_comuni)
+</div>
+<p>T = 1.0 → molecole identiche; T &gt; 0.85 → molto simili; T &lt; 0.4 → diverse strutturalmente. Usato in virtual screening e clustering di librerie chimiche.</p>
+</div>
+
+<div class="card">
+<h3>🎬 Laboratorio Spettri — come funziona</h3>
+<p>La tab <strong>🎬 Spettri</strong> genera spettri animati (NMR, IR, UV-Vis, MS, Raman) a partire dal codice SMILES, senza bisogno di RDKit:</p>
+<ul style="margin:.4em 0 .4em 1.2em;font-size:.85rem;color:#d4e0ec">
+  <li><strong>¹H NMR</strong>: picchi calcolati dai gruppi funzionali (ArH, OH, NH, CH₃, CH₂…) con spostamenti chimici tipici (δ in ppm)</li>
+  <li><strong>IR (Trasmittanza)</strong>: bande di assorbimento per stretching/bending di C=O, O-H, N-H, C-H, C≡N…</li>
+  <li><strong>UV-Vis</strong>: transizioni π→π* e n→π* calcolate dai cromofori rilevati</li>
+  <li><strong>MS</strong>: ione molecolare M⁺ + frammenti tipici (perdita CO, CH₃, COOH…) con pattern isotopici per Cl e Br</li>
+  <li><strong>Raman</strong>: bande intense per C≡C, C=C aromatico, ring breathing, C-X</li>
+</ul>
+<div class="tip">Passa il cursore sui picchi per leggere l'assegnazione chimica.</div>
+</div>
+
+<div class="card">
+<h3>⚡ Come usare questo Lab</h3>
+<div class="guide-step"><div class="step-num">1</div><div class="step-body"><strong>🔬 Molecola</strong> — inserisci un SMILES o clicca su un preset. La struttura 2D appare immediatamente grazie a SmilesDrawer, senza attendere RDKit.</div></div>
+<div class="guide-step"><div class="step-num">2</div><div class="step-body"><strong>📊 Descrittori</strong> — dopo che RDKit carica (barra in alto), tutti i parametri fisico-chimici vengono calcolati automaticamente.</div></div>
+<div class="guide-step"><div class="step-num">3</div><div class="step-body"><strong>💊 Drug-likeness</strong> — verifica Lipinski Ro5, QED, SA Score e tutte le regole farmacologiche per la tua molecola.</div></div>
+<div class="guide-step"><div class="step-num">4</div><div class="step-body"><strong>🔮 QSAR</strong> — predizioni di LogS, pIC50, BBB, tossicità e altro basate su correlazioni empiriche.</div></div>
+<div class="guide-step"><div class="step-num">5</div><div class="step-body"><strong>🔗 Similarità</strong> — confronta la molecola con i farmaci nel database tramite fingerprint e indice di Tanimoto.</div></div>
+<div class="guide-step"><div class="step-num">6</div><div class="step-body"><strong>🎬 Spettri</strong> — visualizza NMR, IR, MS, UV-Vis e Raman animati. Funziona anche senza RDKit.</div></div>
+<div class="guide-step"><div class="step-num">7</div><div class="step-body"><strong>📚 Libreria</strong> — salva le molecole che analizzi per confrontarle in seguito.</div></div>
+</div>
+
+<div style="text-align:center;margin:14px 0 6px">
+  <button class="btn" onclick="showPanelById('p-mol');setTimeout(function(){loadExample();},80)">▶ Inizia con un esempio</button>
+  <button class="btn btn-outline" style="margin-left:8px" onclick="showPanelById('p-speclive');if(!window._spLivInit){SpectralLab.init();window._spLivInit=1;}">🎬 Vai agli Spettri</button>
 </div>
 </div>
 
 <!-- ══════════════════════════════════════ PANEL: MOLECOLA -->
-<div class="panel active" id="p-mol">
+<div class="panel" id="p-mol">
 <h2>🔬 Visualizzatore Molecolare</h2>
 <div class="card">
   <div class="inp-row">
@@ -219,21 +356,533 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
     <button class="btn" onclick="analyzeMol()">Analizza</button>
     <button class="btn btn-outline btn-sm" onclick="loadExample()">Esempio</button>
   </div>
-  <div style="font-size:.76rem;color:#9fb3c8;margin-top:4px">
-    Farmaci noti: premi per caricare
-    <span style="color:#1c3a57"> · <kbd>Enter</kbd> per analizzare</span>
+<div style="font-size:.76rem;color:#9fb3c8;margin-top:4px">
+  Molecole per categoria — clicca per caricare <span style="color:#1c3a57"> · <kbd>Enter</kbd> per analizzare</span>
+</div>
+<div style="display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #1c3a57;margin-top:6px;padding-bottom:0">
+  <div class="ptab active" onclick="showPresetCat(this,'pcat-farmaci')">💊 Farmaci</div>
+  <div class="ptab" onclick="showPresetCat(this,'pcat-organica')">🧪 Organica</div>
+  <div class="ptab" onclick="showPresetCat(this,'pcat-biochimica')">🧬 Biochimica</div>
+  <div class="ptab" onclick="showPresetCat(this,'pcat-naturali')">🌿 Naturali</div>
+  <div class="ptab" onclick="showPresetCat(this,'pcat-solventi')">⚗️ Solventi & Mat.</div>
+  <div class="ptab" onclick="showPresetCat(this,'pcat-chimica-fisica')">⚛️ Chim. Fisica</div>
+</div>
+<div class="pcat active" id="pcat-farmaci">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Analgesici / FANS</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)Nc1ccc(O)cc1')">Paracetamolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Ibuprofene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C(O)c1ccccc1OC(C)=O')">Aspirina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2cc(ccc2c1)C(C)C(=O)O')">Naprossene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)Cc1ccccc1Nc1c(Cl)cccc1Cl')">Diclofenac</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)C(C)c1cccc(c1)C(=O)c1ccccc1')">Ketoprofene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2c(c1)c(CC(=O)O)c(C)n2C(=O)c1ccc(Cl)cc1')">Indometacina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@@H]3[C@@H]1C5')">Morfina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2c(c1)C[C@H]1N(C)CC[C@@]3(O)[C@H]1[C@@H]2O3')">Codeina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1(CCc2ccccc2)CCCC1CN(C)C')">Tramadolo</button>
+    </div>
   </div>
-  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)Nc1ccc(O)cc1')">Paracetamolo</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)Cc1ccc(cc1)C(C)C(=O)O')">Ibuprofene</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C(O)c1ccccc1OC(C)=O')">Aspirina</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CCC[C@H]1c2cccnc2')">Nicotina</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1cnc2N(C)C(=O)N(C)c12')">Caffeina</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCc1ccc(O)c(O)c1')">Dopamina</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')">Testosterone</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O')">Glucosio</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1=C2[C@@]([C@H](C(=O)[C@@H]3[C@@]2(C[C@@H]([C@H]4[C@]3(COC4=O)OC(=O)c5ccccc5)O)C)OC(=O)[C@@H](NC(=O)c6ccccc6)c7ccccc7)(C[C@@H]1OC(=O)[C@H](O)[C@@H](NC(=O)c8ccccc8)c9ccccc9)O')">Paclitaxel</button>
-    <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34')">Pirene</button>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Psicofarmaci</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1cnc2N(C)C(=O)N(C)c12')">Caffeina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CCC[C@H]1c2cccnc2')">Nicotina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1C(=O)CN=C(c2ccccc2)c2cc(Cl)ccc21')">Diazepam</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1nnc2N3CC(=NCC3=O)c4ccccc4c2c1')">Alprazolam</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CNCCC(Oc1ccc(C(F)(F)F)cc1)c1ccccc1')">Fluoxetina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN[C@@H]1CC[C@@H](c2ccc(Cl)c(Cl)c2)c2ccccc21')">Sertralina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)CCC=C1c2ccccc2CCc2ccccc21')">Amitriptilina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1(CCc2ccc(Cl)cc2)CCN(CCCCc2ccc3c(c2)OCC3=O)CC1')">Aloperidolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1cc2c(cc1OC)CC1CC(=O)Cc3cc(OC)c(OC)cc3CN1CC2')">Donepezil</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Antibiotici</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C)S[C@@H]2[C@H](NC(=O)[C@@H](N)c3ccc(O)cc3)C(=O)N2[C@H]1C(=O)O')">Amoxicillina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C)S[C@@H]2[C@H](NC(=O)[C@@H](N)c3ccccc3)C(=O)N2[C@H]1C(=O)O')">Ampicillina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C)S[C@@H]2[C@H](NC(=O)Cc3ccccc3)C(=O)N2[C@H]1C(=O)O')">Penicillina G</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O')">Ciprofloxacina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ncc([N+](=O)[O-])n1CCO')">Metronidazolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@@H](O)[C@@H](NC(=O)C(Cl)Cl)c1ccc([N+](=O)[O-])cc1')">Cloramfenicolo</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Cardiovascolare</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)c1c(C(=O)Nc2ccccc2F)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CC[C@@H](O)CC(=O)O')">Atorvastatina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCc1nc(Cl)c(CO)n1Cc1ccc(-c2ccccc2-c2nnn[nH]2)cc1')">Losartan</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOC(=O)C1=C(COCCN)NC(C)=C(C(=O)OC)C1c1ccccc1Cl')">Amlodipina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)NCC(O)COc1cccc2ccccc12')">Propranololo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCOC(=O)CCOc1ccc(CC(O)CNC(C)C)cc1')">Metoprololo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1CC2(OC1C(O)C2O)O[C@H]1CC[C@@H]2CC3=CC(=O)O[C@H]3C[C@H]2[C@H]1C')">Digossina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Anticancro</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1=C2[C@@]([C@H](C(=O)[C@@H]3[C@@]2(C[C@@H]([C@H]4[C@]3(COC4=O)OC(=O)c5ccccc5)O)C)OC(=O)[C@@H](NC(=O)c6ccccc6)c7ccccc7)(C[C@@H]1OC(=O)[C@H](O)[C@@H](NC(=O)c8ccccc8)c9ccccc9)O')">Paclitaxel</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(Cc1cnc2nc(N)nc(N)c2n1)c1ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)cc1')">Metotrexato</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC(=C(c1ccccc1)c1ccc(OCCN(C)C)cc1)c1ccccc1')">Tamoxifene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1')">Imatinib</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=c1[nH]cc(F)c(=O)[nH]1')">5-Fluorouracile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('[NH3][Pt](Cl)(Cl)[NH3]')">Cisplatino</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Antiistaminici & GI</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOC(=O)n1ccc2c(cc1=O)-c1cccc3cccc1N2CC3')">Loratadina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(=O)N1CCN(CC1)c1ccc(Cl)cc1')">Cetirizina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)CCOc1ccccc1Cc1ccccc1')">Difenidramina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NS(=O)(=O)/C(=N/NC(=O)NC)N=Cc1csc(CN2CCSCC2)n1')">Famotidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2[nH]c([S@@](=O)Cc3ncc(C)c(OC)c3C)nc2c1')">Omeprazolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)C(=N)NC(N)=N')">Metformina</button>
+    </div>
+  </div>
+</div>
+<div class="pcat" id="pcat-organica">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Alcani & Cicloalcani</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C')">Metano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC')">Etano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC')">Propano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCC')">Butano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)C')">Isobutano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCC')">Pentano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)(C)C')">Neopentano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCC')">Esano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CC1')">Ciclopropano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCC1')">Ciclobutano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCCC1')">Ciclopentano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCCCC1')">Cicloesano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1C2CC3CC1CC(C2)C3')">Adamantano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCC2CCCCC2C1')">Decalina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Alcheni & Alchini</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=C')">Etilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC=C')">Propilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC=C')">1-Butene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C/C=C\C')">cis-2-Butene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C/C=C/C')">trans-2-Butene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=C)C')">Isobutilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=CC=C')">1,3-Butadiene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=C)C=C')">Isoprene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C#C')">Acetilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC#C')">Propino</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC#C')">1-Butino</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=Cc1ccccc1')">Stirene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C(=C)C#C')">Vinilacetilene</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Aromatici & PAH</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccccc1')">Benzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccccc1')">Toluene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccccc1C')">o-Xilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(C)cc1')">p-Xilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCc1ccccc1')">Etilbenzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=Cc1ccccc1')">Stirene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2ccccc2c1')">Naftalene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2cc3ccccc3cc2c1')">Antracene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2c(c1)ccc1ccccc12')">Fenantrene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2c(c1)cc1ccc3cccc4ccc2c1c34')">Pirene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2c(c1)Cc1ccccc1-2')">Fluorene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc(-c2ccccc2)cc1')">Bifenile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2cc3ccccc3cc2c1')">Trifenilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2cccc2c1')">Azulene</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Alogeno-derivati</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCl')">Clorometano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClCCl')">Diclorometano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClC(Cl)Cl')">Cloroformio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClC(Cl)(Cl)Cl')">CCl₄</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Brc1ccccc1')">Bromobenzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Clc1ccccc1')">Clorobenzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Fc1ccccc1')">Fluorobenzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Ic1ccccc1')">Iodobenzene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClCC=C')">Allilcloruro</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('BrCc1ccccc1')">Benzile bromuro</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCBr')">1-Bromobutano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(Cl)cc1')">p-Clorotoluene</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Alcoli & Fenoli</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CO')">Metanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCO')">Etanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCO')">1-Propanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(O)C')">2-Propanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCO')">1-Butanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)(C)O')">t-Butanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(O)CO')">Glicerina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCCO')">Etilenglicole</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1ccccc1')">Fenolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(O)cc1')">Cresolo-p</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccccc1O')">Guaiacolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1CCCCC1')">Cicloesan-1-olo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCc1ccccc1')">Benzilalcol</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Eteri & Epossidi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOCC')">Dietiletere</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCOC1')">THF</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1COCCO1')">1,4-Diossano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccccc1')">Anisolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)(C)OC')">MTBE</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CO1')">Ossido di etilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1CO1')">Ossido di propilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1OC1c1ccccc1')">Ossido di stirene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COCC')">DME</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1OCO1')">Diossolo</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Aldeidi & Chetoni</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=O')">Formaldeide</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC=O')">Acetaldeide</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC=O')">Propanal</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCC=O')">Butanal</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=Cc1ccccc1')">Benzaldeide</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=CC=Cc1ccccc1')">Cinnamaldeide</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)=O')">Acetone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC(C)=O')">Butanone (MEK)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C1CCCCC1')">Cicloesanone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C(c1ccccc1)c1ccccc1')">Benzofenone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)c1ccccc1')">Acetofenone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(=O)CO')">Diidrossiacetone</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Acidi & Derivati</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC=O')">Acido formico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)O')">Acido acetico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC(=O)O')">Acido propionico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)c1ccccc1')">Acido benzoico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)C(=O)O')">Acido ossalico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)CC(=O)O')">Acido malonico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)CCC(=O)O')">Acido succinico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)CCCC(=O)O')">Acido glutarico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)OC(C)=O')">Anidride acetica</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)Cl')">Cloruro di acetile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOC(C)=O')">Acetato di etile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NC(=O)c1ccccc1')">Benzammide</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NC(N)=O')">Urea</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)O')">Acido acetico glac.</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Ammine</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN')">Metilamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CNC')">Dimetilamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)C')">Trimetilammina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCN')">Etilamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCNCC')">Dietilamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ccccc1')">Anilina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(N)cc1')">p-Toluidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCN(CC)CC')">Trietilammina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCCCN')">Putrescina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCCCCN')">Cadaverina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCCCNCCCCN')">Spermina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCS(=O)(=O)O')">Taurina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Eterocicli N/O/S</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccncc1')">Piridina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1cc[nH]c1')">Pirrol</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccoc1')">Furano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccsc1')">Tiofene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1cnc[nH]1')">Imidazolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1cnccn1')">Pirimidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1cnccn1')">Pirazina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1cocn1')">Ossazolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CNCCO1')">Morfolina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCNCC1')">Piperidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CNCCN1')">Piperazina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2ncccc2c1')">Chinolina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccc2[nH]ccc2c1')">Indolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ncc2[nH]cnc2n1')">Purina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ncnc2[nH]cnc12')">Adenina</button>
+    </div>
+  </div>
+</div>
+<div class="pcat" id="pcat-biochimica">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Amminoacidi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCC(=O)O')">Glicina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](C)C(=O)O')">Alanina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](C(C)C)C(=O)O')">Valina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](CC(C)C)C(=O)O')">Leucina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC[C@H](C)[C@@H](N)C(=O)O')">Isoleucina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](CO)C(=O)O')">Serina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H]([C@H](O)C)C(=O)O')">Treonina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](CS)C(=O)O')">Cisteina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CSCC[C@@H](N)C(=O)O')">Metionina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](Cc1ccccc1)C(=O)O')">Fenilalanina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](Cc1ccc(O)cc1)C(=O)O')">Tirosina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O')">Triptofano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](Cc1cnc[nH]1)C(=O)O')">Istidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NCCCC[C@@H](N)C(=O)O')">Lisina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NC(=N)NCCC[C@@H](N)C(=O)O')">Arginina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](CC(=O)O)C(=O)O')">Acido aspartico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N[C@@H](CCC(=O)O)C(=O)O')">Acido glutammico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NC(=O)C[C@@H](N)C(=O)O')">Asparagina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('NC(=O)CC[C@@H](N)C(=O)O')">Glutammina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)[C@@H]1CCCN1')">Prolina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Carboidrati</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O')">α-D-Glucosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@@H]1OC(O)(CO)[C@@H](O)[C@H]1O')">β-D-Fruttosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@H](O)[C@@H]1O')">D-Galattosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@@H]1OC(O)[C@@H](O)[C@@H](O)[C@@H]1O')">D-Mannosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@@H]1O')">D-Ribosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)C[C@@H]1O')">2-Desossiribosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@@H](O)C(=O)[C@H](O)[C@@H](O)CO')">Fruttosio (lineare)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O[C@@H]2[C@@H](CO)O[C@](O)(CO)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O')">Saccarosio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)N[C@@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](CO)O1')">N-Acetilglucosamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1C(=O)O')">Acido glucuronico</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Nucleotidi & Basi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ncnc2[nH]cnc12')">Adenina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1nc2[nH]cnc2c(=O)[nH]1')">Guanina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ccn(C)c(=O)n1')">Citosina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1cnc(=O)[nH]c1=O')">Timina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=c1cc[nH]c(=O)[nH]1')">Uracile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O')">Adenosina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O')">ATP (semplif.)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1cn([C@H]2CC(O)[C@@H](CO)O2)c(=O)[nH]c1=O')">Timidina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)c1cccnc1')">Acido nicotinico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ncnc2c1ncn2[C@@H]1O[C@H]2COP(=O)(O)O[C@@H]2[C@H]1O')">cAMP</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Acidi Grassi & Lipidi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCCCCCCCCCCCC(=O)O')">Acido palmitico (C16)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCCCCCCCCCCCCCC(=O)O')">Acido stearico (C18)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCCCC/C=C\CCCCCCCC(=O)O')">Acido oleico (18:1)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCC/C=C\C/C=C\CCCCCCCC(=O)O')">Acido linoleico (18:2)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCC/C=C\C/C=C\C/C=C\C/C=C\CCCC(=O)O')">Acido arachidonico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC/C=C\C/C=C\C/C=C\C/C=C\C/C=C\CCCC(=O)O')">Acido EPA (20:5)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCC/C=C\C/C=C\C/C=C\C/C=C\C/C=C\C/C=C\CCCC(=O)O')">Acido DHA (22:6)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(O)CO')">Glicerolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCCCCCCCCC/C=C/[C@@H](O)[C@@H](N)CO')">Sfingosina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC[N+](C)(C)C')">Colina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Vitamine</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@H](O)[C@H]1OC(=O)C(O)=C1O')">Vitamina C</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1c(C)c(C)c2c(c1C)OCC(C)(CCC(C)CCC(C)CCCC(C)C)O2')">Vitamina E (α-toc.)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ncc(C[n+]2csc(CCO)c2C)cn1')">Tiamina (B1)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ncc(CO)c(CO)c1O')">Piridossina (B6)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)c1cccnc1')">Niacina (B3)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1nc2ncc(CNc3ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)cc3)nc2c(=O)[nH]1')">Acido folico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)CCCC[C@@H]1SC[C@@H]2NC(=O)N[C@H]12')">Biotina (B7)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC=C(C)C=CC=C(C)C=CC1=C(C)CCCC1(C)C')">Retinolo (vit. A)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(CCCC(C)C1CCC2C1CCC1=CC(O)CCC21)C')">Calciferolo (vit. D2)</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Steroidi & Ormoni</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O)CC[C@]4(C)[C@H]3CC[C@]12C')">Colesterolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C')">Testosterone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC2=C(CC[C@@H]3[C@@H]2CC[C@]4(C)[C@H]3CC[C@H]4O)C=C1')">Estradiolo (E2)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(=O)[C@@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@]4(C)[C@@H]3[C@@H](O)C[C@@]12C')">Cortisolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)[C@@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@]4(C)[C@@H]3CC[C@@]12C')">Progesterone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1CC2CCC3=CC(=O)CCC3=C2C1')">DHEA</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=CC1(O)CC2C3CCC4=CC(=O)CCC4=C3CCC2(C)C1=O')">Aldosterone</button>
+    </div>
+  </div>
+</div>
+<div class="pcat" id="pcat-naturali">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Alcaloidi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1cnc2N(C)C(=O)N(C)c12')">Caffeina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CCC[C@H]1c2cccnc2')">Nicotina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cn1cnc2N(C)C(=O)[nH]c2c1=O')">Teofillina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2c(c1)C[C@H]1N(C)CC[C@@]3(O)[C@H]1[C@@H]2O3')">Codeina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@@H]3[C@@H]1C5')">Morfina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1ccc2cc(OC)c(OC)c(OC)c2c1NC(=O)Cc1cc(OC)c(OC)c(OC)c1')">Colchicina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)[C@@H]1CC[C@H](CC1)OC(=O)[C@@](O)(CO)c1ccccc1')">Atropina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)[C@]1(C)C(=O)N[C@@H]2Cc3cn([C@@H]4CC[C@@H]5NC(=O)[C@H](CO)[C@]5([C@@H]4c3cc1=O)C)c(=O)n24')">Ergotamina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C1OC[C@@]23c4ccc5c(c4)[C@@H]2[C@H](OC[C@H]3C=C)[C@H]1N(CC5)C2')">Stricnina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=C(O)C=C(CC2OC3=CC(O)=CC(O)=C3C(O)=C2)C=C1')">Quercetina-nat.</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Terpeni</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1=CC(C(C)=C)CC=C1')">Limonene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1CCC(C(C)C)C(O)C1')">Mentolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1=CCC2CC1C2(C)C')">α-Pinene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C2CCC1=C)CCC2')">β-Pinene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC12CCC(CC1=O)C2(C)C')">Canfora</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)(O)C=CCCC(C)=C')">Linalolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)=CCC/C(C)=C\CO')">Geraniol</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=C)C1CC=C(C)C(=O)C1')">Carvone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccc(C(C)C)c(O)c1')">Timolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)c1ccc(C)cc1O')">Carvacrolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)=CCCC(C)=CCCC(C)=CCO')">Farnesolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=CCCC(=CCCC(=CCC/C(C)=C/CCC/C(C)=C\CCC=C(C)C)C)C)C')">Squalene</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Flavonoidi & Polifenoli</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC(=C2OC3=CC(O)=CC(O)=C3C(=O)C2=C1)O')">Quercetina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1ccc(-c2cc(=O)c3c(O)cc(O)cc3o2)cc1')">Apigenina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=c1cc(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12')">Luteolina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1ccc(-c2oc3cc(O)cc(O)c3c(=O)c2O)cc1')">Kaempferolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC(=C2C(=O)CC(c3ccc(O)cc3)O2)O')">Naringenina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC(=C2O[C@H](c3ccc(O)c(O)c3)C[C@@H](O)C2=C1)O')">Catechina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC(=C2O[C@@H](c3ccc(O)c(O)c3)[C@H](O)C2=C1)O')">Epicatechina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1')">Resveratrolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('COc1cc(/C=C/C(=O)CC(=O)/C=C/c2ccc(O)c(OC)c2)ccc1O')">Curcumina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Oc1ccc(-c2coc3cc(O)cc(O)c3c2=O)cc1')">Genisteina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Antibiotici Naturali</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C)S[C@@H]2[C@H](NC(=O)Cc3ccccc3)C(=O)N2[C@H]1C(=O)O')">Penicillina G</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC1(C)S[C@@H]2[C@H](NC(=O)[C@@H](N)c3ccc(O)cc3)C(=O)N2[C@H]1C(=O)O')">Amoxicillina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC[C@@H](O)[C@@H](NC(=O)C(Cl)Cl)c1ccc([N+](=O)[O-])cc1')">Cloramfenicolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ncc([N+](=O)[O-])n1CCO')">Metronidazolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1cc(NS(=O)(=O)c2ccc(N)cc2)no1')">Sulfametossazolo</button>
+    </div>
+  </div>
+</div>
+<div class="pcat" id="pcat-solventi">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Solventi da Lab</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O')">Acqua</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CO')">Metanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCO')">Etanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(O)C')">2-Propanolo</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)=O')">Acetone</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC#N')">Acetonitrile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)C=O')">DMF</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CS(C)=O')">DMSO</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClCCl')">DCM</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClC(Cl)Cl')">Cloroformio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOCC')">Dietiletere</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1CCOC1')">THF</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C1COCCO1')">1,4-Diossano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCOC(C)=O')">EtOAc</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCCCCC')">n-Esano</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cc1ccccc1')">Toluene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN1CCCC1=O')">NMP</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('c1ccncc1')">Piridina</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Monomeri & Polimeri</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=C')">Etilene (PE)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC=C')">Propilene (PP)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=Cc1ccccc1')">Stirene (PS)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClC=C')">Cloruro di vinile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=CC#N')">Acrilonitrile (PAN)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(O)C(=O)O')">Acido lattico (PLA)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C1CCCCCN1')">Caprolattame (Nylon 6)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(C)(c1ccc(O)cc1)c1ccc(O)cc1')">Bisfenolo A</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=C(C)C(=O)OC')">Metil metacrilato (PMMA)</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=CC(=O)OCC')">Acrilato di etile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C=CC(N)=O')">Acrilammide</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Reattivi Inorganici</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OO')">H₂O₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N')">Ammoniaca</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cl')">Acido cloridrico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OS(=O)(=O)O')">Acido solforico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=[N+]([O-])O')">Acido nitrico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OP(=O)(O)O')">Acido fosforico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)OC(C)=O')">Anidride acetica</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('ClC(=O)C(=O)Cl')">Cloruro di ossalile</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=P(Cl)(Cl)Cl')">Ossicloruro di P</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C[Si](C)(C)Cl')">Clorotrimeti lsilano</button>
+    </div>
+  </div>
+</div>
+<div class="pcat" id="pcat-chimica-fisica">
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Molecole Semplici</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('[H][H]')">H₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N#N')">N₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=O')">O₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('[C-]#[O+]')">CO</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C=O')">CO₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('C')">CH₄</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N')">NH₃</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Cl')">HCl</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=S=O')">SO₂</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=S(=O)=O')">SO₃</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('[N]=O')">NO</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N#[N+][O-]')">N₂O</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('S')">H₂S</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('N#C')">HCN</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('S=C=S')">CS₂</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Tamponi & Acidi</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CC(=O)O')">Acido acetico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(CC(=O)O)(CC(=O)O)C(=O)O')">Acido citrico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(C(O)C(=O)O)C(=O)O')">Acido tartarico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCCO[NH+]1CCN(CCS(=O)(=O)[O-])CC1')">HEPES</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OCC(N)(CO)CO')">TRIS</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OP(=O)(O)O')">Acido fosforico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)O')">Acido carbonico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OB(O)O')">Acido borico</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC(=O)CN(CCN(CC(=O)O)CC(=O)O)CC(=O)O')">EDTA</button>
+    </div>
+  </div>
+  <div class="pcat-sub">
+    <div class="pcat-sub-lbl">Indicatori & Coloranti</div>
+    <div class="pcat-btns">
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC=C(C(c2cc(O)ccc2O)c2ccccc2)C=C1')">Fenoftaleina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)c1ccc(/N=N/c2ccc(S(=O)(=O)O)cc2)cc1')">Metil arancio</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('OC1=CC=C2C(=C1)Oc1cc(O)ccc1C2=O')">Fluoresceina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCN(CC)c1ccc2c(-c3ccccc3C(=O)O)c3ccc(=[N+](CC)CC)cc3oc2c1')">Rodamina B</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('O=C1c2ccccc2C(=O)c2c1ccc(O)c2O')">Alizarina</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('Nc1ccc(-c2ccc3nc(N)c(cc3c2)C(=N)N)cc1')">DAPI</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CN(C)c1ccc2nc3ccc(=[N+](C)C)cc3[s+]c2c1')">Blu di metilene</button>
+      <button class="btn btn-outline btn-sm" onclick="loadPreset('CCN(CC)c1ccc2nc3ccc(=[N+](CC)CC)cc3cc2c1')">Acridina arancio</button>
+    </div>
   </div>
 </div>
 
@@ -823,6 +1472,211 @@ input[type=text]:focus,select:focus{border-color:#00c9b7}
 </div>
 </div>
 
+<!-- ══════════════════════════════════════ PANEL: SPETTRI LIVE -->
+<div class="panel" id="p-speclive">
+<h2>🎬 Laboratorio Spettri Animati</h2>
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="spec-smi-input" placeholder="SMILES — usa ← da Molecola o inserisci direttamente" onkeydown="if(event.key==='Enter')specAnalyze()">
+    <button class="btn btn-outline btn-sm" onclick="specLoadFromMol()" title="Importa SMILES dalla tab Molecola">← da Molecola</button>
+    <button class="btn btn-sm" onclick="specAnalyze()">Avvia</button>
+  </div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin:.4em 0">
+    <button class="btn sptb on" data-spt="nmr" onclick="specSetType(this,'nmr')">¹H NMR</button>
+    <button class="btn btn-outline sptb" data-spt="ir" onclick="specSetType(this,'ir')">IR</button>
+    <button class="btn btn-outline sptb" data-spt="uv" onclick="specSetType(this,'uv')">UV-Vis</button>
+    <button class="btn btn-outline sptb" data-spt="ms" onclick="specSetType(this,'ms')">MS</button>
+    <button class="btn btn-outline sptb" data-spt="raman" onclick="specSetType(this,'raman')">Raman</button>
+  </div>
+  <div class="spec-cw"><canvas id="spec-cv"></canvas><div id="spec-tip" class="spec-tip"></div></div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:6px">
+    <button class="btn btn-sm" id="spec-pb" onclick="specPlay()">▶ Avvia</button>
+    <button class="btn btn-outline btn-sm" onclick="specStep()">⏭ Passo</button>
+    <button class="btn btn-outline btn-sm" onclick="specReset()">↺ Reset</button>
+    <label style="font-size:.78rem;color:#9fb3c8;display:inline-flex;align-items:center;gap:4px;margin-left:auto;cursor:pointer">
+      <input type="checkbox" id="spec-ap" onchange="specToggleAuto(this.checked)"> Auto-play
+    </label>
+  </div>
+  <div id="spec-lgd" style="margin-top:5px;min-height:16px"></div>
+  <div id="spec-asgn" style="font-size:.81rem;color:#9fb3c8;min-height:20px;padding:3px 0;border-top:1px solid #0d2236;margin-top:4px"></div>
+</div>
+<div class="card card-dark">
+  <h3>Molecole rapide</h3>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CC(=O)Nc1ccc(O)cc1','Paracetamolo')">Paracetamolo</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('c1ccccc1','Benzene')">Benzene</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CC(=O)O','Acido acetico')">AcOH</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CCO','Etanolo')">Etanolo</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CC(=O)CC(=O)C','Acetilacetone')">Acetilacetone</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CN1CCC[C@H]1c2cccnc2','Nicotina')">Nicotina</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('O=C(O)c1ccccc1OC(C)=O','Aspirina')">Aspirina</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('CC(C)Cc1ccc(cc1)C(C)C(=O)O','Ibuprofene')">Ibuprofene</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('C#Cc1ccccc1','Fenilacetilene')">Fenilacetilene</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('OC(=O)c1ccc(N)cc1','PABA')">PABA</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('O=C1CCCCC1','Cicloesanone')">Cicloesanone</button>
+    <button class="btn btn-outline btn-sm" onclick="specLoadPreset('OCC1OC(O)C(O)C(O)C1O','Glucosio')">Glucosio</button>
+  </div>
+</div>
+<div class="tip">
+  <strong>Come usare:</strong> inserisci uno SMILES oppure clicca <em>← da Molecola</em> per importare quello attivo, poi scegli il tipo di spettro e premi <em>Avvia</em>.
+  Passa il cursore sui picchi per leggere l'assegnazione chimica. Clicca un picco per fissarla.
+  Lo spettro è generato in modo euristico dai gruppi funzionali rilevati nel SMILES, senza RDKit.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: PHARMA PRO -->
+<div class="panel" id="p-pharma">
+<h2>🔬 Pharma Pro — Drug Discovery Suite</h2>
+
+<div class="card">
+  <div class="inp-row">
+    <input type="text" id="pharma-smiles" placeholder="SMILES molecola — es. CC(=O)Nc1ccc(O)cc1 (paracetamolo)" onkeydown="if(event.key==='Enter')runPharmaAnalysis()">
+    <button class="btn" onclick="runPharmaAnalysis()">🔬 Analisi Pharma</button>
+    <button class="btn btn-outline btn-sm" onclick="syncFrom('pharma-smiles')">← da Molecola</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('CC(=O)Nc1ccc(O)cc1','Paracetamolo')">Paracetamolo</button>
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('CC(C)Cc1ccc(cc1)C(C)C(=O)O','Ibuprofene')">Ibuprofene</button>
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('CN1CCC[C@H]1c2cccnc2','Nicotina')">Nicotina</button>
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('Cn1cnc2N(C)C(=O)N(C)c12','Caffeina')">Caffeina</button>
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C','Testosterone')">Testosterone</button>
+    <button class="btn btn-outline btn-sm" onclick="pharmaPreset('Nc1ccc(NC2=NC=CC(Nc3ccc(N)cc3)=N2)cc1','Metformina-ana.')">Metformina-ana.</button>
+  </div>
+</div>
+
+<div id="pharma-result" style="display:none">
+
+<!-- ADME Panel -->
+<div class="card" style="margin-top:10px">
+  <h3 style="color:#00c9b7;margin-bottom:8px">💊 ADME Prediction</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px" id="adme-grid"></div>
+  <div id="adme-interp" class="tip" style="margin-top:10px;font-size:.82rem"></div>
+</div>
+
+<!-- Radar Drug Profile -->
+<div class="card" style="margin-top:10px">
+  <h3 style="color:#00c9b7;margin-bottom:8px">🕸 Drug Profile Radar (5 regole)</h3>
+  <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center">
+    <canvas id="pharma-radar" width="260" height="260" style="background:#071221;border-radius:10px;border:1px solid #1c3a57"></canvas>
+    <div id="pharma-radar-legend" style="font-size:.79rem;min-width:160px"></div>
+  </div>
+</div>
+
+<!-- Target & Docking -->
+<div class="card" style="margin-top:10px">
+  <h3 style="color:#00c9b7;margin-bottom:8px">🎯 Target Prediction & Docking Score Stimato</h3>
+  <div id="pharma-docking"></div>
+</div>
+
+<!-- Toxicity Alerts -->
+<div class="card" style="margin-top:10px">
+  <h3 style="color:#ff6b6b;margin-bottom:8px">⚠ Tossicità & Alert PAINS</h3>
+  <div id="pharma-tox"></div>
+</div>
+
+<!-- Drug Comparison -->
+<div class="card" style="margin-top:10px">
+  <h3 style="color:#00c9b7;margin-bottom:8px">⚖ Confronto con Farmaci di Riferimento</h3>
+  <div id="pharma-compare"></div>
+</div>
+
+<!-- Pharma Report Export -->
+<div class="card" style="margin-top:10px;background:#071221">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn" onclick="exportPharmaReport()">📄 Genera Report Pharma</button>
+    <span style="color:#9fb3c8;font-size:.79rem">Report HTML completo con tutti i parametri farmaceutici</span>
+  </div>
+</div>
+
+</div><!-- #pharma-result -->
+
+<div class="tip" style="margin-top:10px">
+  <strong>Pipeline Drug Discovery:</strong> ADME → Drug-likeness → Toxicity screening → Target prediction → Lead optimization. Questo pannello simula i primi step computazionali di uno screening primario.
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ PANEL: QUANTUM LAB -->
+<div class="panel" id="p-quantum">
+<h2>⚛️ Quantum Lab — Struttura Atomica & Orbitali</h2>
+
+<div class="card">
+  <h3>Seleziona elemento e configurazione</h3>
+  <div class="inp-row" style="flex-wrap:wrap;gap:8px">
+    <select id="q-element" onchange="updateQuantum()" style="width:auto;flex:none">
+      <option value="H,1">H (Z=1)</option>
+      <option value="He,2">He (Z=2)</option>
+      <option value="Li,3">Li (Z=3)</option>
+      <option value="Be,4">Be (Z=4)</option>
+      <option value="B,5">B (Z=5)</option>
+      <option value="C,6" selected>C (Z=6)</option>
+      <option value="N,7">N (Z=7)</option>
+      <option value="O,8">O (Z=8)</option>
+      <option value="F,9">F (Z=9)</option>
+      <option value="Ne,10">Ne (Z=10)</option>
+      <option value="Na,11">Na (Z=11)</option>
+      <option value="Mg,12">Mg (Z=12)</option>
+      <option value="Al,13">Al (Z=13)</option>
+      <option value="Si,14">Si (Z=14)</option>
+      <option value="P,15">P (Z=15)</option>
+      <option value="S,16">S (Z=16)</option>
+      <option value="Cl,17">Cl (Z=17)</option>
+      <option value="Ar,18">Ar (Z=18)</option>
+      <option value="K,19">K (Z=19)</option>
+      <option value="Ca,20">Ca (Z=20)</option>
+      <option value="Fe,26">Fe (Z=26)</option>
+      <option value="Cu,29">Cu (Z=29)</option>
+      <option value="Zn,30">Zn (Z=30)</option>
+      <option value="Br,35">Br (Z=35)</option>
+      <option value="I,53">I (Z=53)</option>
+    </select>
+    <select id="q-orbital-type" onchange="updateQuantumMode(this.value)" style="width:auto;flex:none">
+      <option value="atomic">Orbitali atomici (s, p, d)</option>
+      <option value="cloud">Nuvola elettronica</option>
+      <option value="energy">Livelli energetici</option>
+    </select>
+    <button class="btn btn-sm" onclick="toggleQuantumAnim()" id="q-play-btn">▶ Anima</button>
+    <button class="btn btn-outline btn-sm" onclick="resetQuantum()">↺ Reset</button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+  <div>
+    <h3>Visualizzatore Orbitali</h3>
+    <div style="position:relative;background:#030d1a;border-radius:10px;border:1px solid #1c3a57;overflow:hidden;line-height:0">
+      <canvas id="q-canvas" width="380" height="320" style="width:100%;display:block;cursor:crosshair"></canvas>
+      <div id="q-overlay" style="position:absolute;top:8px;left:10px;font-size:.73rem;color:#00c9b7;font-weight:700;font-family:monospace;pointer-events:none"></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('1s')">1s</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('2s')">2s</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('2p')">2p</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('3d')">3d</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('sp')">sp</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('sp2')">sp²</button>
+      <button class="btn btn-outline btn-sm" onclick="setQOrbital('sp3')">sp³</button>
+    </div>
+  </div>
+  <div>
+    <h3>Configurazione Elettronica</h3>
+    <div class="card card-dark" id="q-config-box" style="min-height:120px;font-size:.84rem"></div>
+    <h3 style="margin-top:10px">Proprietà Quantistiche</h3>
+    <div class="desc-grid" id="q-props-grid" style="margin-top:6px"></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:10px">
+  <h3>📖 Numeri Quantistici</h3>
+  <table style="font-size:.82rem">
+    <tr><th>Simbolo</th><th>Nome</th><th>Valori</th><th>Significato</th></tr>
+    <tr><td><code>n</code></td><td>Principale</td><td>1, 2, 3…</td><td>Livello energetico / shell</td></tr>
+    <tr><td><code>ℓ</code></td><td>Angolare (azimutale)</td><td>0…n−1</td><td>Forma dell'orbitale (s=0, p=1, d=2, f=3)</td></tr>
+    <tr><td><code>m<sub>ℓ</sub></code></td><td>Magnetico</td><td>−ℓ…+ℓ</td><td>Orientazione nello spazio</td></tr>
+    <tr><td><code>m<sub>s</sub></code></td><td>Spin</td><td>+½, −½</td><td>Spin dell'elettrone (↑ o ↓)</td></tr>
+  </table>
+  <div class="tip" style="margin-top:8px"><strong>Principio di Aufbau:</strong> gli elettroni occupano gli orbitali nell'ordine 1s → 2s → 2p → 3s → 3p → 4s → 3d… seguendo la regola di Hund e il principio di esclusione di Pauli.</div>
+</div>
+</div>
+
 </div><!-- #content -->
 </div><!-- #app -->
 
@@ -836,38 +1690,127 @@ function setStatus(msg,type){
   sp.style.display=type==='loading'?'block':'none';
 }
 
+function _rdkitReady(rdk){
+  RDKit=rdk; rdkReady=true;
+  try{document.getElementById('rdk-ver').textContent='v'+rdk.version();}catch(e){}
+  setStatus('RDKit.js pronto ✔ — tutti i descrittori disponibili','ok');
+  ['btn-svg','btn-png','btn-cpsmi','btn-addlib','btn-runall'].forEach(function(id){
+    var b=document.getElementById(id);if(b)b.disabled=false;
+  });
+  // Analyze pending molecule — update all panels that showed heuristic estimates
+  var smiToAnalyze = window._pendingSMI || curSMI ||
+    (document.getElementById('smiles-input')||{value:''}).value.trim();
+  window._pendingSMI=null;
+  if(smiToAnalyze){
+    document.getElementById('smiles-input').value=smiToAnalyze;
+    curSMI=smiToAnalyze;
+    setTimeout(function(){
+      analyzeMol();
+      // Re-run any panels that were showing heuristic data
+      var active=document.querySelector('.panel.active');
+      if(active&&active.id==='p-drug'){calcDrugLike();}
+      if(active&&active.id==='p-qsar'){calcQSAR();}
+      if(active&&active.id==='p-desc'){calcDescriptors();}
+    },100);
+  }
+}
+
 (function(){
-  setStatus('Caricamento RDKit.js…','loading');
-  function tryLoad(src,onOk,onFail){
+  // CDN cascade: script-tag approach (più affidabile di fetch+blob in iframe)
+  // Versioni stabili × CDN multipli = 8 tentativi
+  var combos=[
+    {base:'https://cdn.jsdelivr.net/npm/@rdkit/rdkit/dist/', js:'RDKit_minimal.js'},
+    {base:'https://unpkg.com/@rdkit/rdkit/dist/', js:'RDKit_minimal.js'},
+    {base:'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2025.3.4-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://unpkg.com/@rdkit/rdkit@2025.3.4-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2024.3.5-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://unpkg.com/@rdkit/rdkit@2024.3.5-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2023.9.2-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://unpkg.com/@rdkit/rdkit@2023.9.2-1.0.0/dist/', js:'RDKit_minimal.js'},
+    {base:'https://cdn.jsdelivr.net/npm/@rdkit/rdkit/Code/MinimalLib/dist/', js:'RDKit_minimal.js'},
+    {base:'https://unpkg.com/@rdkit/rdkit/Code/MinimalLib/dist/', js:'RDKit_minimal.js'}
+  ];
+  var _tried=0;
+  var _activeScript=null;
+
+  function initWasm(base,onFail){
+    if(typeof initRDKitModule!=='function'){onFail();return;}
+    setStatus('WASM: inizializzazione…','loading');
+    var _t=setTimeout(function(){onFail();},40000);
+    initRDKitModule({locateFile:function(f){return base+f;}})
+    .then(function(rdk){clearTimeout(_t);_rdkitReady(rdk);})
+    .catch(function(){clearTimeout(_t);onFail();});
+  }
+
+  function loadViaScriptTag(combo,onFail){
+    _tried++;
+    setStatus('RDKit.js (tentativo '+_tried+'/'+combos.length+')…','loading');
+    // Rimuovi script precedente se c'è
+    if(_activeScript&&_activeScript.parentNode){_activeScript.parentNode.removeChild(_activeScript);}
     var s=document.createElement('script');
-    s.src=src; s.crossOrigin='anonymous';
-    s.onload=onOk; s.onerror=onFail;
+    _activeScript=s;
+    s.crossOrigin='anonymous';
+    // Timeout: se non carica in 20s prova il prossimo
+    var to=setTimeout(function(){
+      s.onload=s.onerror=null;
+      if(s.parentNode)s.parentNode.removeChild(s);
+      onFail();
+    },20000);
+    s.onload=function(){clearTimeout(to);initWasm(combo.base,onFail);};
+    s.onerror=function(){clearTimeout(to);onFail();};
+    s.src=combo.base+combo.js+'?v='+Date.now(); // cache-bust
     document.head.appendChild(s);
   }
-  var CDN1='https://unpkg.com/@rdkit/rdkit@2024.3.3/Code/MinimalLib/dist/RDKit_minimal.js';
-  var CDN2='https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2024.3.3/Code/MinimalLib/dist/RDKit_minimal.js';
 
-  function onLoaded(){
-    if(typeof initRDKitModule!=='function'){setStatus('Errore: initRDKitModule non trovato','err');return;}
-    initRDKitModule().then(function(rdk){
-      RDKit=rdk; rdkReady=true;
-      document.getElementById('rdk-ver').textContent='v'+rdk.version();
-      setStatus('RDKit.js pronto — tutte le funzioni disponibili ✔','ok');
-      document.querySelectorAll('.btn').forEach(function(b){if(b.id!=='btn-svg'&&b.id!=='btn-png'&&b.id!=='btn-cpsmi'&&b.id!=='btn-addlib'&&b.id!=='btn-runall')b.disabled=false;});
-    }).catch(function(e){setStatus('Errore init: '+e.message,'err');});
+  function tryNext(i){
+    if(i>=combos.length){
+      setStatus('RDKit.js non raggiungibile. Le strutture 2D via SmilesDrawer restano disponibili.','err');
+      var rb=document.getElementById('rdk-retry-btn');if(rb)rb.style.display='inline-flex';
+      return;
+    }
+    loadViaScriptTag(combos[i],function(){tryNext(i+1);});
   }
-  tryLoad(CDN1,onLoaded,function(){
-    setStatus('CDN1 fallito, provo CDN2…','loading');
-    tryLoad(CDN2,onLoaded,function(){setStatus('Nessun CDN raggiungibile. Connessione internet richiesta.','err');});
-  });
+  tryNext(0);
+  window._rdkInitFn=function(){_tried=0;tryNext(0);};
 })();
+function initRDKitRobust(){if(window._rdkInitFn)window._rdkInitFn();}
 
 // ─── Tab navigation ──────────────────────────────────────────────────
+
+function showPresetCat(el,id){
+  el.closest('.card').querySelectorAll('.ptab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  el.closest('.card').querySelectorAll('.pcat').forEach(function(p){p.classList.remove('active');});
+  var t=document.getElementById(id);if(t)t.classList.add('active');
+}
+
+var _RDKIT_PANELS=['p-desc','p-drug','p-qsar','p-sim','p-smarts','p-cmp'];
 function showPanel(tab,id){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById(id).classList.add('active');
   tab.classList.add('active');
+  if(_RDKIT_PANELS.indexOf(id)!==-1){
+    if(rdkReady){
+      if(curSMI&&!curDesc.MW) setTimeout(analyzeMol,60);
+    } else {
+      if(curSMI){
+        var hd=smilesDescHeuristic(curSMI);
+        if(hd){
+          curDesc=hd;
+          renderQuickDesc(hd);
+          if(id==='p-drug'){document.getElementById('drug-smiles').value=curSMI;_renderDrugLike(hd);}
+          if(id==='p-qsar'){document.getElementById('qsar-smiles').value=curSMI;_renderQSAR(hd);}
+          if(id==='p-desc'){document.getElementById('desc-smiles').value=curSMI;_renderDescPanel(hd);}
+          setStatus('Stima SMILES (RDKit in caricamento…)','loading');
+          return;
+        }
+      }
+      setStatus('RDKit.js in caricamento — attendi qualche secondo…','loading');
+    }
+  }
+  if(id==='p-speclive'&&!window._spLivInit){SpectralLab.init();window._spLivInit=1;}
+  if(id==='p-pharma'&&curSMI){var pf=document.getElementById('pharma-smiles');if(pf&&!pf.value)pf.value=curSMI;}
 }
 function showPanelById(id){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
@@ -875,6 +1818,8 @@ function showPanelById(id){
   document.getElementById(id).classList.add('active');
   var t=document.querySelector('[data-panel="'+id+'"]');
   if(t)t.classList.add('active');
+  if(_RDKIT_PANELS.indexOf(id)!==-1&&rdkReady&&curSMI&&!curDesc.MW)setTimeout(analyzeMol,60);
+  if(id==='p-speclive'&&!window._spLivInit){SpectralLab.init();window._spLivInit=1;}
 }
 
 // ─── Accordion ───────────────────────────────────────────────────────
@@ -886,23 +1831,59 @@ function toggleAcc(head){
 
 // ─── State ───────────────────────────────────────────────────────────
 var curSMI='', curCanon='', curDesc={};
-var library=JSON.parse(localStorage.getItem('bsi_rdkit_lib2')||'[]');
+var library=(function(){try{return JSON.parse(localStorage.getItem('bsi_rdkit_lib2')||'[]');}catch(e){return [];}})();
 
 // ─── Molecule analysis ───────────────────────────────────────────────
 var EXAMPLES=['CC(=O)Nc1ccc(O)cc1','CC(C)Cc1ccc(cc1)C(C)C(=O)O','CN1CCC[C@H]1c2cccnc2','O=C(O)c1ccccc1OC(C)=O','NCCc1ccc(O)c(O)c1'];
 var exIdx=0;
-function loadExample(){document.getElementById('smiles-input').value=EXAMPLES[exIdx++%EXAMPLES.length];analyzeMol();}
-function loadPreset(smi){document.getElementById('smiles-input').value=smi;analyzeMol();}
+function loadExample(){var smi=EXAMPLES[exIdx++%EXAMPLES.length];_loadSmi(smi);}
+function loadPreset(smi){_loadSmi(smi);}
+function _loadSmi(smi){
+  document.getElementById('smiles-input').value=smi;
+  drawFallback(smi);
+  if(!rdkReady){window._pendingSMI=smi;return;}
+  analyzeMol();
+}
 function syncFrom(id){if(curSMI)document.getElementById(id).value=curSMI;}
 function loadFromGuide(smi,name){
   document.getElementById('smiles-input').value=smi;
   showPanelById('p-mol');
+  drawFallback(smi);
+  if(!rdkReady){window._pendingSMI=smi;return;}
   setTimeout(analyzeMol,50);
 }
 
 function requireRDKit(){
   if(!rdkReady){setStatus('RDKit.js in caricamento — attendi…','loading');return false;}
   return true;
+}
+
+function drawFallback(smi){
+  curSMI=smi;
+  document.getElementById('mol-err').style.display='none';
+  document.getElementById('mol-info').innerHTML=
+    '<div style="margin-bottom:6px"><span style="color:#9fb3c8;font-size:.76rem">SMILES</span><br>'+
+    '<span style="color:#ffb454;font-family:monospace;font-size:.82rem;word-break:break-all">'+escH(smi)+'</span></div>'+
+    '<div style="color:#9fb3c8;font-size:.78rem;margin-top:6px">⏳ RDKit in caricamento — descrittori disponibili a breve</div>';
+  var box=document.getElementById('mol-svg-box');
+  if(typeof SmilesDrawer==='undefined'){
+    box.innerHTML='<div class="placeholder">Struttura 2D in attesa di RDKit…</div>';
+    return;
+  }
+  box.innerHTML='<canvas id="sd-cv" width="380" height="260" style="max-width:100%"></canvas>';
+  try{
+    if(SmilesDrawer.SmiDrawer){
+      var d=new SmilesDrawer.SmiDrawer({width:380,height:260});
+      d.draw(smi,'#sd-cv','light',false);
+    } else {
+      var d2=new SmilesDrawer.Drawer({width:380,height:260});
+      SmilesDrawer.parse(smi,function(tree){d2.draw(tree,'sd-cv','light',false);},function(){
+        box.innerHTML='<div class="placeholder" style="color:#ff6b6b">SMILES non riconosciuto</div>';
+      });
+    }
+  }catch(e){
+    box.innerHTML='<div class="placeholder">2D non disponibile — SMILES in attesa</div>';
+  }
 }
 
 function getMolSafe(smi){
@@ -1000,6 +1981,78 @@ function computeDesc(mol){
   return d;
 }
 
+// ─── SMILES heuristic descriptor estimation (no RDKit needed) ────────
+function smilesDescHeuristic(smi){
+  if(!smi)return null;
+  var d={MW:0,LogP:0,HBD:0,HBA:0,RotBonds:0,TPSA:0,HeavyAtoms:0,ArRings:0,Rings:0,FrCSP3:0,Stereo:0,Formula:'',_heuristic:true};
+  var AW={C:12.011,N:14.007,O:15.999,S:32.06,P:30.974,F:18.998,Cl:35.45,Br:79.904,I:126.904,B:10.81,Si:28.086,Se:78.96};
+  var atoms=[],i=0,s=smi;
+  while(i<s.length){
+    var c=s[i];
+    if(c==='['){
+      var j=s.indexOf(']',i);if(j<0)break;
+      var inn=s.slice(i+1,j),em=inn.match(/^([A-Z][a-z]?|[a-z])/);
+      if(em){
+        var sym=em[1],isAr=sym!==sym.toUpperCase();
+        sym=sym[0].toUpperCase()+(sym[1]||'');
+        if(AW[sym]){var hm=inn.match(/H(\d*)/),nh=hm?(hm[1]===''?1:+hm[1]):0;atoms.push({el:sym,arom:isAr,nh:nh,br:true});}
+      }
+      i=j+1;
+    } else if(c>='A'&&c<='Z'){
+      var sym2=c;
+      if(i+1<s.length){var t2=c+s[i+1];if(AW[t2]&&s[i+1]>='a'&&s[i+1]<='z'){sym2=t2;i++;}}
+      if(AW[sym2])atoms.push({el:sym2,arom:false,nh:0,br:false});
+      i++;
+    } else if('bcnosp'.indexOf(c)>=0){
+      atoms.push({el:c.toUpperCase(),arom:true,nh:0,br:false});i++;
+    } else i++;
+  }
+  if(!atoms.length)return null;
+  d.HeavyAtoms=atoms.length;
+  var cnt={};atoms.forEach(function(a){cnt[a.el]=(cnt[a.el]||0)+1;});
+  // Implicit H estimate
+  var totalH=atoms.reduce(function(sum,a){
+    if(a.br)return sum+a.nh;
+    if(a.arom)return sum+(a.el==='C'?0.5:a.el==='N'?0.1:0);
+    return sum+(a.el==='C'?1.4:a.el==='N'?0.7:a.el==='O'?0.2:0);
+  },0);
+  d.MW=atoms.reduce(function(s,a){return s+(AW[a.el]||12);},0)+totalH*1.008;
+  // HBD
+  d.HBD=atoms.filter(function(a){return a.br&&a.nh>0&&(a.el==='N'||a.el==='O');}).reduce(function(s,a){return s+a.nh;},0);
+  d.HBD+=atoms.filter(function(a){return !a.br&&a.el==='N'&&!a.arom;}).length;
+  d.HBD+=Math.round(atoms.filter(function(a){return !a.br&&a.el==='O'&&!a.arom;}).length*0.5);
+  d.HBD=Math.max(0,d.HBD);
+  // HBA, LogP, TPSA
+  d.HBA=(cnt.N||0)+(cnt.O||0);
+  var LP={C:0.53,N:-1.03,O:-1.0,S:0.73,P:-0.18,F:0.14,Cl:0.71,Br:1.03,I:1.12};
+  var LPA={C:0.28,N:-0.97,O:-0.73,S:0.65};
+  d.LogP=atoms.reduce(function(s,a){return s+(a.arom?(LPA[a.el]||0):(LP[a.el]||0));},0);
+  d.TPSA=(cnt.N||0)*12.9+(cnt.O||0)*9.0;
+  // Rings
+  var ro={},rc=0;
+  for(var ri=0;ri<smi.length;ri++){
+    var ch=smi[ri];
+    if(ch==='%'&&ri+2<smi.length&&/\d\d/.test(smi.slice(ri+1,ri+3))){
+      var rn=smi.slice(ri+1,ri+3);ri+=2;if(ro[rn]){rc++;delete ro[rn];}else ro[rn]=true;
+    } else if(ch>='1'&&ch<='9'){if(ro[ch]){rc++;delete ro[ch];}else ro[ch]=true;}
+  }
+  d.Rings=rc;
+  var arC=atoms.filter(function(a){return a.arom&&a.el==='C';}).length;
+  d.ArRings=Math.min(rc,Math.round(arC/6));
+  d.FrCSP3=Math.max(0,(cnt.C||0)-arC)/Math.max(1,cnt.C||1);
+  d.RotBonds=Math.max(0,Math.round((d.HeavyAtoms-arC-rc*3)*0.35));
+  d.Stereo=(smi.match(/@/g)||[]).length;
+  var fo=[];['C','N','O','S','P','F','Cl','Br','I'].forEach(function(e){if(cnt[e])fo.push(e+(cnt[e]>1?cnt[e]:''));});
+  d.Formula='~'+fo.join('');
+  return d;
+}
+
+function _heuristicBanner(){
+  return '<div class="warn" style="margin-bottom:10px;font-size:.82rem">'+
+    '⚠ Valori <strong>stimati da SMILES</strong> (RDKit.js in caricamento). '+
+    'I dati si aggiorneranno automaticamente con i valori precisi una volta pronto RDKit.</div>';
+}
+
 function renderQuickDesc(d){
   var items=[
     {k:'MW',v:d.MW.toFixed(2),u:'Da',tip:'Peso molecolare medio.\n≤ 500 Da per Lipinski.',
@@ -1036,13 +2089,21 @@ function renderQuickDesc(d){
 
 // ─── Full descriptors ────────────────────────────────────────────────
 function calcDescriptors(){
-  if(!requireRDKit())return;
   var smi=document.getElementById('desc-smiles').value.trim()||curSMI;
   if(!smi){alert('Inserisci uno SMILES o caricalo dal tab Molecola.');return;}
-  var mol=getMolSafe(smi);
-  if(!mol){document.getElementById('desc-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
-  var d=computeDesc(mol);mol.delete();
+  var d;
+  if(rdkReady){
+    var mol=getMolSafe(smi);
+    if(!mol){document.getElementById('desc-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+    d=computeDesc(mol);mol.delete();
+  } else {
+    d=smilesDescHeuristic(smi);
+    if(!d){document.getElementById('desc-result').innerHTML='<div class="warn">SMILES non riconoscibile.</div>';return;}
+  }
   curDesc=d;
+  _renderDescPanel(d);
+}
+function _renderDescPanel(d){
 
   var fullItems=[
     {k:'Peso Molecolare (MW)',v:d.MW.toFixed(3),u:'Da',tip:'Media pesata isotopica. ≤ 500 Da per Lipinski.',
@@ -1069,18 +2130,27 @@ function calcDescriptors(){
       '<div class="dh">'+it.hint+'</div></div>';
   }).join('');
   html+='</div>';
-  document.getElementById('desc-result').innerHTML=html;
+  var banner=d._heuristic?_heuristicBanner():'';
+  document.getElementById('desc-result').innerHTML=banner+html;
   document.getElementById('desc-export').style.display='flex';
 }
 
 // ─── Drug-likeness ───────────────────────────────────────────────────
 function calcDrugLike(){
-  if(!requireRDKit())return;
   var smi=document.getElementById('drug-smiles').value.trim()||curSMI;
   if(!smi){alert('Inserisci uno SMILES.');return;}
-  var mol=getMolSafe(smi);
-  if(!mol){document.getElementById('drug-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
-  var d=computeDesc(mol);mol.delete();
+  var d;
+  if(rdkReady){
+    var mol=getMolSafe(smi);
+    if(!mol){document.getElementById('drug-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+    d=computeDesc(mol);mol.delete();
+  } else {
+    d=smilesDescHeuristic(smi);
+    if(!d){document.getElementById('drug-result').innerHTML='<div class="warn">SMILES non riconoscibile.</div>';return;}
+  }
+  _renderDrugLike(d);
+}
+function _renderDrugLike(d){
   var mw=d.MW,lp=d.LogP,hba=d.HBA,hbd=d.HBD,rb=d.RotBonds,tpsa=d.TPSA,ha=d.HeavyAtoms;
 
   var rules=[
@@ -1154,7 +2224,8 @@ function calcDrugLike(){
     '<div><div style="color:#e8eef4;font-weight:700">Score complessivo</div>'+
     '<div style="color:#9fb3c8;font-size:.78rem">'+totalPass+'/'+totalChecks+' criteri soddisfatti</div></div>'+
     '</div><div class="score-bar" style="margin-top:8px"><div class="score-fill" style="width:'+overall+'%;background:'+oc+'"></div></div></div>';
-  document.getElementById('drug-result').innerHTML=summary+html;
+  var banner=d._heuristic?_heuristicBanner():'';
+  document.getElementById('drug-result').innerHTML=banner+summary+html;
   // Animate score bars: set to 0, reflow, then restore width for CSS transition
   requestAnimationFrame(function(){
     document.querySelectorAll('#drug-result .score-fill').forEach(function(el){
@@ -1206,12 +2277,20 @@ function calcDrugLike(){
 
 // ─── QSAR predictions ────────────────────────────────────────────────
 function calcQSAR(){
-  if(!requireRDKit())return;
   var smi=document.getElementById('qsar-smiles').value.trim()||curSMI;
   if(!smi){alert('Inserisci uno SMILES.');return;}
-  var mol=getMolSafe(smi);
-  if(!mol){document.getElementById('qsar-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
-  var d=computeDesc(mol);mol.delete();
+  var d;
+  if(rdkReady){
+    var mol=getMolSafe(smi);
+    if(!mol){document.getElementById('qsar-result').innerHTML='<div class="warn">SMILES non valido.</div>';return;}
+    d=computeDesc(mol);mol.delete();
+  } else {
+    d=smilesDescHeuristic(smi);
+    if(!d){document.getElementById('qsar-result').innerHTML='<div class="warn">SMILES non riconoscibile.</div>';return;}
+  }
+  _renderQSAR(d);
+}
+function _renderQSAR(d){
   var mw=d.MW,lp=d.LogP,tpsa=d.TPSA,hbd=d.HBD,hba=d.HBA,rb=d.RotBonds,ar=d.ArRings,fsp3=d.FrCSP3;
 
   // LogS (solubilità acquosa) — Delaney-like
@@ -1310,8 +2389,8 @@ function calcQSAR(){
       return '<span style="color:'+cc+'">'+c.name+' '+Math.round(c.score*100)+'%</span>';
     }).join(' · ')+'</div>';
 
-  document.getElementById('qsar-result').innerHTML=html;
-  // Animate meter bars
+  var banner=d._heuristic?_heuristicBanner():'';
+  document.getElementById('qsar-result').innerHTML=banner+html;
   requestAnimationFrame(function(){
     document.querySelectorAll('#qsar-result .meter-fill').forEach(function(el){
       var w=el.style.width; el.style.width='0'; el.offsetWidth; el.style.width=w;
@@ -1439,7 +2518,7 @@ function runAllTabs(){
 }
 
 // ─── Library ─────────────────────────────────────────────────────────
-function saveLib(){localStorage.setItem('bsi_rdkit_lib2',JSON.stringify(library));}
+function saveLib(){try{localStorage.setItem('bsi_rdkit_lib2',JSON.stringify(library));}catch(e){}}
 
 function addToLibrary(){
   if(!curSMI)return;
@@ -1661,7 +2740,7 @@ function calcSMARTS(){
   var col=count>0?'#4caf80':'#ff6b6b';
   document.getElementById('smarts-sv').innerHTML=svg;
   document.getElementById('smarts-count').innerHTML=
-    '<span style="color:'+col+';font-weight:700">'+(count>0?count+' corrisp.'+(count>1?'e trovate':'a trovata')+' ':''+'<em style="color:#9fb3c8">(1° evidenziata in giallo)</em>':'Nessuna corrispondenza — pattern assente in questa molecola.')+'</span>';
+    '<span style="color:'+col+';font-weight:700">'+(count>0?count+' corrisp.'+(count>1?'e trovate':'a trovata')+' <em style="color:#9fb3c8">(1° evidenziata in giallo)</em>':'Nessuna corrispondenza — pattern assente in questa molecola.')+'</span>';
 
   // List all matches
   if(count>0){
@@ -1949,6 +3028,1103 @@ window.addEventListener('load',function(){
   if(!curSMI){document.getElementById('smiles-input').value='CC(=O)Nc1ccc(O)cc1';}
 });
 
+// ─── PHARMA PRO ──────────────────────────────────────────────────────
+var _pharmaDesc=null,_pharmaSmi='';
+
+function pharmaPreset(smi,name){
+  document.getElementById('pharma-smiles').value=smi;
+  runPharmaAnalysis();
+}
+
+function runPharmaAnalysis(){
+  var smi=document.getElementById('pharma-smiles').value.trim()||curSMI;
+  if(!smi){alert('Inserisci uno SMILES.');return;}
+  _pharmaSmi=smi;
+  var d;
+  if(rdkReady){
+    var mol=getMolSafe(smi);
+    if(!mol){alert('SMILES non valido.');return;}
+    d=computeDesc(mol);mol.delete();
+  } else {
+    d=smilesDescHeuristic(smi);
+    if(!d){alert('SMILES non riconoscibile.');return;}
+  }
+  _pharmaDesc=d;
+  document.getElementById('pharma-result').style.display='block';
+  renderADME(d,smi);
+  renderPharmaRadar(d);
+  renderPharmaDocking(d,smi);
+  renderPharmaTox(d,smi);
+  renderPharmaCompare(d,smi);
+}
+
+function renderADME(d,smi){
+  var mw=d.MW,lp=d.LogP,tpsa=d.TPSA,hbd=d.HBD,rb=d.RotBonds,ha=d.HeavyAtoms,hba=d.HBA;
+  // ESOL solubility (Delaney)
+  var logS=0.16-0.63*lp-0.0062*mw+0.066*rb-0.74*(d.ArRings||0);
+  var solvScore=logS>=-2?100:(logS>=-4?Math.round(75+(logS+4)*12.5):Math.round(50+(logS+6)*12.5));
+  solvScore=Math.max(0,Math.min(100,solvScore));
+  // BBB
+  var bbb=0;
+  if(mw<450)bbb+=30;else if(mw<500)bbb+=15;
+  if(tpsa<60)bbb+=30;else if(tpsa<90)bbb+=15;
+  if(lp>=1&&lp<=3)bbb+=25;else if(lp>=0&&lp<=4)bbb+=12;
+  if(hbd<=3)bbb+=15;
+  bbb=Math.min(100,bbb);
+  // Oral bioav
+  var lio5=((mw<=500?1:0)+(lp<=5?1:0)+(hbd<=5?1:0)+(hba<=10?1:0));
+  var veb=((rb<=10?1:0)+(tpsa<=140?1:0));
+  var oral=Math.round(((lio5/4)*60)+((veb/2)*40));
+  // Caco-2
+  var caco=100-Math.round(tpsa*0.4)-Math.round(Math.max(0,hbd-3)*8);
+  caco=Math.max(5,Math.min(100,caco));
+  // P-gp substrate
+  var pgp=lp>3&&mw>400?'Alto rischio':lp>2&&mw>350?'Moderato':'Basso';
+  var pgpC=lp>3&&mw>400?'#ff6b6b':lp>2&&mw>350?'#ffb454':'#4caf80';
+  // CYP3A4
+  var cyp=d.ArRings>=2&&lp>2?'Substrato probabile':d.ArRings>=1?'Substrato possibile':'Non substrato';
+  var cypC=d.ArRings>=2&&lp>2?'#ffb454':d.ArRings>=1?'#9fb3c8':'#4caf80';
+  // Half-life estimate
+  var hl=mw<300?'Breve (1-3h)':mw<500?'Media (4-12h)':'Lunga (>12h)';
+  var admeItems=[
+    {k:'Solubilità Acquosa (logS)',v:logS.toFixed(2),u:'mol/L',score:solvScore,
+     color:solvScore>70?'#4caf80':solvScore>40?'#ffb454':'#ff6b6b',
+     tip:logS>=-2?'Solubile':'Poco solubile'},
+    {k:'Biodisponib. Orale',v:oral+'%',u:'',score:oral,
+     color:oral>=70?'#4caf80':oral>=40?'#ffb454':'#ff6b6b',tip:oral>=70?'Buona':'Ridotta'},
+    {k:'Permeabilità BBB',v:bbb+'%',u:'',score:bbb,
+     color:bbb>=60?'#4caf80':bbb>=30?'#ffb454':'#ff6b6b',tip:bbb>=60?'Penetra BBB':'Non penetra BBB'},
+    {k:'Permeabilità Caco-2',v:caco+'%',u:'',score:caco,
+     color:caco>=70?'#4caf80':caco>=40?'#ffb454':'#ff6b6b',tip:caco>=70?'Alta':'Bassa'},
+    {k:'Substrato P-gp',v:pgp,u:'',score:null,color:pgpC,tip:'Pompa di efflusso intestinale'},
+    {k:'CYP3A4',v:cyp,u:'',score:null,color:cypC,tip:'Metabolismo epatico principale'},
+    {k:'Emivita stimata (t½)',v:hl,u:'',score:null,color:'#9fb3c8',tip:'Stima da MW'},
+  ];
+  var html='';
+  admeItems.forEach(function(it){
+    html+='<div class="adme-card">';
+    html+='<div class="adme-val" style="color:'+it.color+'">'+it.v+(it.u?' <span style="font-size:.68rem;color:#9fb3c8">'+it.u+'</span>':'')+'</div>';
+    html+='<div class="adme-key">'+it.k+'</div>';
+    if(it.score!==null){
+      html+='<div class="adme-bar"><div class="adme-fill" style="width:0%;background:'+it.color+'" data-w="'+it.score+'"></div></div>';
+    }
+    html+='<div style="font-size:.69rem;color:#9fb3c8;margin-top:2px">'+it.tip+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('adme-grid').innerHTML=html;
+  requestAnimationFrame(function(){
+    document.querySelectorAll('#adme-grid .adme-fill').forEach(function(el){
+      var w=el.getAttribute('data-w');if(w)el.style.width=w+'%';
+    });
+  });
+  // Interpretation
+  var interps=[];
+  if(oral>=70)interps.push('✅ Buona biodisponibilità orale — candidato farmaco orale');
+  else if(oral>=40)interps.push('⚠ Biodisponibilità orale borderline — potrebbe richiedere formulazione');
+  else interps.push('❌ Biodisponibilità orale bassa — considerare formulazione parenterale o prodrug');
+  if(bbb>=60)interps.push('🧠 Penetra la barriera emato-encefalica — potenziale attività CNS');
+  if(lp>3&&mw>400)interps.push('⚠ Possibile substrato P-glicoproteina — rischio efflux intestinale');
+  if(d.ArRings>=2&&lp>2)interps.push('⚠ Probabile metabolismo via CYP3A4 — attenzione alle interazioni');
+  document.getElementById('adme-interp').innerHTML=interps.join('<br>');
+}
+
+function renderPharmaRadar(d){
+  var cv=document.getElementById('pharma-radar');
+  if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=90;
+  ctx.clearRect(0,0,W,H);
+  var axes=[
+    {l:'Lipinski',score:((d.MW<=500?1:0)+(d.LogP<=5?1:0)+(d.HBD<=5?1:0)+(d.HBA<=10?1:0))/4},
+    {l:'Veber',score:((d.RotBonds<=10?1:0)+(d.TPSA<=140?1:0))/2},
+    {l:'Ghose',score:((d.MW>=160&&d.MW<=480?1:0)+(d.LogP>=-0.4&&d.LogP<=5.6?1:0)+(d.HeavyAtoms>=20&&d.HeavyAtoms<=70?1:0))/3},
+    {l:'Egan',score:((d.TPSA<=131.6?1:0)+(d.LogP<=5.88?1:0))/2},
+    {l:'Lead-like',score:((d.MW>=200&&d.MW<=350?1:0)+(d.LogP<=3.5?1:0)+(d.HBD<=3?1:0))/3},
+  ];
+  var n=axes.length;
+  // Grid rings
+  [0.25,0.5,0.75,1].forEach(function(r){
+    ctx.beginPath();
+    for(var i=0;i<n;i++){
+      var a=i/n*Math.PI*2-Math.PI/2;
+      var x=cx+Math.cos(a)*R*r, y=cy+Math.sin(a)*R*r;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle='rgba(28,58,87,'+(r===1?'0.8':'0.35')+')';
+    ctx.lineWidth=1;ctx.stroke();
+  });
+  // Axes
+  axes.forEach(function(ax,i){
+    var a=i/n*Math.PI*2-Math.PI/2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+    ctx.strokeStyle='rgba(28,58,87,0.6)';ctx.lineWidth=1;ctx.stroke();
+  });
+  // Molecule polygon
+  ctx.beginPath();
+  axes.forEach(function(ax,i){
+    var a=i/n*Math.PI*2-Math.PI/2,r=R*ax.score;
+    var x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(0,201,183,0.18)';ctx.fill();
+  ctx.strokeStyle='#00c9b7';ctx.lineWidth=2;ctx.stroke();
+  // Dots
+  axes.forEach(function(ax,i){
+    var a=i/n*Math.PI*2-Math.PI/2,r=R*ax.score;
+    ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,4,0,Math.PI*2);
+    ctx.fillStyle='#00c9b7';ctx.fill();
+  });
+  // Labels
+  ctx.font='bold 11px system-ui,sans-serif';ctx.fillStyle='#9fb3c8';ctx.textAlign='center';
+  axes.forEach(function(ax,i){
+    var a=i/n*Math.PI*2-Math.PI/2,lr=R+22;
+    ctx.fillText(ax.l,cx+Math.cos(a)*lr,cy+Math.sin(a)*lr+4);
+  });
+  // Legend
+  var legHtml='<div style="color:#e8eef4;font-weight:700;font-size:.82rem;margin-bottom:8px">Punteggi</div>';
+  axes.forEach(function(ax){
+    var pct=Math.round(ax.score*100);
+    var c=pct>=80?'#4caf80':pct>=50?'#ffb454':'#ff6b6b';
+    legHtml+='<div style="display:flex;align-items:center;gap:6px;margin:.18em 0;font-size:.78rem">'+
+      '<span style="width:8px;height:8px;border-radius:50%;background:#00c9b7;flex-shrink:0"></span>'+
+      '<span style="flex:1;color:#9fb3c8">'+ax.l+'</span>'+
+      '<span style="color:'+c+';font-weight:700">'+pct+'%</span></div>';
+  });
+  document.getElementById('pharma-radar-legend').innerHTML=legHtml;
+}
+
+var PHARMA_TARGETS=[
+  {name:'COX-1/2',smarts:['c1ccccc1','C(=O)O','NS(=O)'],desc:'FANS, analgesici',affScore:function(d,smi){return smi.match(/c1ccc/)?0.7:0.2;}},
+  {name:'β-adrenergico',smarts:['c1ccccc1','NCC'],desc:'Cardiovascolare',affScore:function(d,smi){return smi.match(/NCCc/)?0.8:0.2;}},
+  {name:'Dopamina D2',smarts:['c1ccccc1','NCC'],desc:'CNS, antipsicotico',affScore:function(d,smi){return d.ArRings>=2&&d.MW>250?0.6:0.2;}},
+  {name:'hERG K⁺ channel',smarts:['c1ccccc1'],desc:'Cardiotossicità',affScore:function(d,smi){return d.LogP>3&&d.ArRings>=2?0.7:0.2;}},
+  {name:'ACE (inibitore)',smarts:['CC(=O)'],desc:'Ipertensione',affScore:function(d,smi){return smi.match(/C\(=O\)O/)?0.5:0.15;}},
+  {name:'Serotonina 5-HT',smarts:['c1cc[nH]c1'],desc:'CNS, antidepressivi',affScore:function(d,smi){return smi.match(/\[nH\]|c1cc\[nH\]/)?0.8:0.2;}},
+];
+
+function renderPharmaDocking(d,smi){
+  var html='<div style="overflow-x:auto"><table style="font-size:.8rem;min-width:500px"><tr><th>Target</th><th>Categoria</th><th>Score stimato</th><th>Affinità</th></tr>';
+  PHARMA_TARGETS.forEach(function(t){
+    var sc=t.affScore(d,smi);
+    // Adjust by MW/LogP
+    if(d.MW>600)sc*=0.6;
+    if(d.LogP>5||d.LogP<-1)sc*=0.8;
+    sc=Math.min(0.95,Math.max(0.05,sc));
+    var kcal=(-4-sc*6).toFixed(1);
+    var c=sc>0.6?'#4caf80':sc>0.3?'#ffb454':'#ff6b6b';
+    var label=sc>0.6?'Alta':sc>0.3?'Moderata':'Bassa';
+    html+='<tr><td><strong>'+escH(t.name)+'</strong></td><td style="color:#9fb3c8">'+escH(t.desc)+'</td>'+
+      '<td style="font-family:monospace;color:#b794f6">'+kcal+' kcal/mol</td>'+
+      '<td><span class="rbadge" style="background:rgba('+hexToRGBA(c)+',0.15);color:'+c+'">'+label+'</span></td></tr>';
+  });
+  html+='</table></div>';
+  html+='<div class="note" style="margin-top:8px;font-size:.77rem">Score stimati da descrittori molecolari e SMARTS. Per docking reale usare AutoDock Vina, Glide o GOLD.</div>';
+  document.getElementById('pharma-docking').innerHTML=html;
+}
+
+function hexToRGBA(hex){
+  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return r+','+g+','+b;
+}
+
+var PAINS_PATTERNS=[
+  {name:'Catecholo (BIS-CATECHOL)',smarts:/c1cc(O)c(O)cc1/,level:'Alto',tip:'Falso positivo comune — interferisce con saggi fluorescenti'},
+  {name:'Michael Acceptor',smarts:/C=CC=O|C=CC#N|C=CS/,level:'Alto',tip:'Reattivo covalente — può alchilare residui nucleofili'},
+  {name:'Idrazide',smarts:/C\(=O\)NN|NNC=O/,level:'Medio',tip:'Potenziale mutagenicità (test di Ames)'},
+  {name:'Epossido',smarts:/C1OC1/,level:'Alto',tip:'Altamente reattivo, possibile cancerogeno'},
+  {name:'Aldeide reattiva',smarts:/[^O]C=O/,level:'Alto',tip:'Interferisce con assay thiol-based'},
+  {name:'Nitro aromatico',smarts:/\[N\+\]\(=O\)\[O-\]|N\(=O\)=O/,level:'Medio',tip:'Potenziale mutagenicità (riduzione a idrossilamina)'},
+  {name:'Anello furano',smarts:/c1ccoc1|o1cccc1/,level:'Basso',tip:'Metabolismo a metaboliti reattivi epossidici'},
+  {name:'Idrossamic acid',smarts:/C\(=O\)NO|NOS\(=O\)/,level:'Basso',tip:'Chelante metallico — può dare effetti off-target'},
+];
+
+function renderPharmaTox(d,smi){
+  var alerts=[];
+  PAINS_PATTERNS.forEach(function(p){
+    if(p.smarts.test(smi))alerts.push(p);
+  });
+  // Additional descriptor-based alerts
+  if(d.ArRings>=4)alerts.push({name:'Troppi anelli aromatici ('+d.ArRings+')',level:'Medio',tip:'> 4 anelli aromatici: rischio hERG, scarsa solubilità'});
+  if(d.MW>500&&d.LogP>5)alerts.push({name:'Ro5 dual failure (MW+LogP)',level:'Alto',tip:'Violazione doppia Lipinski: bassa biodisponibilità orale'});
+  if(d.LogP>4.5)alerts.push({name:'Alta lipofilia (LogP '+d.LogP.toFixed(1)+')',level:'Medio',tip:'LogP >4.5: accumulo nei tessuti lipofili, tossicità epatica'});
+  if(d.TPSA<50&&d.LogP>2)alerts.push({name:'Bassa TPSA + alto LogP',level:'Basso',tip:'Penetrazione non selettiva nelle membrane — tossicità non specifica'});
+  if(!alerts.length){
+    document.getElementById('pharma-tox').innerHTML='<div class="note">✅ Nessun alert PAINS rilevato. La molecola sembra strutturalmente pulita.</div>';return;
+  }
+  var html='';
+  alerts.forEach(function(a){
+    var c=a.level==='Alto'?'#ff6b6b':a.level==='Medio'?'#ffb454':'#4caf80';
+    html+='<div class="tox-row">'+
+      '<span class="tox-icon">'+(a.level==='Alto'?'🚨':a.level==='Medio'?'⚠':'ℹ')+'</span>'+
+      '<span class="tox-text"><strong>'+escH(a.name)+'</strong><br><span style="color:#9fb3c8;font-size:.77rem">'+escH(a.tip)+'</span></span>'+
+      '<span class="tox-lvl" style="background:rgba('+hexToRGBA(c)+',0.15);color:'+c+'">'+a.level+'</span></div>';
+  });
+  document.getElementById('pharma-tox').innerHTML=html;
+}
+
+var REF_DRUGS=[
+  {name:'Paracetamolo',smi:'CC(=O)Nc1ccc(O)cc1',fp:[1,0,1,1,0,0,1,0]},
+  {name:'Ibuprofene',smi:'CC(C)Cc1ccc(cc1)C(C)C(=O)O',fp:[1,0,0,0,0,1,0,0]},
+  {name:'Aspirina',smi:'CC(=O)Oc1ccccc1C(=O)O',fp:[1,0,0,1,0,0,0,0]},
+  {name:'Caffeina',smi:'Cn1cnc2N(C)C(=O)N(C)c12',fp:[0,1,0,1,1,0,0,1]},
+  {name:'Morfina',smi:'CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@@H]3[C@@H]1C5',fp:[0,0,1,0,1,1,0,0]},
+  {name:'Amoxicillina',smi:'CC1(C)S[C@@H]2[C@H](NC(=O)[C@@H](N)c3ccc(O)cc3)C(=O)N2[C@H]1C(=O)O',fp:[0,0,1,1,0,0,1,1]},
+  {name:'Metformina',smi:'CN(C)C(=N)NC(=N)N',fp:[0,1,0,1,1,0,0,0]},
+  {name:'Omeprazolo',smi:'COc1ccc2[nH]c(=S)cc2c1OC',fp:[0,1,0,0,1,0,0,1]},
+];
+
+function simpleFP(d,smi){
+  return [
+    d.ArRings>0?1:0,
+    (d.HBA||0)>4?1:0,
+    (d.HBD||0)>1?1:0,
+    d.MW>200&&d.MW<500?1:0,
+    d.MW>300?1:0,
+    d.LogP>1?1:0,
+    (d.RotBonds||0)<8?1:0,
+    (d.ArRings||0)>1?1:0,
+  ];
+}
+
+function tanimotoSimple(a,b){
+  var inter=0,union=0;
+  for(var i=0;i<a.length;i++){if(a[i]||b[i])union++;if(a[i]&&b[i])inter++;}
+  return union>0?inter/union:0;
+}
+
+function renderPharmaCompare(d,smi){
+  var fp=simpleFP(d,smi);
+  var rows=REF_DRUGS.map(function(r){
+    return {name:r.name,sim:tanimotoSimple(fp,r.fp),smi:r.smi};
+  }).sort(function(a,b){return b.sim-a.sim;});
+  var html='';
+  rows.forEach(function(r){
+    var pct=Math.round(r.sim*100);
+    var c=pct>=70?'#4caf80':pct>=40?'#ffb454':'#ff6b6b';
+    html+='<div class="cmp-drug-row">'+
+      '<span class="cmp-drug-name">'+escH(r.name)+'</span>'+
+      '<div class="cmp-sim-bar"><div class="cmp-sim-fill" style="width:0%;background:'+c+'" data-w="'+pct+'"></div></div>'+
+      '<span style="min-width:42px;text-align:right;font-size:.77rem;color:'+c+'">'+pct+'%</span>'+
+      '<button class="btn btn-outline btn-sm" style="font-size:.7rem;padding:2px 7px;margin-left:4px" onclick="loadPreset(\''+r.smi+'\');showPanelById(\'p-mol\')">Carica</button>'+
+      '</div>';
+  });
+  document.getElementById('pharma-compare').innerHTML=html;
+  requestAnimationFrame(function(){
+    document.querySelectorAll('#pharma-compare .cmp-sim-fill').forEach(function(el){
+      var w=el.getAttribute('data-w');if(w)el.style.width=w+'%';
+    });
+  });
+}
+
+function exportPharmaReport(){
+  if(!_pharmaDesc){alert('Esegui prima un\'analisi Pharma.');return;}
+  var d=_pharmaDesc;
+  var html='<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">'+
+    '<title>Pharma Report — BioSpecInfo</title>'+
+    '<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:40px auto;color:#1a1a2e;padding:20px}'+
+    'h1{color:#0a7a71;border-bottom:2px solid #0a7a71;padding-bottom:8px}'+
+    'h2{color:#0a7a71;margin-top:24px;font-size:1.05rem}'+
+    'table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.9rem}'+
+    'th{background:#0a7a71;color:#fff;padding:6px 10px;text-align:left}'+
+    'td{padding:5px 10px;border:1px solid #ddd}tr:nth-child(even)td{background:#f0f8f7}'+
+    '.ok{color:#2e7d32;font-weight:700}.warn{color:#e65100;font-weight:700}.bad{color:#c62828;font-weight:700}'+
+    '.footer{margin-top:32px;color:#888;font-size:.8rem;text-align:center;border-top:1px solid #ddd;padding-top:12px}</style></head><body>';
+  html+='<h1>🔬 Pharma Report — BioSpecInfo</h1>';
+  html+='<p><strong>SMILES:</strong> <code>'+escH(_pharmaSmi)+'</code></p>';
+  html+='<p><strong>Data:</strong> '+new Date().toLocaleDateString('it-IT')+'</p>';
+  html+='<h2>📊 Descrittori Molecolari</h2><table><tr><th>Descrittore</th><th>Valore</th><th>Range farmaceutico</th><th>Giudizio</th></tr>';
+  [
+    {k:'MW',v:d.MW.toFixed(2)+' Da',ok:d.MW<=500,range:'≤ 500 Da (Lipinski)'},
+    {k:'LogP',v:d.LogP.toFixed(3),ok:d.LogP>=-0.4&&d.LogP<=5,range:'-0.4 a 5'},
+    {k:'TPSA',v:d.TPSA.toFixed(1)+' Ų',ok:d.TPSA<=140,range:'≤ 140 Ų (Veber)'},
+    {k:'HBD',v:d.HBD,ok:d.HBD<=5,range:'≤ 5 (Lipinski)'},
+    {k:'HBA',v:d.HBA,ok:d.HBA<=10,range:'≤ 10 (Lipinski)'},
+    {k:'RotBonds',v:d.RotBonds,ok:d.RotBonds<=10,range:'≤ 10 (Veber)'},
+    {k:'Anelli Ar.',v:d.ArRings,ok:d.ArRings<=3,range:'≤ 3 ottimale'},
+    {k:'FrCSP3',v:(d.FrCSP3*100).toFixed(0)+'%',ok:d.FrCSP3>=0.25,range:'> 25%'},
+  ].forEach(function(r){
+    html+='<tr><td>'+r.k+'</td><td>'+r.v+'</td><td>'+r.range+'</td><td class="'+(r.ok?'ok':'bad')+'">'+(r.ok?'✔ OK':'✘ Fuori range')+'</td></tr>';
+  });
+  html+='</table>';
+  html+='<h2>💊 Drug-likeness</h2><p>Regola di Lipinski Ro5: '+[d.MW<=500,d.LogP<=5,d.HBD<=5,d.HBA<=10].filter(Boolean).length+'/4 criteri soddisfatti.</p>';
+  html+='<h2>📋 Considerazioni Farmaceutiche</h2><ul>';
+  if(d.MW<=500&&d.LogP<=5&&d.HBD<=5&&d.HBA<=10)html+='<li class="ok">✅ Rispetta la Regola dei Cinque di Lipinski — candidato per somministrazione orale</li>';
+  else html+='<li class="bad">⚠ Non rispetta tutti i criteri Lipinski — valutare vie di somministrazione alternative</li>';
+  if(d.TPSA<60)html+='<li>🧠 TPSA bassa ('+d.TPSA.toFixed(0)+' Ų) — possibile penetrazione BBB</li>';
+  if(d.FrCSP3>=0.25)html+='<li class="ok">✅ Buona frazione sp³ — migliore solubilità e selettività target</li>';
+  else html+='<li class="warn">⚠ Molecola planare (FrCSP3 = '+(d.FrCSP3*100).toFixed(0)+'%) — rischio scarsa solubilità</li>';
+  html+='</ul>';
+  html+='<div class="footer">Report generato da BioSpecInfo v11 — RDKit Cheminformatics Lab<br>Per uso didattico e di ricerca. I valori sono stime computazionali.</div>';
+  html+='</body></html>';
+  var blob=new Blob([html],{type:'text/html'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='pharma-report-bsi.html';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+// ─── QUANTUM LAB ─────────────────────────────────────────────────────
+var _qAnim=null,_qPlaying=false,_qAngle=0,_qOrbital='2p',_qElement='C',_qZ=6;
+
+var ELEMENTS={
+  H:{Z:1,config:'1s¹',shells:[1],color:'#ffffff',ionE:13.6,radius:53},
+  He:{Z:2,config:'1s²',shells:[2],color:'#b794f6',ionE:24.6,radius:31},
+  Li:{Z:3,config:'[He] 2s¹',shells:[2,1],color:'#ff6b6b',ionE:5.4,radius:167},
+  Be:{Z:4,config:'[He] 2s²',shells:[2,2],color:'#4caf80',ionE:9.3,radius:112},
+  B:{Z:5,config:'[He] 2s² 2p¹',shells:[2,3],color:'#ffb454',ionE:8.3,radius:87},
+  C:{Z:6,config:'[He] 2s² 2p²',shells:[2,4],color:'#00c9b7',ionE:11.3,radius:77},
+  N:{Z:7,config:'[He] 2s² 2p³',shells:[2,5],color:'#64b5f6',ionE:14.5,radius:75},
+  O:{Z:8,config:'[He] 2s² 2p⁴',shells:[2,6],color:'#ff6b6b',ionE:13.6,radius:73},
+  F:{Z:9,config:'[He] 2s² 2p⁵',shells:[2,7],color:'#b794f6',ionE:17.4,radius:64},
+  Ne:{Z:10,config:'[He] 2s² 2p⁶',shells:[2,8],color:'#00c9b7',ionE:21.6,radius:38},
+  Na:{Z:11,config:'[Ne] 3s¹',shells:[2,8,1],color:'#ff6b6b',ionE:5.1,radius:190},
+  Mg:{Z:12,config:'[Ne] 3s²',shells:[2,8,2],color:'#4caf80',ionE:7.6,radius:160},
+  Al:{Z:13,config:'[Ne] 3s² 3p¹',shells:[2,8,3],color:'#ffb454',ionE:6.0,radius:143},
+  Si:{Z:14,config:'[Ne] 3s² 3p²',shells:[2,8,4],color:'#9fb3c8',ionE:8.2,radius:117},
+  P:{Z:15,config:'[Ne] 3s² 3p³',shells:[2,8,5],color:'#ffb454',ionE:10.5,radius:110},
+  S:{Z:16,config:'[Ne] 3s² 3p⁴',shells:[2,8,6],color:'#ffb454',ionE:10.4,radius:103},
+  Cl:{Z:17,config:'[Ne] 3s² 3p⁵',shells:[2,8,7],color:'#4caf80',ionE:13.0,radius:99},
+  Ar:{Z:18,config:'[Ne] 3s² 3p⁶',shells:[2,8,8],color:'#00c9b7',ionE:15.8,radius:71},
+  K:{Z:19,config:'[Ar] 4s¹',shells:[2,8,8,1],color:'#ff6b6b',ionE:4.3,radius:243},
+  Ca:{Z:20,config:'[Ar] 4s²',shells:[2,8,8,2],color:'#4caf80',ionE:6.1,radius:194},
+  Fe:{Z:26,config:'[Ar] 3d⁶ 4s²',shells:[2,8,14,2],color:'#ffb454',ionE:7.9,radius:126},
+  Cu:{Z:29,config:'[Ar] 3d¹⁰ 4s¹',shells:[2,8,18,1],color:'#ffb454',ionE:7.7,radius:128},
+  Zn:{Z:30,config:'[Ar] 3d¹⁰ 4s²',shells:[2,8,18,2],color:'#9fb3c8',ionE:9.4,radius:122},
+  Br:{Z:35,config:'[Ar] 3d¹⁰ 4s² 4p⁵',shells:[2,8,18,7],color:'#ff6b6b',ionE:11.8,radius:114},
+  I:{Z:53,config:'[Kr] 4d¹⁰ 5s² 5p⁵',shells:[2,8,18,18,7],color:'#b794f6',ionE:10.5,radius:133},
+};
+
+var ORBITAL_SHAPES={
+  '1s':{type:'sphere',n:1,l:0,desc:'1s: sferica, vicina al nucleo'},
+  '2s':{type:'sphere2',n:2,l:0,desc:'2s: sferica con nodo radiale'},
+  '2p':{type:'dumbbell',n:2,l:1,desc:'2p: due lobi, 3 orientazioni (x,y,z)'},
+  '3d':{type:'clover',n:3,l:2,desc:'3d: quattro lobi, forma a quadrifoglio'},
+  'sp':{type:'sp',n:2,l:1,desc:'sp ibrido: 2 lobi lineari (180°)'},
+  'sp2':{type:'sp2',n:2,l:1,desc:'sp² ibrido: 3 lobi planari (120°)'},
+  'sp3':{type:'sp3',n:2,l:1,desc:'sp³ ibrido: 4 lobi tetraedrici (109.5°)'},
+};
+
+var _qMode='atomic';
+
+function initQuantum(){
+  if(window._qInit)return;
+  window._qInit=true;
+  updateQuantum();
+}
+
+function updateQuantumMode(mode){
+  _qMode=mode;
+  drawOrbital();
+}
+
+function updateQuantum(){
+  var sel=document.getElementById('q-element');
+  if(!sel)return;
+  var val=sel.value.split(',');
+  _qElement=val[0];_qZ=parseInt(val[1])||6;
+  var el=ELEMENTS[_qElement]||ELEMENTS['C'];
+  drawOrbital();
+  updateQConfig(el);
+  updateQProps(el);
+}
+
+function setQOrbital(orb){_qOrbital=orb;drawOrbital();}
+
+function toggleQuantumAnim(){
+  var btn=document.getElementById('q-play-btn');
+  if(_qPlaying){
+    _qPlaying=false;
+    if(_qAnim){cancelAnimationFrame(_qAnim);_qAnim=null;}
+    if(btn)btn.textContent='▶ Anima';
+  } else {
+    _qPlaying=true;
+    if(btn)btn.textContent='⏸ Pausa';
+    animateQuantum();
+  }
+}
+
+function resetQuantum(){
+  _qPlaying=false;if(_qAnim){cancelAnimationFrame(_qAnim);_qAnim=null;}
+  _qAngle=0;
+  var btn=document.getElementById('q-play-btn');if(btn)btn.textContent='▶ Anima';
+  drawOrbital();
+}
+
+function animateQuantum(){
+  _qAngle+=0.015;
+  drawOrbital();
+  if(_qPlaying)_qAnim=requestAnimationFrame(animateQuantum);
+}
+
+function drawOrbital(){
+  var cv=document.getElementById('q-canvas');if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+
+  // Background gradient
+  var bg=ctx.createRadialGradient(cx,cy,0,cx,cy,W/2);
+  bg.addColorStop(0,'#061020');bg.addColorStop(1,'#020810');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  var el=ELEMENTS[_qElement]||ELEMENTS['C'];
+  var oinfo=ORBITAL_SHAPES[_qOrbital]||ORBITAL_SHAPES['2p'];
+  var elColor=el.color||'#00c9b7';
+
+  // ── Cloud mode ──────────────────────────────────────────────────────
+  if(_qMode==='cloud'){
+    var nucRc=10+el.Z*0.25;
+    // Nucleus
+    var gn=ctx.createRadialGradient(cx,cy,0,cx,cy,nucRc*2.5);
+    gn.addColorStop(0,elColor+'ff');gn.addColorStop(0.5,elColor+'55');gn.addColorStop(1,'transparent');
+    ctx.fillStyle=gn;ctx.beginPath();ctx.arc(cx,cy,nucRc*2.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=elColor;ctx.beginPath();ctx.arc(cx,cy,nucRc,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#000';ctx.font='bold '+Math.max(8,Math.min(12,nucRc-2))+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(_qElement,cx,cy);
+    // Electron cloud dots
+    var shells=el.shells||[1];
+    var shellRadii=[55,90,125,155];
+    shells.forEach(function(ne,si){
+      var sr=shellRadii[si]||40;
+      for(var di=0;di<ne*18;di++){
+        var a2=Math.random()*Math.PI*2;
+        var rjit=sr*(0.7+Math.random()*0.6);
+        var dx=cx+Math.cos(a2)*rjit,dy=cy+Math.sin(a2)*rjit;
+        var alpha=Math.floor(60+Math.random()*100).toString(16).padStart(2,'0');
+        ctx.fillStyle=elColor+alpha;
+        ctx.beginPath();ctx.arc(dx,dy,1.2,0,Math.PI*2);ctx.fill();
+      }
+    });
+    var ov2=document.getElementById('q-overlay');
+    if(ov2)ov2.textContent=_qElement+' (Z='+_qZ+') · Nuvola elettronica';
+    return;
+  }
+
+  // ── Energy levels mode ──────────────────────────────────────────────
+  if(_qMode==='energy'){
+    ctx.font='bold 13px system-ui,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+    var levels=[
+      {n:'1s',e:2,y:H-40},{n:'2s',e:2,y:H-90},{n:'2p',e:6,y:H-120},
+      {n:'3s',e:2,y:H-160},{n:'3p',e:6,y:H-185},{n:'4s',e:2,y:H-210},
+      {n:'3d',e:10,y:H-230},{n:'4p',e:6,y:H-255},
+    ];
+    // Total electrons for this element
+    var remaining=el.Z,filled=[];
+    var fillOrder=['1s','2s','2p','3s','3p','4s','3d','4p'];
+    var maxE={s:2,p:6,d:10,f:14};
+    fillOrder.forEach(function(lv){
+      var mx=maxE[lv.slice(-1)]||2;
+      if(remaining>0){filled.push({n:lv,e:Math.min(remaining,mx)});remaining-=mx;}
+    });
+    // Draw energy axis
+    ctx.strokeStyle='#1c3a57';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(70,20);ctx.lineTo(70,H-20);ctx.stroke();
+    ctx.fillStyle='#9fb3c8';ctx.font='10px system-ui';ctx.textAlign='center';
+    ctx.fillText('E',70,14);
+    levels.forEach(function(lv){
+      var fe=filled.find(function(f){return f.n===lv.n;});
+      var eCount=fe?fe.e:0;
+      var col=eCount>0?elColor:'#1c3a57';
+      // Level line
+      ctx.strokeStyle=col;ctx.lineWidth=eCount>0?2.5:1;
+      ctx.beginPath();ctx.moveTo(90,lv.y);ctx.lineTo(W-80,lv.y);ctx.stroke();
+      // Label
+      ctx.fillStyle=eCount>0?elColor:'#4a5568';ctx.font='bold 11px monospace';ctx.textAlign='right';
+      ctx.fillText(lv.n,85,lv.y);
+      // Electrons as arrows
+      var maxEl=parseInt(lv.n.slice(-1)==='s'?2:lv.n.slice(-1)==='p'?6:10);
+      var step=(W-170)/(maxEl+1);
+      for(var ei=0;ei<eCount;ei++){
+        var ex2=100+(ei+1)*step;
+        var spin=ei%2===0?1:-1;
+        ctx.strokeStyle=elColor;ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(ex2,lv.y+6*spin);ctx.lineTo(ex2,lv.y-6*spin);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(ex2,lv.y-6*spin);ctx.lineTo(ex2-3,lv.y-6*spin+4*spin);ctx.moveTo(ex2,lv.y-6*spin);ctx.lineTo(ex2+3,lv.y-6*spin+4*spin);ctx.stroke();
+      }
+      if(eCount>0){ctx.fillStyle=elColor+'99';ctx.font='10px system-ui';ctx.textAlign='left';ctx.fillText(eCount+'e⁻',W-75,lv.y);}
+    });
+    ctx.fillStyle='#9fb3c8';ctx.font='11px system-ui';ctx.textAlign='center';
+    ctx.fillText(_qElement+' (Z='+_qZ+')',W/2,H-10);
+    var ov3=document.getElementById('q-overlay');
+    if(ov3)ov3.textContent=_qElement+' (Z='+_qZ+') · Diagramma livelli energetici';
+    return;
+  }
+
+  // Draw nuclear glow
+  var nucR=12+el.Z*0.3;
+  var grad=ctx.createRadialGradient(cx,cy,0,cx,cy,nucR*3);
+  grad.addColorStop(0,elColor+'ff');grad.addColorStop(0.3,elColor+'66');grad.addColorStop(1,'transparent');
+  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(cx,cy,nucR*3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=elColor;ctx.beginPath();ctx.arc(cx,cy,nucR,0,Math.PI*2);ctx.fill();
+  // nucleus label
+  ctx.fillStyle='#000';ctx.font='bold '+(Math.max(8,Math.min(14,nucR)))+'px system-ui,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(_qElement,cx,cy);
+
+  // Draw orbital based on type
+  var type=oinfo.type;
+  if(type==='sphere'||type==='sphere2'){
+    var orR=type==='sphere'?55:80;
+    // Outer glow
+    var sgrad=ctx.createRadialGradient(cx,cy,orR*0.6,cx,cy,orR);
+    sgrad.addColorStop(0,elColor+'33');sgrad.addColorStop(1,'transparent');
+    ctx.fillStyle=sgrad;ctx.beginPath();ctx.arc(cx,cy,orR,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=elColor+'88';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.arc(cx,cy,orR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    if(type==='sphere2'){
+      ctx.strokeStyle=elColor+'44';ctx.beginPath();ctx.arc(cx,cy,orR*0.45,0,Math.PI*2);ctx.stroke();
+    }
+    // Electron dot(s)
+    var eN=Math.min(2,el.shells[0]||1);
+    for(var ei=0;ei<eN;ei++){
+      var ea=_qAngle*2+ei*Math.PI;
+      var ex=cx+Math.cos(ea)*orR,ey=cy+Math.sin(ea)*orR*0.35;
+      drawElectron(ctx,ex,ey,elColor);
+    }
+  } else if(type==='dumbbell'||type==='sp'||type==='sp2'||type==='sp3'){
+    var orbs=[];
+    if(type==='dumbbell')orbs=[{ax:0},{ax:Math.PI/2},{ax:Math.PI}];
+    else if(type==='sp')orbs=[{ax:0},{ax:Math.PI}];
+    else if(type==='sp2')orbs=[{ax:0},{ax:Math.PI*2/3},{ax:Math.PI*4/3}];
+    else orbs=[{ax:0},{ax:Math.PI*2/3},{ax:Math.PI*4/3+0.5},{ax:0.3}];
+    orbs.forEach(function(orb,oi){
+      var a=orb.ax+_qAngle*0.3;
+      var lbR=70,lbH=35;
+      ctx.save();
+      ctx.translate(cx,cy);ctx.rotate(a);
+      // lobe 1
+      var lg1=ctx.createRadialGradient(lbR/2,0,0,lbR/2,0,lbR);
+      lg1.addColorStop(0,elColor+(oi%2===0?'99':'66'));lg1.addColorStop(1,'transparent');
+      ctx.fillStyle=lg1;
+      ctx.beginPath();ctx.ellipse(lbR/2,0,lbR/2,lbH,0,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle=elColor+(oi%2===0?'88':'55');ctx.lineWidth=1;
+      ctx.beginPath();ctx.ellipse(lbR/2,0,lbR/2,lbH,0,0,Math.PI*2);ctx.stroke();
+      // lobe 2
+      var lg2=ctx.createRadialGradient(-lbR/2,0,0,-lbR/2,0,lbR);
+      lg2.addColorStop(0,elColor+'55');lg2.addColorStop(1,'transparent');
+      ctx.fillStyle=lg2;
+      ctx.beginPath();ctx.ellipse(-lbR/2,0,lbR/2,lbH,0,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      // electron on lobe
+      var ea2=a+_qAngle*1.5+oi*2.1;
+      var ex2=cx+Math.cos(ea2)*70,ey2=cy+Math.sin(ea2)*35;
+      drawElectron(ctx,ex2,ey2,elColor);
+    });
+  } else if(type==='clover'){
+    [0,Math.PI/4,Math.PI/2,Math.PI*3/4].forEach(function(a0,oi){
+      var a=a0+_qAngle*0.2;
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(a);
+      var cg=ctx.createRadialGradient(60,0,0,60,0,70);
+      cg.addColorStop(0,elColor+(oi%2===0?'88':'55'));cg.addColorStop(1,'transparent');
+      ctx.fillStyle=cg;
+      ctx.beginPath();ctx.ellipse(55,0,40,22,0,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      var ea3=a+_qAngle*2+oi*1.57;
+      drawElectron(ctx,cx+Math.cos(ea3)*70,cy+Math.sin(ea3)*25,elColor);
+    });
+  }
+
+  // Label overlay
+  var ov=document.getElementById('q-overlay');
+  if(ov)ov.textContent=_qElement+' (Z='+_qZ+') · '+oinfo.desc;
+}
+
+function drawElectron(ctx,x,y,col){
+  var eg=ctx.createRadialGradient(x,y,0,x,y,6);
+  eg.addColorStop(0,'#fff');eg.addColorStop(0.4,col);eg.addColorStop(1,'transparent');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();
+}
+
+function updateQConfig(el){
+  var box=document.getElementById('q-config-box');if(!box)return;
+  var shells=el.shells||[1];
+  var shellNames=['K','L','M','N','O'];
+  var html='<div style="margin-bottom:6px"><strong>Configurazione:</strong> <code style="color:#b794f6">'+el.config+'</code></div>';
+  shells.forEach(function(n,i){
+    html+='<div class="q-shell">'+shellNames[i]+' (n='+(i+1)+'): <span class="q-electron">'+n+' e⁻</span></div>';
+  });
+  html+='<div style="margin-top:8px;font-size:.78rem;color:#9fb3c8">Elettroni totali: <strong style="color:#00c9b7">'+el.Z+'</strong></div>';
+  box.innerHTML=html;
+}
+
+function updateQProps(el){
+  var grid=document.getElementById('q-props-grid');if(!grid)return;
+  var props=[
+    {k:'Numero Atomico',v:'Z = '+el.Z,c:'#00c9b7'},
+    {k:'Config. Elettronica',v:el.config,c:'#b794f6'},
+    {k:'Elettronegatività est.',v:(el.ionE*0.15+1.5).toFixed(1)+' (Pauling~)',c:'#ffb454'},
+    {k:'Raggio Atomico',v:el.radius+' pm',c:'#4caf80'},
+    {k:'Energia Ioniz.',v:el.ionE.toFixed(1)+' eV',c:'#64b5f6'},
+    {k:'Shell Valenza',v:'n = '+el.shells.length,c:'#9fb3c8'},
+  ];
+  grid.innerHTML=props.map(function(p){
+    return '<div class="di" style="border-color:#1c3a57"><div class="dv" style="color:'+p.c+';font-size:.95rem">'+p.v+'</div><div class="dk">'+p.k+'</div></div>';
+  }).join('');
+}
+
+// ─── RDKit Retry ─────────────────────────────────────────────────────
+function retryRDKit(){
+  document.getElementById('rdk-retry-btn').style.display='none';
+  setStatus('RDKit.js: nuovo tentativo…','loading');
+  // Re-run the init sequence
+  initRDKitRobust();
+}
+
+// ─── Spectral Lab ─────────────────────────────────────────────────────
+var SpectralLab=(function(){
+  var cv=null,ctx=null,W=0,H=0;
+  var PAD={top:36,right:16,bottom:50,left:56};
+  var _type='nmr',_peaks=[],_frame=0,_maxF=100,_playing=false,_auto=false,_raf=null;
+  var _molName='',_hover=null;
+
+  var SPEC={
+    nmr:{title:'¹H NMR',xl:'δ (ppm)',yl:'Intensità',xA:12,xB:0,col:'#00c9b7',gl:[0,2,4,6,8,10,12],rev:true},
+    ir:{title:'Infrarosso (Trasmittanza)',xl:'Numero d\'onda (cm⁻¹)',yl:'T (%)',xA:4000,xB:400,col:'#ffb454',gl:[4000,3500,3000,2500,2000,1500,1000,500],rev:true,ir:true},
+    uv:{title:'UV-Vis',xl:'λ (nm)',yl:'Assorbanza',xA:200,xB:700,col:'#9c6fde',gl:[200,250,300,350,400,450,500,600,700],rev:false},
+    ms:{title:'Spettrometria di Massa (EI)',xl:'m/z',yl:'Int. rel. (%)',xA:0,xB:500,col:'#4caf80',gl:[0,100,200,300,400,500],rev:false,bar:true},
+    raman:{title:'Raman',xl:'Shift Raman (cm⁻¹)',yl:'Intensità',xA:200,xB:3500,col:'#64b5f6',gl:[500,1000,1500,2000,2500,3000],rev:false}
+  };
+
+  function xCV(v,s){
+    var pW=W-PAD.left-PAD.right;
+    return s.rev?PAD.left+(s.xA-v)/(s.xA-s.xB)*pW:PAD.left+(v-s.xA)/(s.xB-s.xA)*pW;
+  }
+  function yCV(f){return H-PAD.bottom-f*(H-PAD.top-PAD.bottom);}
+  function g2(x,sig){return Math.exp(-x*x/(2*sig*sig));}
+  function h2r(hex,a){
+    var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+  function pSig(s,p){
+    var rng=Math.abs(s.xB-s.xA)||1,pW=W-PAD.left-PAD.right;
+    return Math.max(3.5,Math.min(p.w/rng*pW*0.5,90));
+  }
+
+  function init(){
+    cv=document.getElementById('spec-cv');
+    if(!cv)return;
+    ctx=cv.getContext('2d');
+    cv.addEventListener('mousemove',onMM);
+    cv.addEventListener('mouseleave',onML);
+    cv.addEventListener('click',onCK);
+    setSz(cv.parentElement.clientWidth||600);
+    window.addEventListener('resize',function(){if(cv&&cv.parentElement)setSz(cv.parentElement.clientWidth);});
+  }
+
+  function setSz(w){
+    if(!cv)return;
+    cv.width=Math.max(280,w-2);
+    cv.height=Math.round(cv.width*0.44);
+    W=cv.width;H=cv.height;
+    draw();
+  }
+
+  function draw(){
+    if(!cv||!ctx)return;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#07111f';ctx.fillRect(0,0,W,H);
+    var s=SPEC[_type];
+    drawAxes(s);
+    if(!_peaks||!_peaks.length)return;
+    var n=_peaks.length;
+    for(var i=0;i<n;i++){
+      var p=_peaks[i];
+      var t0=(i/n)*_maxF*0.62;
+      var prog=Math.max(0,Math.min(1,(_frame-t0)/(_maxF*0.38)));
+      var ease=prog<1?prog*prog*(3-2*prog):1;
+      drawP(s,p,ease,!!(_hover&&_hover.id===p.id));
+    }
+  }
+
+  function drawAxes(s){
+    var pL=PAD.left,pR=PAD.right,pT=PAD.top,pB=PAD.bottom;
+    var pH=H-pT-pB,pW=W-pL-pR;
+    ctx.save();
+    // Y grid
+    ctx.lineWidth=1;
+    var yTk=s.ir?[20,40,60,80,100]:[0.25,0.5,0.75,1.0];
+    yTk.forEach(function(v){
+      var f=s.ir?v/100:v;
+      var y=yCV(f);
+      ctx.strokeStyle='#0d1f35';ctx.setLineDash([2,4]);
+      ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#2a4a6b';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText(s.ir?v+'%':v.toFixed(2),pL-3,y+3);
+    });
+    // X grid
+    s.gl.forEach(function(v){
+      var x=xCV(v,s);
+      if(x<pL||x>W-pR)return;
+      ctx.strokeStyle='#0d1f35';ctx.setLineDash([2,4]);
+      ctx.beginPath();ctx.moveTo(x,pT);ctx.lineTo(x,H-pB);ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    // IR baseline
+    if(s.ir){
+      ctx.strokeStyle='rgba(255,180,84,0.28)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.beginPath();ctx.moveTo(pL,yCV(1));ctx.lineTo(W-pR,yCV(1));ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // Axes
+    ctx.strokeStyle='#1c3a57';ctx.lineWidth=1.5;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(pL,pT);ctx.lineTo(pL,H-pB);ctx.lineTo(W-pR,H-pB);ctx.stroke();
+    // X ticks + labels
+    s.gl.forEach(function(v){
+      var x=xCV(v,s);if(x<pL||x>W-pR)return;
+      ctx.strokeStyle='#1c3a57';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(x,H-pB);ctx.lineTo(x,H-pB+4);ctx.stroke();
+      ctx.fillStyle='#4a6a8a';ctx.font='9px monospace';ctx.textAlign='center';
+      ctx.fillText(v,x,H-pB+13);
+    });
+    // Axis labels
+    ctx.fillStyle='#6a8aaa';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(s.xl,pL+pW/2,H-2);
+    ctx.save();ctx.translate(11,pT+pH/2);ctx.rotate(-Math.PI/2);ctx.fillText(s.yl,0,0);ctx.restore();
+    // Title
+    ctx.fillStyle=s.col;ctx.font='bold 11px sans-serif';ctx.textAlign='left';
+    ctx.fillText(s.title+(_molName?' — '+_molName:''),pL+4,pT-8);
+    ctx.restore();
+  }
+
+  function drawP(s,p,prog,hov){
+    if(!prog||!p)return;
+    var cx=xCV(p.x,s);
+    var col=hov?'#ffb454':(p.col||s.col);
+    var sig=pSig(s,p);
+    var span=sig*4.5;
+    var steps=Math.max(18,Math.ceil(span*2));
+
+    if(s.bar){
+      // MS bar chart
+      var bH=(H-PAD.top-PAD.bottom)*p.h*prog;
+      var bW=hov?4:2.5;
+      ctx.save();
+      ctx.fillStyle=col;ctx.globalAlpha=hov?1:0.88;
+      if(hov){ctx.shadowColor=col;ctx.shadowBlur=14;}
+      ctx.fillRect(cx-bW/2,yCV(p.h*prog),bW,bH);
+      ctx.shadowBlur=0;ctx.globalAlpha=1;
+      if(prog>0.75&&p.label&&p.h>0.1){
+        ctx.fillStyle=col;ctx.font='8px monospace';ctx.textAlign='center';
+        ctx.fillText(Math.round(p.x),cx,yCV(p.h*prog)-4);
+      }
+      if(hov&&p.label){
+        ctx.fillStyle='#e8eef4';ctx.font='bold 9px monospace';
+        ctx.fillText(p.label,cx,yCV(p.h*prog)-14);
+      }
+      ctx.restore();return;
+    }
+
+    // Build Gaussian point array
+    var pts=[];
+    for(var i=0;i<=steps;i++){
+      var dx=((i/steps)-0.5)*span*2;
+      var gv=p.h*prog*g2(dx,sig);
+      pts.push([cx+dx, s.ir?yCV(1-gv*0.88):yCV(gv)]);
+    }
+    var by=s.ir?yCV(1):yCV(0);
+
+    ctx.save();
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0],by);
+    pts.forEach(function(pt){ctx.lineTo(pt[0],pt[1]);});
+    ctx.lineTo(pts[pts.length-1][0],by);
+    ctx.closePath();
+    var gr;
+    if(s.ir){
+      gr=ctx.createLinearGradient(cx,yCV(1-p.h*prog*0.88),cx,by);
+      gr.addColorStop(0,h2r(col,hov?0.38:0.20));
+      gr.addColorStop(1,'transparent');
+    }else{
+      gr=ctx.createLinearGradient(cx,yCV(p.h*prog),cx,by);
+      gr.addColorStop(0,h2r(col,hov?0.72:0.52));
+      gr.addColorStop(1,h2r(col,0.04));
+    }
+    ctx.fillStyle=gr;ctx.fill();
+
+    // Stroke outline
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0],pts[0][1]);
+    for(var j=1;j<pts.length;j++)ctx.lineTo(pts[j][0],pts[j][1]);
+    ctx.strokeStyle=col;ctx.lineWidth=hov?2:1.5;
+    if(hov){ctx.shadowColor=col;ctx.shadowBlur=14;}
+    ctx.stroke();ctx.shadowBlur=0;
+
+    // Label
+    var topY=s.ir?yCV(1-p.h*prog*0.88):yCV(p.h*prog);
+    if(prog>0.5&&p.label&&p.h>(s.ir?0.28:0.1)){
+      ctx.fillStyle=col;ctx.font=(hov?'bold ':'')+Math.max(8,Math.min(10,Math.round(sig*0.7)))+'px monospace';
+      ctx.textAlign='center';ctx.fillText(p.label,cx,topY-5);
+    }
+    ctx.restore();
+  }
+
+  // Animation
+  function tick(){
+    _frame=Math.min(_frame+2.2,_maxF);
+    draw();
+    if(_frame<_maxF){_raf=requestAnimationFrame(tick);}
+    else{_playing=false;updBtn();if(_auto)setTimeout(function(){if(_peaks.length)SpectralLab.step();},1600);}
+  }
+  function updBtn(){var b=document.getElementById('spec-pb');if(b)b.textContent=_playing?'⏸ Pausa':'▶ Avvia';}
+
+  // Mouse
+  function cvPos(e){var r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+  function nearest(mx,my){
+    var s=SPEC[_type],best=null,bd=9999;
+    (_peaks||[]).forEach(function(p){
+      var cx2=xCV(p.x,s);
+      var cy2=s.ir?yCV(1-p.h*0.88):yCV(p.h);
+      var d=Math.sqrt((mx-cx2)*(mx-cx2)+(my-cy2)*(my-cy2));
+      if(d<40&&d<bd){bd=d;best=p;}
+    });
+    return best;
+  }
+  function showTip(p,mx,my){
+    var tip=document.getElementById('spec-tip');
+    if(!tip)return;
+    var s=SPEC[_type];
+    if(p){
+      tip.textContent=(p.assign||p.label||p.x+' '+s.xl);
+      tip.style.display='block';
+      tip.style.left=Math.min(mx+12,cv.clientWidth-220)+'px';
+      tip.style.top=Math.max(my-32,2)+'px';
+      var ai=document.getElementById('spec-asgn');
+      if(ai)ai.innerHTML='<span style="color:'+escH(s.col)+'">●</span> <b>'+escH(p.label||String(p.x))+'</b> — '+escH(p.assign||'');
+    }else{
+      tip.style.display='none';
+      var ai2=document.getElementById('spec-asgn');
+      if(ai2&&ai2.textContent.charAt(0)!=='📌')ai2.textContent='';
+    }
+  }
+  function onMM(e){var c=cvPos(e);var p=nearest(c.x,c.y);if(p!==_hover){_hover=p;draw();}showTip(p,c.x,c.y);}
+  function onML(){_hover=null;var tip=document.getElementById('spec-tip');if(tip)tip.style.display='none';draw();}
+  function onCK(e){var c=cvPos(e);var p=nearest(c.x,c.y);if(p){var ai=document.getElementById('spec-asgn');var s=SPEC[_type];if(ai)ai.innerHTML='<span style="color:#00c9b7">📌</span> <b>'+escH(p.label||String(p.x))+'</b> — '+escH(p.assign||'');}}
+
+  // SMILES feature detection
+  function feat(smi){
+    var f={smi:smi};
+    f.nC=(smi.match(/C/gi)||[]).length;
+    f.ar=(smi.match(/c/g)||[]).length>=4;
+    f.benz=/c1ccccc1/.test(smi)||((smi.match(/c/g)||[]).length>=6&&f.ar);
+    f.amide=/C\(=O\)N|NC\(=O\)/.test(smi);
+    f.ester=/C\(=O\)OC|OC\(=O\)C/.test(smi);
+    f.acid=!f.ester&&/C\(=O\)O(?!C)/.test(smi);
+    f.ket=!f.amide&&!f.acid&&!f.ester&&/C\(=O\)C/.test(smi);
+    f.ald=/C=O[)\s]|C=O$/.test(smi)||/\[CH\]=O/.test(smi);
+    f.co=f.amide||f.acid||f.ester||f.ket||f.ald;
+    f.oh=/[^C(]O(?![C=(\[])|^O(?![C=(])|\[OH\]/.test(smi);
+    f.alc=f.oh&&!f.acid;
+    f.phen=f.oh&&f.ar;
+    f.ether=/COC|cOC|COc/.test(smi);
+    f.nh=/N[H]|NH/.test(smi);
+    f.amine=!f.amide&&/N/.test(smi);
+    f.nme=/CN/.test(smi);
+    f.alkene=/C=C/.test(smi)&&!f.ar;
+    f.triple=/C#C/.test(smi);
+    f.nitrile=/C#N/.test(smi);
+    f.cl=/Cl/.test(smi);f.br=/Br/.test(smi);f.s=/S/.test(smi);
+    f.nitro=/\[N\+\].*\[O-\]|N\(=O\)=O/.test(smi);
+    // MW estimate
+    var mw=0;
+    mw+=(smi.match(/C(?!l)/gi)||[]).length*12;
+    mw+=(smi.match(/N/g)||[]).length*14;
+    mw+=(smi.match(/O/g)||[]).length*16;
+    mw+=(smi.match(/S/g)||[]).length*32;
+    mw+=(smi.match(/Cl/g)||[]).length*35;
+    mw+=(smi.match(/Br/g)||[]).length*80;
+    mw+=(smi.match(/F(?!e)/g)||[]).length*19;
+    mw+=Math.max(2,f.nC)*1.5;
+    f.mw=Math.round(mw)||80;
+    return f;
+  }
+
+  function nmrPk(smi,f){
+    var ps=[],id=0;
+    function pk(x,h,w,lb,as){ps.push({id:id++,x:x,h:h,w:w,label:lb,assign:as});}
+    if(f.ald)pk(9.8,0.70,0.06,'CHO','Aldeide H-C=O (9.4–10.2 ppm)');
+    if(f.acid)pk(11.5,0.42,0.80,'COOH','Acido O-H (9–12 ppm, segnale largo)');
+    if(f.amide)pk(8.4,0.44,0.24,'N-H','Ammide N-H (7.5–9 ppm, largo)');
+    if(f.benz){pk(7.28,0.90,0.16,'ArH','Protoni aromatici (7.2–8.0 ppm)');
+      if(f.amide||f.phen)pk(7.90,0.55,0.10,'ArH (p-sos.)','ArH para-sostituito (7.5–8.2 ppm)');
+      else pk(7.52,0.60,0.09,'ArH','ArH (meta/orto, 7.3–7.7 ppm)');}
+    else if(f.ar)pk(7.1,0.72,0.20,'ArH','ArH eterociclico (6.8–8.5 ppm)');
+    if(f.alkene){pk(5.88,0.55,0.08,'=CH₂','Vinile =CH₂ (4.5–6.5 ppm)');pk(6.42,0.42,0.07,'=CH-','Vinile =CH- (5.5–7 ppm)');}
+    if(f.triple)pk(2.5,0.38,0.05,'≡CH','Alchino terminale (2–3 ppm)');
+    if(f.ether)pk(3.76,0.76,0.07,'OCH₃','Metossi O-CH₃ (3.3–3.9 ppm)');
+    if(f.alc&&!f.acid)pk(3.55,0.30,0.30,'O-H','Alcol O-H (variabile, 2–5 ppm)');
+    if(f.nme)pk(2.88,0.62,0.08,'N-CH₃','N-metile (2.2–3.1 ppm)');
+    if(f.co&&!f.ald)pk(2.34,0.73,0.07,'CO-CH₃','CH₃ adiacente C=O (2.0–2.6 ppm)');
+    if(f.benz&&f.nC>6)pk(2.72,0.63,0.11,'Ar-CH₂','Benzilico ArCH₂ (2.5–3.2 ppm)');
+    if(f.nC>5&&!f.ar)pk(1.60,0.52,0.15,'CH₂','Metilene -CH₂- (1.2–1.8 ppm)');
+    if(f.nC>3)pk(0.90,0.68,0.09,'CH₃','Metile terminale (0.8–1.5 ppm)');
+    var mx=ps.reduce(function(a,b){return a>b.h?a:b.h;},0.01);
+    ps.forEach(function(p){p.h=p.h/mx;});return ps;
+  }
+
+  function irPk(smi,f){
+    var ps=[],id=0;
+    function pk(x,h,w,lb,as){ps.push({id:id++,x:x,h:h,w:w,label:lb,assign:as});}
+    if(f.acid)pk(2950,0.82,340,'O-H (COOH)','O-H stretch acido carbossilico (2500–3300 cm⁻¹, largo)');
+    if(f.alc&&!f.acid)pk(3350,0.76,115,'O-H str','O-H stretch alcol (3200–3550 cm⁻¹)');
+    if(f.phen)pk(3405,0.80,105,'O-H (fenolo)','O-H stretch fenolo (3200–3600 cm⁻¹)');
+    if(f.nh&&!f.amide){pk(3420,0.52,33,'N-H str','N-H stretch ammina (3300–3500 cm⁻¹)');pk(3340,0.48,30,'N-H str (sim.)','N-H stretch simmetrico');}
+    if(f.amide){pk(3310,0.65,52,'N-H (amm.)','N-H stretch ammide (~3300 cm⁻¹)');pk(1660,0.93,27,'C=O I (amm.)','C=O stretch band I ammide (1630–1680 cm⁻¹)');pk(1550,0.74,32,'N-H II (amm.)','N-H bending band II (1510–1570 cm⁻¹)');}
+    if(f.ar)pk(3065,0.32,20,'=C-H (Ar)','Aromatico =C-H stretch (3000–3100 cm⁻¹)');
+    if(f.triple){pk(3310,0.72,17,'≡C-H','≡C-H stretch (3300 cm⁻¹, tagliente)');pk(2120,0.84,26,'C≡C','C≡C stretch (2100–2260 cm⁻¹)');}
+    if(f.nitrile)pk(2225,0.88,20,'C≡N','Nitrile C≡N stretch (2200–2260 cm⁻¹)');
+    if(f.ald){pk(2820,0.54,17,'CHO H','Aldeide C-H stretch (2820 cm⁻¹)');pk(2720,0.50,17,'CHO H','Aldeide C-H stretch (2720 cm⁻¹)');pk(1730,0.95,22,'C=O (CHO)','Aldeide C=O stretch (1720–1740 cm⁻¹)');}
+    if(f.nC>2){pk(2965,0.55,21,'C-H str','C-H alifatico stretch (~2960 cm⁻¹)');pk(2870,0.44,17,'CH₂ str','CH₂ stretch (~2860 cm⁻¹)');}
+    if(f.ester){pk(1735,0.95,22,'C=O (est.)','Estere C=O stretch (1735–1750 cm⁻¹)');pk(1250,0.80,36,'C-O str','Estere C-O stretch (1200–1300 cm⁻¹)');}
+    if(f.acid&&!f.amide)pk(1710,0.93,27,'C=O (COOH)','Acido C=O stretch (1700–1725 cm⁻¹)');
+    if(f.ket)pk(1715,0.92,24,'C=O (chet.)','Chetone C=O stretch (1705–1725 cm⁻¹)');
+    if(f.ar){pk(1600,0.68,17,'C=C Ar','C=C aromatico (1600 cm⁻¹)');pk(1500,0.62,15,'C=C Ar','C=C aromatico (1500 cm⁻¹)');pk(750,0.80,27,'=C-H oop','C-H out-of-plane aromatico (650–900 cm⁻¹)');}
+    if(f.alkene){pk(1640,0.60,19,'C=C str','Alchene C=C stretch (1620–1680 cm⁻¹)');pk(900,0.74,21,'=CH₂ oop','=CH₂ wag (890 cm⁻¹)');}
+    if(f.nC>2){pk(1465,0.54,17,'CH₂ bend','CH₂ scissor (1450–1470 cm⁻¹)');pk(1375,0.49,13,'CH₃ bend','CH₃ sym bend (1375 cm⁻¹)');}
+    if(f.ether)pk(1090,0.74,36,'C-O-C str','Etere C-O stretch (1050–1150 cm⁻¹)');
+    if(f.cl)pk(730,0.80,27,'C-Cl str','C-Cl stretch (600–800 cm⁻¹)');
+    if(f.br)pk(620,0.75,23,'C-Br str','C-Br stretch (500–700 cm⁻¹)');
+    return ps;
+  }
+
+  function uvPk(smi,f){
+    var ps=[],id=0;
+    function pk(x,h,w,lb,as){ps.push({id:id++,x:x,h:h,w:w,label:lb,assign:as});}
+    pk(205,0.44,11,'σ→σ*','Transizione σ→σ* (legami C-C/C-H, <200 nm)');
+    if(f.benz){pk(254,0.90,7,'π→π* E₂','Benzene π→π* E₂ (254 nm, ε≈10⁴)');pk(280,0.46,17,'B-band','B-band (280 nm, proibita per simmetria)');}
+    else if(f.ar)pk(270,0.74,15,'π→π*','Eterociclico π→π* (~270 nm)');
+    if((f.ket||f.acid)&&!f.benz)pk(275,0.24,13,'n→π* (C=O)','Chetone/Acido n→π* (270–280 nm, ε≈30)');
+    if(f.ald)pk(330,0.32,17,'n→π* (CHO)','Aldeide n→π* (315–340 nm, ε≈15)');
+    if(f.amide){pk(210,0.84,10,'π→π* (amm.)','Ammide π→π* (200–230 nm)');pk(260,0.18,17,'n→π* (amm.)','Ammide n→π* (~260 nm, ε<200)');}
+    if(f.alkene)pk(190,0.76,9,'π→π* (C=C)','Alchene isolato π→π* (170–200 nm, ε>10⁴)');
+    if(f.nitrile)pk(215,0.62,10,'π→π* (C≡N)','Nitrile π→π* (~215 nm)');
+    if(f.nitro){pk(270,0.90,18,'π→π* (NO₂)','Nitro π→π* (250–280 nm)');pk(330,0.43,26,'n→π* (NO₂)','Nitro n→π* (310–340 nm)');}
+    var mx=ps.reduce(function(a,b){return a>b.h?a:b.h;},0.01);
+    ps.forEach(function(p){p.h=p.h/mx;});return ps;
+  }
+
+  function msPk(smi,f){
+    var ps=[],id=0,mw=f.mw;
+    function pk(x,h,lb,as){var xi=Math.round(x);if(xi>=10&&xi<700)ps.push({id:id++,x:xi,h:Math.max(0,Math.min(1,h)),w:1,label:lb,assign:as});}
+    pk(mw,0.65,'M⁺·','Ione molecolare M⁺· (m/z = '+mw+')');
+    pk(mw+1,0.08,'M+1','[M+1]⁺ contributo ¹³C');
+    pk(mw-28,1.0,'[M-28]⁺','Perdita CO o C₂H₄ (m/z '+(mw-28)+')');
+    pk(mw-15,0.55,'[M-CH₃]⁺','Perdita CH₃ (m/z '+(mw-15)+')');
+    if(f.acid){pk(mw-17,0.72,'[M-OH]⁺','Perdita OH (m/z '+(mw-17)+')');pk(mw-45,0.58,'[M-COOH]⁺','Perdita COOH (m/z '+(mw-45)+')');}
+    if(f.ester)pk(mw-31,0.75,'[M-OCH₃]⁺','Perdita OCH₃ (m/z '+(mw-31)+')');
+    if(f.amide)pk(mw-17,0.65,'[M-NH₃]⁺','Perdita NH₃ (m/z '+(mw-17)+')');
+    if(f.benz){pk(77,0.60,'C₆H₅⁺','Catione fenile (m/z 77)');pk(51,0.28,'m/z 51','[C₄H₃]⁺');pk(65,0.20,'m/z 65','C₅H₅⁺');}
+    if(f.ald)pk(29,0.68,'CHO⁺','Ione formile CHO⁺ (m/z 29)');
+    if(f.cl){pk(mw+2,0.22,'M+2 (³⁷Cl)','Isotopo ³⁷Cl (33% del M+)');pk(mw-35,0.78,'[M-Cl]⁺','Perdita ³⁵Cl');}
+    if(f.br){pk(mw+2,0.65,'M+2 (⁸¹Br)','Isotopo ⁸¹Br (quasi = M+)');pk(mw-79,0.84,'[M-Br]⁺','Perdita ⁷⁹Br');}
+    // noise
+    var bases=[mw*0.12,mw*0.25,mw*0.42,mw*0.6,mw*0.78];
+    bases.forEach(function(b,i){pk(b,0.04+i*0.02,'','frammento');});
+    ps.sort(function(a,b){return a.x-b.x;});
+    var mx2=ps.reduce(function(a,b){return a>b.x?a:b.x;},100);
+    var step=Math.ceil(mx2/4/25)*25||50;
+    SPEC.ms.xB=mx2+Math.round(mx2*0.1);
+    SPEC.ms.gl=[];for(var gv=0;gv<=SPEC.ms.xB;gv+=step)SPEC.ms.gl.push(gv);
+    return ps;
+  }
+
+  function ramanPk(smi,f){
+    var ps=[],id=0;
+    function pk(x,h,w,lb,as){ps.push({id:id++,x:x,h:h,w:w,label:lb,assign:as});}
+    if(f.nC>2){pk(2920,0.75,17,'C-H str','C-H stretch alifatico (2850–3000 cm⁻¹)');pk(2850,0.65,15,'CH₂ str','CH₂ stretch simmetrico (2850 cm⁻¹)');}
+    if(f.ar){pk(3060,0.52,13,'=C-H Ar','Aromatico C-H stretch (3060 cm⁻¹)');pk(1600,0.95,15,'C=C (Ar)','C=C aromatico 1600 cm⁻¹ — molto intenso in Raman');pk(1580,0.78,13,'C=C (Ar)','C=C aromatico 1580 cm⁻¹');pk(1000,0.90,10,'Ring breath.','Benzene ring breathing (1000 cm⁻¹) — diagnostico Raman');}
+    if(f.triple)pk(2150,0.96,13,'C≡C','C≡C stretch (2100–2200 cm⁻¹) — molto intenso in Raman');
+    if(f.alkene)pk(1640,0.78,15,'C=C','C=C stretch alchene (intenso in Raman)');
+    if(f.co&&!f.ald)pk(1720,0.43,17,'C=O','C=O stretch (debole in Raman rispetto a IR)');
+    if(f.s){pk(2555,0.84,10,'S-H str','S-H stretch (2550–2580 cm⁻¹) — caratteristico');pk(650,0.70,17,'C-S str','C-S stretch (600–700 cm⁻¹)');}
+    if(f.nC>3){pk(1050,0.57,21,'C-C str','C-C stretch scheletrico (900–1100 cm⁻¹)');pk(870,0.48,17,'C-C str','C-C stretch (800–900 cm⁻¹)');}
+    if(f.nC>2){pk(1445,0.54,13,'CH₂ sciss.','CH₂ scissors (1440–1460 cm⁻¹)');pk(1375,0.44,10,'CH₃ bend','CH₃ sym bend (1375 cm⁻¹)');}
+    if(f.ether)pk(1100,0.66,22,'C-O-C str','C-O-C stretch etere (intenso in Raman)');
+    if(f.cl)pk(700,0.86,17,'C-Cl str','C-Cl stretch (intenso in Raman)');
+    if(f.br)pk(580,0.88,15,'C-Br str','C-Br stretch (intenso in Raman)');
+    var mx=ps.reduce(function(a,b){return a>b.h?a:b.h;},0.01);
+    ps.forEach(function(p){p.h=p.h/mx;});return ps;
+  }
+
+  function analyze(){
+    var inp=document.getElementById('spec-smi-input');
+    var smi=inp?inp.value.trim():'';
+    if(!smi){alert('Inserisci un SMILES valido');return;}
+    var f=feat(smi);
+    if(_type==='nmr')_peaks=nmrPk(smi,f);
+    else if(_type==='ir')_peaks=irPk(smi,f);
+    else if(_type==='uv')_peaks=uvPk(smi,f);
+    else if(_type==='ms')_peaks=msPk(smi,f);
+    else _peaks=ramanPk(smi,f);
+    _frame=0;_playing=true;_hover=null;
+    if(_raf)cancelAnimationFrame(_raf);
+    _raf=requestAnimationFrame(tick);
+    updBtn();lgnd();
+    var ai=document.getElementById('spec-asgn');if(ai)ai.textContent='';
+  }
+
+  function lgnd(){
+    var el=document.getElementById('spec-lgd');if(!el)return;
+    var seen={};
+    var html='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    (_peaks||[]).forEach(function(p){
+      if(p.label&&!seen[p.label]&&p.h>0.08){
+        seen[p.label]=1;
+        var col2=p.col||SPEC[_type].col;
+        html+='<span style="font-size:.72rem;color:#9fb3c8;display:inline-flex;align-items:center;gap:3px">'+
+          '<span style="width:8px;height:8px;border-radius:50%;background:'+escH(col2)+';display:inline-block;flex-shrink:0"></span>'+escH(p.label)+'</span>';
+      }
+    });
+    el.innerHTML=html+'</div>';
+  }
+
+  var pub={
+    init:init,
+    setType:function(btn,t){
+      document.querySelectorAll('.sptb').forEach(function(b){b.classList.remove('on','active');b.classList.add('btn-outline');});
+      if(btn){btn.classList.add('on');btn.classList.remove('btn-outline');}
+      _type=t;
+      // Reset MS x-range on type change
+      if(t!=='ms'){SPEC.ms.xB=500;SPEC.ms.gl=[0,100,200,300,400,500];}
+      analyze();
+    },
+    loadFromMol:function(){
+      var smi=window.curSMI||(document.getElementById('smiles-input')||{value:''}).value.trim();
+      if(smi){var inp=document.getElementById('spec-smi-input');if(inp)inp.value=smi;analyze();}
+      else alert('Nessuna molecola caricata. Vai alla tab 🔬 Molecola e carica un SMILES prima.');
+    },
+    loadPreset:function(smi,name){_molName=name||'';var inp=document.getElementById('spec-smi-input');if(inp)inp.value=smi;analyze();},
+    analyze:analyze,
+    play:function(){if(_playing){_playing=false;cancelAnimationFrame(_raf);updBtn();return;}if(_frame>=_maxF)_frame=0;_playing=true;_raf=requestAnimationFrame(tick);updBtn();},
+    step:function(){_playing=false;cancelAnimationFrame(_raf);var n=Math.max(1,(_peaks||[]).length);_frame=Math.min(_frame+Math.ceil(_maxF/n),_maxF);draw();updBtn();},
+    reset:function(){_playing=false;cancelAnimationFrame(_raf);_frame=0;draw();updBtn();},
+    toggleAuto:function(v){_auto=v;},
+    animateSpectrum:function(smi,type){
+      if(!cv)init();
+      if(type&&SPEC[type])_type=type;
+      var inp=document.getElementById('spec-smi-input');if(inp)inp.value=smi;
+      if(!cv){setTimeout(function(){SpectralLab.analyze();},120);}else analyze();
+    }
+  };
+  return pub;
+})();
+
+// Global wrappers for onclick attributes
+function specSetType(btn,t){SpectralLab.setType(btn,t);}
+function specLoadFromMol(){SpectralLab.loadFromMol();}
+function specLoadPreset(smi,name){SpectralLab.loadPreset(smi,name);}
+function specAnalyze(){SpectralLab.analyze();}
+function specPlay(){SpectralLab.play();}
+function specStep(){SpectralLab.step();}
+function specReset(){SpectralLab.reset();}
+function specToggleAuto(v){SpectralLab.toggleAuto(v);}
+function animateSpectrum(smi,type){SpectralLab.animateSpectrum(smi,type);}
+
+// ─── End Spectral Lab ─────────────────────────────────────────────────
+
 // Show floating back button when embedded in BioSpecInfo overlay
 (function(){
   try{
@@ -1963,7 +4139,7 @@ window.addEventListener('load',function(){
 
 <!-- Floating back button — visible only inside the BioSpecInfo overlay -->
 <div id="bsi-float-back">
-  <button onclick="try{window.parent.document.getElementById('bsi-rdkitlab-ov').style.display='none';}catch(e){}" title="Chiudi Lab e torna all\'app">◀ Indietro</button>
+  <button onclick="try{window.parent.document.getElementById('bsi-rdkitlab-ov').style.display='none';}catch(e){}" title="Torna all\'app">↩ Indietro</button>
 </div>
 </body>
 </html>
