@@ -664,7 +664,7 @@ input::placeholder, textarea::placeholder { color: #888888; }
 </style>
 </head>
 <body>
-<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v140-2026-06';
+<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v141-2026-07';
 // URL Web App di Google Apps Script per telemetria accessi/errori/feedback (vedi tools/telemetria-feedback.gs).
 // Lasciare vuoto disabilita l'invio remoto: i dati restano solo in coda locale (bsi_telemetry_queue).
 window.BSI_TELEMETRY_URL='';</script>
@@ -31772,6 +31772,7 @@ var _ITEMS=[
   {ic:'⚛️',nm:'Lab Quantistico',ds:'Orbitali 3D, spettroscopie, cinetica e altre 10 simulazioni',key:'qlab',hl:true},
   {ic:'🌈',nm:'Centro Spettri',ds:'IR · ¹H/¹³C-NMR · 3D · mappa · confronto · guida',key:'scentro',hl:true},
   {ic:'🧪',nm:'Simulazioni Interattive',ds:'pH · titolazione · tamponi · Beer-Lambert · gas ideali · cinetica — esperimenti in tempo reale',key:'simulazioni',hl:true},
+  {ic:'🌌',nm:'Astrochimica 3D',ds:'Molecole ISM, esopianeti JWST, nebule, spettri stellari, nucleosintesi, chimica cometaria, quiz',key:'astro',hl:true},
   {ic:'📋',nm:'Questionario & Feedback',ds:'Vota l\'app, segnala bug o idee',key:'feedback',hl:true},
   {ic:'🧪',nm:'Sintesi Organica',ds:'Reazioni animate con meccanismi',key:'ssyn'},
   {ic:'🔄',nm:'Retrosintesi',ds:'Disconnessioni sistematiche',key:'sretro'},
@@ -31817,6 +31818,7 @@ function _act(key){
     if(key==='rdkitlab'){ window.openRDKitLab(); return; }
     if(key==='accademia'){ window.openAccademia(); return; }
     if(key==='simulazioni'){ window.openSimulazioni(); return; }
+    if(key==='astro')      { window.openAstro(); return; }
     if(key==='qlab')     { if(typeof window.openQuantumLab==='function') window.openQuantumLab(); return; }
     if(key==='scentro')  { var b=document.querySelector('[data-s=scentro]'); if(b){b.click();} else if(typeof window.initCentro==='function'){var sec=document.getElementById('scentro');if(sec){document.querySelectorAll('.section').forEach(function(x){x.classList.remove('on');});sec.classList.add('on');setTimeout(window.initCentro,40);}} return; }
     if(key==='feedback') { if(typeof window.openFeedback21==='function') window.openFeedback21(); return; }
@@ -37045,6 +37047,20 @@ window.openSimulazioni=function(){
     var fr=document.createElement('iframe');fr.src='simulazioni.html';
     fr.style.cssText='flex:1;border:none;width:100%;height:100%';
     var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.textContent='\u21A9 Indietro';cb.onclick=function(){ov.style.display='none';};
+    ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);
+  }else{ov.style.display='flex';}
+};
+window.openAstro=function(){
+  var ov=document.getElementById('bsi-astro-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-astro-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#030812;display:flex;flex-direction:column';
+    var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;
+    var ttl=document.createElement('span');ttl.style.cssText='color:#00c9b7;font-weight:800;font-size:.9rem;flex:1';ttl.textContent='🌌 Astrochimica 3D';tb.appendChild(ttl);
+    var fr=document.createElement('iframe');fr.src='astro.html';
+    fr.setAttribute('allow','fullscreen');fr.setAttribute('allowfullscreen','');
+    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.textContent='↩ Indietro';cb.onclick=function(){ov.style.display='none';};
     ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);
   }else{ov.style.display='flex';}
 };

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioSpecInfo v11 — Changelog & Documentazione Tecnica</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d1522">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#071221;color:#d4e0ec;line-height:1.6;padding:20px 16px}
+.container{max-width:860px;margin:0 auto}
+header{text-align:center;padding:32px 0 24px;border-bottom:2px solid #1c3a57;margin-bottom:28px}
+.logo{font-size:2.8rem;margin-bottom:8px}
+h1{color:#00c9b7;font-size:1.6rem;font-weight:900;margin-bottom:4px}
+.subtitle{color:#9fb3c8;font-size:.9rem}
+.badge{display:inline-block;background:rgba(0,201,183,.15);border:1px solid #00c9b7;border-radius:20px;padding:3px 12px;font-size:.78rem;color:#00c9b7;margin-top:8px}
+
+h2{color:#e8eef4;font-size:1.1rem;font-weight:800;margin:28px 0 14px;padding-left:12px;border-left:3px solid #00c9b7;display:flex;align-items:center;gap:8px}
+h3{color:#00c9b7;font-size:.92rem;font-weight:700;margin:14px 0 8px}
+
+.release{background:#0d2236;border:1px solid #1c3a57;border-radius:10px;padding:16px 18px;margin:14px 0}
+.release-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.release-date{background:#071221;border:1px solid #1c3a57;border-radius:6px;padding:3px 10px;font-size:.78rem;color:#ffb454;font-family:monospace}
+.release-title{font-weight:700;color:#e8eef4;font-size:.95rem;flex:1}
+.release-hash{font-family:monospace;font-size:.72rem;color:#1c3a57}
+
+.feat-list{list-style:none;margin:0;padding:0}
+.feat-list li{padding:5px 0;border-bottom:1px solid rgba(28,58,87,.5);font-size:.85rem;display:flex;align-items:flex-start;gap:8px}
+.feat-list li:last-child{border-bottom:none}
+.feat-tag{flex-shrink:0;padding:2px 8px;border-radius:8px;font-size:.68rem;font-weight:700;min-width:52px;text-align:center}
+.tag-new{background:rgba(76,175,128,.15);color:#4caf80}
+.tag-fix{background:rgba(255,107,107,.15);color:#ff6b6b}
+.tag-imp{background:rgba(0,201,183,.15);color:#00c9b7}
+.tag-perf{background:rgba(183,148,246,.15);color:#b794f6}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.stat{background:#0d2236;border:1px solid #1c3a57;border-radius:8px;padding:12px;text-align:center}
+.stat-val{font-size:1.6rem;font-weight:900;color:#00c9b7;display:block}
+.stat-lbl{font-size:.72rem;color:#9fb3c8;margin-top:3px}
+
+.tech-table{width:100%;border-collapse:collapse;font-size:.83rem;margin:10px 0}
+.tech-table th{background:#071221;color:#00c9b7;padding:6px 10px;text-align:left;border:1px solid #1c3a57}
+.tech-table td{padding:5px 10px;border:1px solid #1c3a57;color:#d4e0ec;vertical-align:top}
+.tech-table tr:nth-child(even) td{background:rgba(7,18,33,.4)}
+code{background:#071221;border:1px solid #1c3a57;border-radius:3px;padding:1px 6px;font-size:.83em;color:#00c9b7;font-family:monospace}
+
+.timeline{border-left:2px solid #1c3a57;margin-left:10px;padding-left:20px}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-27px;top:4px;width:10px;height:10px;border-radius:50%;background:#00c9b7;border:2px solid #071221}
+.tl-date{color:#ffb454;font-size:.75rem;font-family:monospace;margin-bottom:3px}
+.tl-desc{color:#d4e0ec;font-size:.85rem}
+
+.note{background:#071c2e;border-left:3px solid #00c9b7;padding:10px 14px;border-radius:0 6px 6px 0;margin:14px 0;font-size:.85rem}
+.warn-box{background:#1c0e00;border-left:3px solid #ffb454;padding:10px 14px;border-radius:0 6px 6px 0;margin:14px 0;font-size:.85rem}
+
+footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1c3a57;color:#9fb3c8;font-size:.78rem}
+a{color:#00c9b7;text-decoration:none}a:hover{text-decoration:underline}
+
+@media(max-width:600px){h1{font-size:1.3rem}.stat-val{font-size:1.3rem}.release{padding:12px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">🧪</div>
+  <h1>BioSpecInfo v11</h1>
+  <p class="subtitle">Piattaforma interattiva per chimica farmaceutica, spettroscopia e drug discovery</p>
+  <span class="badge">Changelog & Documentazione Tecnica — dal 26 Giugno 2026</span>
+</header>
+
+<!-- STATISTICHE GENERALI -->
+<h2>📊 Statistiche Progetto</h2>
+<div class="stat-grid">
+  <div class="stat"><span class="stat-val">4</span><span class="stat-lbl">File HTML principali</span></div>
+  <div class="stat"><span class="stat-val">43K+</span><span class="stat-lbl">Righe di codice totali</span></div>
+  <div class="stat"><span class="stat-val">13</span><span class="stat-lbl">Tab nel RDKit Lab</span></div>
+  <div class="stat"><span class="stat-val">83</span><span class="stat-lbl">Domande quiz chimica</span></div>
+  <div class="stat"><span class="stat-val">10</span><span class="stat-lbl">Livelli Accademia</span></div>
+  <div class="stat"><span class="stat-val">25</span><span class="stat-lbl">Elementi Quantum Lab</span></div>
+  <div class="stat"><span class="stat-val">8</span><span class="stat-lbl">Farmaci riferimento (Pharma)</span></div>
+  <div class="stat"><span class="stat-val">5</span><span class="stat-lbl">Tipi spettro (NMR/IR/UV/MS/Raman)</span></div>
+</div>
+
+<!-- TIMELINE SVILUPPO -->
+<h2>🗓 Timeline Sviluppo</h2>
+<div class="timeline">
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">26/06/2026</div>
+    <div class="tl-desc"><strong>Lab Spettri Animati</strong> — Aggiunto tab 🎬 Spettri con SpectralLab canvas: NMR¹H, IR (trasmittanza), UV-Vis, MS (con pattern isotopici Cl/Br), Raman. Animazione progressiva picchi, tooltip hover, play/step/reset. Fix bottoni ↩ Indietro e duplicati menu.</div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">27/06/2026</div>
+    <div class="tl-desc"><strong>Stabilità RDKit + Intro Tab</strong> — Aggiunta tab 📋 Intro con guida teorica completa (SMILES, descrittori, drug-likeness, QED, fingerprints). Fix duplicati nel menu bottom sheet. Migliorato sistema di retry RDKit con 6 CDN (jsdelivr + unpkg, versioni 2022/2023/2024).</div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">30/06/2026</div>
+    <div class="tl-desc"><strong>Mobile UI — Safe-area CSS</strong> — Fix posizionamento overlay su mobile: titolo non sovrappone status bar (env(safe-area-inset-top)), bottone ↩ Indietro non tagliato dalla barra navigazione Android (env(safe-area-inset-bottom)). _BSI_TB_STYLE e _BSI_BACK_BTN condivisi tra openRDKitLab(), openChimOrga(), openAccademia().</div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">30/06/2026</div>
+    <div class="tl-desc"><strong>smilesDescHeuristic() — RDKit-free</strong> — Parser SMILES puro JS che stima MW, LogP, HBD, HBA, TPSA, RotBonds, ArRings, FrCSP3 senza attendere RDKit.js. Le tab Drug-likeness, QSAR, Descrittori mostrano valori immediati con banner "⚠ Stima SMILES". Si aggiornano automaticamente quando RDKit è pronto.</div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">30/06/2026 – 01/07/2026</div>
+    <div class="tl-desc"><strong>🎓 Accademia Chimica</strong> — Nuova piattaforma gamificata "Duolingo della chimica" (accademia.html, 1329 righe). 83 domande, 6 categorie, 3 difficoltà, 10 livelli XP, streak giornaliero con moltiplicatori, confetti, level-up overlay, timer animato. Integrata in index.html come overlay iframe con voce nel bottom sheet e bottone navbar.</div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-date">01/07/2026</div>
+    <div class="tl-desc"><strong>🔬 Pharma Pro + ⚛️ Quantum Lab</strong> — Due nuovi tab in RDKit Lab (+738 righe). Pharma Pro: ADME completo, radar 5 regole, docking score stimato per 6 target, alert PAINS, confronto Tanimoto con 8 farmaci, export report HTML. Quantum Lab: visualizzatore canvas orbitali atomici (1s/2s/2p/3d/sp/sp²/sp³), nuvola elettronica, diagramma livelli energetici, 25 elementi con configurazione elettronica. SW bump a 07a.</div>
+  </div>
+
+</div>
+
+<!-- DETTAGLIO RELEASE -->
+<h2>📦 Release Dettagliate</h2>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">01/07/2026</span>
+    <span class="release-title">Enhance RDKit Lab: Pharma Pro, Quantum Lab, Stability</span>
+    <span class="release-hash">3450efc</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-new">NUOVO</span> Tab 🔬 Pharma Pro con ADME (7 predizioni), radar 5 regole, docking 6 target, PAINS screening, confronto farmaci, export HTML</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Tab ⚛️ Quantum Lab con canvas orbitali animati, nuvola elettronica, livelli energetici, 25 elementi</li>
+    <li><span class="feat-tag tag-fix">FIX</span> Pulsante ↺ Ricarica visibile quando RDKit CDN cascade fallisce completamente</li>
+    <li><span class="feat-tag tag-fix">FIX</span> retryRDKit() / initRDKitRobust() per re-eseguire cascata CDN senza reload pagina</li>
+    <li><span class="feat-tag tag-imp">IMP</span> showPanel() ora auto-popola SMILES in Pharma Pro da curSMI</li>
+    <li><span class="feat-tag tag-imp">IMP</span> Quantum Lab: implementati mode "nuvola elettronica" e "livelli energetici"</li>
+    <li><span class="feat-tag tag-perf">PERF</span> SW cache bump a biospecinfo-v99-2026-07a per forzare aggiornamento su tutti i dispositivi</li>
+  </ul>
+</div>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">01/07/2026</span>
+    <span class="release-title">Upgrade Accademia Chimica — 83 domande complete</span>
+    <span class="release-hash">2d510a7</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-imp">IMP</span> accademia.html: da 763 a 1329 righe — tutte le 83 domande scritte per esteso</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Stats per categoria (catStats) con localStorage persistente</li>
+    <li><span class="feat-tag tag-imp">IMP</span> Animazioni migliorate: confetti canvas, bounceIn level-up, popXP XP popup</li>
+    <li><span class="feat-tag tag-imp">IMP</span> Timer con avviso colore rosso a ≤5s rimanenti</li>
+  </ul>
+</div>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">30/06/2026</span>
+    <span class="release-title">Add Accademia Chimica — Duolingo della chimica</span>
+    <span class="release-hash">23d117b</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-new">NUOVO</span> File accademia.html: piattaforma gamificata completa</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> 10 livelli progressivi: Molecola(0XP) → Maestro(5801XP)</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Streak giornaliero con moltiplicatori ×1.5 (≥3gg) e ×2.0 (≥7gg)</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Timer per difficoltà: Facile 45s / Medio 30s / Difficile 20s</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> openAccademia() overlay in index.html + menu bottom sheet + navbar</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> 🎓 Accademia aggiunta a STATIC_FILES in sw.js; cache bump a 06h</li>
+  </ul>
+</div>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">01/07/2026</span>
+    <span class="release-title">Fix mobile UI — safe-area + RDKit-free descriptors</span>
+    <span class="release-hash">4096083</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-fix">FIX</span> Titolo overlay non sovrappone status bar Android/iOS (env(safe-area-inset-top))</li>
+    <li><span class="feat-tag tag-fix">FIX</span> Bottone ↩ Indietro non tagliato da barra navigazione (env(safe-area-inset-bottom))</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> smilesDescHeuristic(smi): stima immediata descrittori senza RDKit.js</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> _renderDrugLike(), _renderQSAR(), _renderDescPanel() estratti come funzioni riutilizzabili</li>
+    <li><span class="feat-tag tag-imp">IMP</span> _BSI_TB_STYLE e _BSI_BACK_BTN condivisi tra tutti gli overlay</li>
+  </ul>
+</div>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">27/06/2026</span>
+    <span class="release-title">Fix close buttons, RDKit stability, intro section</span>
+    <span class="release-hash">2c165f2</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-fix">FIX</span> Bottoni chiusura overlay non funzionanti</li>
+    <li><span class="feat-tag tag-fix">FIX</span> Voci duplicate nel menu bottom sheet</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Tab 📋 Intro in RDKit Lab con guida teorica completa</li>
+    <li><span class="feat-tag tag-imp">IMP</span> RDKit loading: 6 CDN fallback (jsdelivr + unpkg, versioni 2022/2023/2024)</li>
+  </ul>
+</div>
+
+<div class="release">
+  <div class="release-header">
+    <span class="release-date">26/06/2026</span>
+    <span class="release-title">Animated Spectral Lab — 5 tipi spettro</span>
+    <span class="release-hash">origine</span>
+  </div>
+  <ul class="feat-list">
+    <li><span class="feat-tag tag-new">NUOVO</span> Tab 🎬 Spettri: SpectralLab IIFE con canvas 2D</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> NMR ¹H: picchi per ArH, OH, NH, CH₃, CH₂, OCH₃, C=O, benzilico</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> IR: bande O-H, N-H, C=O (acido/estere/ammide/chetone), C≡C, C≡N, C-X</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> UV-Vis: transizioni π→π*, n→π* per cromofori</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> MS: M⁺, perdite tipiche, pattern isotopici Cl(+2, 33%) e Br(+2, ~100%)</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Raman: C≡C, ring breathing benzene (1000 cm⁻¹), C=C aromatico</li>
+    <li><span class="feat-tag tag-new">NUOVO</span> Animazione progressiva picchi + tooltip hover + play/step/reset</li>
+  </ul>
+</div>
+
+<!-- ARCHITETTURA TECNICA -->
+<h2>🏗 Architettura Tecnica</h2>
+
+<table class="tech-table">
+  <tr><th>Componente</th><th>Tecnologia</th><th>Note</th></tr>
+  <tr><td>Strutture 2D molecolari</td><td>RDKit.js (WASM) + SmilesDrawer fallback</td><td>6 CDN, retry automatico</td></tr>
+  <tr><td>3D viewer</td><td>3Dmol.js + Three.js</td><td>File locali nella repo</td></tr>
+  <tr><td>Spettri animati</td><td>Canvas 2D + requestAnimationFrame</td><td>SpectralLab IIFE, no lib esterne</td></tr>
+  <tr><td>Orbitali atomici</td><td>Canvas 2D + requestAnimationFrame</td><td>Quantum Lab, 25 elementi</td></tr>
+  <tr><td>Gamification</td><td>Vanilla JS + localStorage</td><td>bsi_academy_v2</td></tr>
+  <tr><td>PWA offline</td><td>Service Worker + Cache API</td><td>Cache-first per statici, SW v07a</td></tr>
+  <tr><td>CSS mobile</td><td>env(safe-area-inset-*)</td><td>viewport-fit=cover richiesto</td></tr>
+  <tr><td>Storage dati</td><td>localStorage</td><td>Libreria molecole: bsi_rdkit_lib2</td></tr>
+</table>
+
+<!-- LEGENDA TAG -->
+<h2>🏷 Legenda Tag</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+  <span class="feat-tag tag-new">NUOVO</span> <span style="font-size:.83rem">Nuova funzionalità</span>
+  <span class="feat-tag tag-fix" style="margin-left:12px">FIX</span> <span style="font-size:.83rem">Bug corretto</span>
+  <span class="feat-tag tag-imp" style="margin-left:12px">IMP</span> <span style="font-size:.83rem">Miglioramento</span>
+  <span class="feat-tag tag-perf" style="margin-left:12px">PERF</span> <span style="font-size:.83rem">Performance / Cache</span>
+</div>
+
+<div class="note" style="margin-top:20px">
+  <strong>Link app:</strong> <a href="https://samupropio1-ship-it.github.io/BioSpecInfo-v11/" target="_blank">https://samupropio1-ship-it.github.io/BioSpecInfo-v11/</a><br>
+  <strong>Repository:</strong> <a href="https://github.com/samupropio1-ship-it/BioSpecInfo-v11" target="_blank">github.com/samupropio1-ship-it/BioSpecInfo-v11</a>
+</div>
+
+<footer>
+  BioSpecInfo v11 — Documentazione tecnica generata il 01/07/2026<br>
+  Piattaforma didattica open-source per chimica farmaceutica · 100% client-side · 0 server
+</footer>
+
+</div>
+</body>
+</html>
