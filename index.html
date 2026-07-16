@@ -35477,13 +35477,6 @@ window.addEventListener('resize',function(){var on=document.querySelector('.mod.
   if(id==='ho')drawHO();else if(id==='box')drawBox();else if(id==='mb')drawMB();}});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){var on=document.querySelector('.mod.on');if(on)setModule(on.id.slice(2));}});
 </SCRIPTBSIQ>
-<script>
-// BioSpecInfo v140 — New overlay tools
-var _BSI_TB_STYLE='display:flex;align-items:flex-end;background:#071221;border-bottom:1px solid #1c3a57;padding:env(safe-area-inset-top,12px) 10px 8px 10px;min-height:calc(44px + env(safe-area-inset-top,0px));flex-shrink:0';
-var _BSI_BACK_BTN='position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:16px;z-index:10000;height:40px;border-radius:20px;padding:0 16px;border:1.5px solid rgba(0,201,183,.6);background:rgba(7,18,33,.97);color:#00c9b7;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 14px rgba(0,0,0,.55);backdrop-filter:blur(4px);letter-spacing:.02em';
-window.openAccademia=function(){var ov=document.getElementById('bsi-accademia-ov');if(!ov){ov=document.createElement('div');ov.id='bsi-accademia-ov';ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🎓 Accademia BioSpecInfo</span>';var fr=document.createElement('iframe');fr.src='accademia.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.innerHTML='↩ Indietro';cb.onclick=function(){ov.style.display='none';};ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);}else{ov.style.display='flex';};};
-window.openSimulazioni=function(){var ov=document.getElementById('bsi-sim-ov');if(!ov){ov=document.createElement('div');ov.id='bsi-sim-ov';ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a1b2e;display:flex;flex-direction:column';var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🧪 Simulazioni Interattive</span>';var fr=document.createElement('iframe');fr.src='simulazioni.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.innerHTML='↩ Indietro';cb.onclick=function(){ov.style.display='none';};ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);}else{ov.style.display='flex';};};
-</script>
 </body>
 </html>
 </script>
@@ -36988,7 +36981,8 @@ window.openRDKitLab=function(){
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
     var tb=document.createElement('div');
     tb.style.cssText='display:flex;align-items:center;background:#071221;border-bottom:1px solid #1c3a57;height:42px;padding:0 10px;flex-shrink:0';
-    tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🧪 RDKit Cheminformatics Lab</span><button onclick="document.getElementById('bsi-rdkitlab-ov').style.display='none'" style="background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer">✕ Chiudi</button>';
+    var ttl=document.createElement('span');ttl.style.cssText='color:#00c9b7;font-weight:800;font-size:.9rem;flex:1';ttl.textContent='🧪 RDKit Cheminformatics Lab';tb.appendChild(ttl);
+    var xcb=document.createElement('button');xcb.style.cssText='background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer';xcb.textContent='✕ Chiudi';xcb.onclick=function(){ov.style.display='none';};tb.appendChild(xcb);
     var fr=document.createElement('iframe');
     fr.src='rdkit_lab.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';
     ov.appendChild(tb);ov.appendChild(fr);document.body.appendChild(ov);
@@ -37001,11 +36995,12 @@ window.openChimOrga=function(){
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
     var tb=document.createElement('div');
     tb.style.cssText='display:flex;align-items:center;background:#071221;border-bottom:1px solid #1c3a57;height:42px;padding:0 10px;flex-shrink:0';
-    tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">⚗️ Chimica Organica 1+2</span><button onclick="document.getElementById('bsi-chimorga-ov').style.display='none'" style="background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer">✕ Chiudi</button>';
-    var fr=document.createElement('iframe');
-    fr.id='bsi-chimorga-fr';fr.src='chimorga.html';
-    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
-    ov.appendChild(tb);ov.appendChild(fr);document.body.appendChild(ov);
+    var ttl2=document.createElement('span');ttl2.style.cssText='color:#00c9b7;font-weight:800;font-size:.9rem;flex:1';ttl2.textContent='⚗️ Chimica Organica 1+2';tb.appendChild(ttl2);
+    var xcb2=document.createElement('button');xcb2.style.cssText='background:none;border:1px solid rgba(255,107,107,.35);color:#ff6b6b;border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:700;cursor:pointer';xcb2.textContent='✕ Chiudi';xcb2.onclick=function(){ov.style.display='none';};tb.appendChild(xcb2);
+    var fr2=document.createElement('iframe');
+    fr2.id='bsi-chimorga-fr';fr2.src='chimorga.html';
+    fr2.style.cssText='flex:1;border:none;width:100%;height:100%';
+    ov.appendChild(tb);ov.appendChild(fr2);document.body.appendChild(ov);
   }else{ov.style.display='flex';}
 };
 window.openGuidaRet=function(){
@@ -37020,6 +37015,37 @@ window.openGuidaRet=function(){
     window.addEventListener('message',function(e){
       if(e.data&&e.data.type==='BSI_GUIDARET_CLOSE'){ov.style.display='none';}
     });
+  }else{ov.style.display='flex';}
+};
+</script>
+<script>
+// BioSpecInfo v140 — Overlay tools
+var _BSI_TB_STYLE='display:flex;align-items:flex-end;background:#071221;border-bottom:1px solid #1c3a57;padding:env(safe-area-inset-top,12px) 10px 8px 10px;min-height:calc(44px + env(safe-area-inset-top,0px));flex-shrink:0';
+var _BSI_BACK_BTN='position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:16px;z-index:10000;height:40px;border-radius:20px;padding:0 16px;border:1.5px solid rgba(0,201,183,.6);background:rgba(7,18,33,.97);color:#00c9b7;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 14px rgba(0,0,0,.55);backdrop-filter:blur(4px);letter-spacing:.02em';
+window.openAccademia=function(){
+  var ov=document.getElementById('bsi-accademia-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-accademia-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';
+    var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;
+    var ttl=document.createElement('span');ttl.style.cssText='color:#00c9b7;font-weight:800;font-size:.9rem;flex:1';ttl.textContent='\u{1F393} Accademia BioSpecInfo';tb.appendChild(ttl);
+    var fr=document.createElement('iframe');fr.src='accademia.html';
+    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.textContent='\u21A9 Indietro';cb.onclick=function(){ov.style.display='none';};
+    ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);
+  }else{ov.style.display='flex';}
+};
+window.openSimulazioni=function(){
+  var ov=document.getElementById('bsi-sim-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='bsi-sim-ov';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a1b2e;display:flex;flex-direction:column';
+    var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;
+    var ttl=document.createElement('span');ttl.style.cssText='color:#00c9b7;font-weight:800;font-size:.9rem;flex:1';ttl.textContent='\u{1F9EA} Simulazioni Interattive';tb.appendChild(ttl);
+    var fr=document.createElement('iframe');fr.src='simulazioni.html';
+    fr.style.cssText='flex:1;border:none;width:100%;height:100%';
+    var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.textContent='\u21A9 Indietro';cb.onclick=function(){ov.style.display='none';};
+    ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);
   }else{ov.style.display='flex';}
 };
 </script>
