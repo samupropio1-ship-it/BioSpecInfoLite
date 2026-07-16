@@ -1,9 +1,52 @@
 <!doctype html>
 <html lang="it">
 <head>
+<script>
+/* ===== BSI GUARD v14 — localStorage sicuro (incognito / cookie bloccati / WebView) =====
+   Senza questa guardia, un accesso a localStorage in modalita' privata lancia
+   SecurityError e INTERROMPE l'intero script della pagina (sezioni vuote). */
+(function(){
+  var ok=false;
+  try{var t="__bsi_probe";window.localStorage.setItem(t,t);window.localStorage.removeItem(t);ok=true;}catch(e){ok=false;}
+  if(!ok){
+    var mem={};
+    try{
+      Object.defineProperty(window,"localStorage",{
+        value:{
+          getItem:function(k){return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null;},
+          setItem:function(k,v){mem[k]=String(v);},
+          removeItem:function(k){delete mem[k];},
+          clear:function(){mem={};},
+          key:function(i){return Object.keys(mem)[i]||null;},
+          get length(){return Object.keys(mem).length;}
+        },
+        configurable:true
+      });
+    }catch(e2){}
+  }
+  /* JSON.parse sicuro riutilizzabile */
+  window.bsiSafeParse=function(raw,fallback){
+    try{ var v=JSON.parse(raw); return (v===null||v===undefined)?fallback:v; }
+    catch(e){ return fallback; }
+  };
+  window.bsiLoadJSON=function(key,fallback){
+    try{ return window.bsiSafeParse(window.localStorage.getItem(key), fallback); }
+    catch(e){ return fallback; }
+  };
+  window.bsiSaveJSON=function(key,val){
+    try{ window.localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch(e){ return false; }
+  };
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Guida Retrosintesi — BioSpecInfo</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d1522">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:#0a1b2e;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}

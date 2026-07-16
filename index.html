@@ -664,7 +664,7 @@ input::placeholder, textarea::placeholder { color: #888888; }
 </style>
 </head>
 <body>
-<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v99-2026-06';
+<script>window.BSI_EDITION='lite';window.BSI_APP_VERSION='biospecinfo-v140-2026-06';
 // URL Web App di Google Apps Script per telemetria accessi/errori/feedback (vedi tools/telemetria-feedback.gs).
 // Lasciare vuoto disabilita l'invio remoto: i dati restano solo in coda locale (bsi_telemetry_queue).
 window.BSI_TELEMETRY_URL='';</script>
@@ -31766,10 +31766,12 @@ var _ITEMS=[
   {sec:'🔬 Funzioni chimiche'},
   {ic:'⚗️',nm:'Sintesi & Retrosintesi',ds:'Qualsiasi molecola via PubChem',key:'sr',hl:true},
   {ic:'📋',nm:'Guida Retrosintesi',ds:'98 esercizi + 24 percorso essenziale',key:'guidaret',hl:true},
-  {ic:'⚗️',nm:'Chimica Organica 1+2',ds:'14 moduli interattivi, meccanismi, stereochimica, named reactions',key:'chimorga',hl:true},
+  {ic:'⚗️',nm:'Chimica Organica 1+2',ds:'17 moduli interattivi, meccanismi, stereochimica, molecole biologiche',key:'chimorga',hl:true},
+  {ic:'🎓',nm:'Accademia Chimica',ds:'Quiz gamificati · XP · livelli · streak · 83 domande su 6 materie',key:'accademia',hl:true},
   {ic:'🧪',nm:'RDKit Cheminformatics Lab',ds:'Visualizzatore SVG, descrittori, drug-likeness, similarità Tanimoto, libreria molecole',key:'rdkitlab',hl:true},
   {ic:'⚛️',nm:'Lab Quantistico',ds:'Orbitali 3D, spettroscopie, cinetica e altre 10 simulazioni',key:'qlab',hl:true},
   {ic:'🌈',nm:'Centro Spettri',ds:'IR · ¹H/¹³C-NMR · 3D · mappa · confronto · guida',key:'scentro',hl:true},
+  {ic:'🧪',nm:'Simulazioni Interattive',ds:'pH · titolazione · tamponi · Beer-Lambert · gas ideali · cinetica — esperimenti in tempo reale',key:'simulazioni',hl:true},
   {ic:'📋',nm:'Questionario & Feedback',ds:'Vota l\'app, segnala bug o idee',key:'feedback',hl:true},
   {ic:'🧪',nm:'Sintesi Organica',ds:'Reazioni animate con meccanismi',key:'ssyn'},
   {ic:'🔄',nm:'Retrosintesi',ds:'Disconnessioni sistematiche',key:'sretro'},
@@ -31813,6 +31815,8 @@ function _act(key){
     if(key==='guidaret'){ window.openGuidaRet(); return; }
     if(key==='chimorga'){ window.openChimOrga(); return; }
     if(key==='rdkitlab'){ window.openRDKitLab(); return; }
+    if(key==='accademia'){ window.openAccademia(); return; }
+    if(key==='simulazioni'){ window.openSimulazioni(); return; }
     if(key==='qlab')     { if(typeof window.openQuantumLab==='function') window.openQuantumLab(); return; }
     if(key==='scentro')  { var b=document.querySelector('[data-s=scentro]'); if(b){b.click();} else if(typeof window.initCentro==='function'){var sec=document.getElementById('scentro');if(sec){document.querySelectorAll('.section').forEach(function(x){x.classList.remove('on');});sec.classList.add('on');setTimeout(window.initCentro,40);}} return; }
     if(key==='feedback') { if(typeof window.openFeedback21==='function') window.openFeedback21(); return; }
@@ -35473,6 +35477,13 @@ window.addEventListener('resize',function(){var on=document.querySelector('.mod.
   if(id==='ho')drawHO();else if(id==='box')drawBox();else if(id==='mb')drawMB();}});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){var on=document.querySelector('.mod.on');if(on)setModule(on.id.slice(2));}});
 </SCRIPTBSIQ>
+<script>
+// BioSpecInfo v140 — New overlay tools
+var _BSI_TB_STYLE='display:flex;align-items:flex-end;background:#071221;border-bottom:1px solid #1c3a57;padding:env(safe-area-inset-top,12px) 10px 8px 10px;min-height:calc(44px + env(safe-area-inset-top,0px));flex-shrink:0';
+var _BSI_BACK_BTN='position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:16px;z-index:10000;height:40px;border-radius:20px;padding:0 16px;border:1.5px solid rgba(0,201,183,.6);background:rgba(7,18,33,.97);color:#00c9b7;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 14px rgba(0,0,0,.55);backdrop-filter:blur(4px);letter-spacing:.02em';
+window.openAccademia=function(){var ov=document.getElementById('bsi-accademia-ov');if(!ov){ov=document.createElement('div');ov.id='bsi-accademia-ov';ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#071221;display:flex;flex-direction:column';var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🎓 Accademia BioSpecInfo</span>';var fr=document.createElement('iframe');fr.src='accademia.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.innerHTML='↩ Indietro';cb.onclick=function(){ov.style.display='none';};ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);}else{ov.style.display='flex';};};
+window.openSimulazioni=function(){var ov=document.getElementById('bsi-sim-ov');if(!ov){ov=document.createElement('div');ov.id='bsi-sim-ov';ov.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a1b2e;display:flex;flex-direction:column';var tb=document.createElement('div');tb.style.cssText=_BSI_TB_STYLE;tb.innerHTML='<span style="color:#00c9b7;font-weight:800;font-size:.9rem;flex:1">🧪 Simulazioni Interattive</span>';var fr=document.createElement('iframe');fr.src='simulazioni.html';fr.style.cssText='flex:1;border:none;width:100%;height:100%';var cb=document.createElement('button');cb.setAttribute('style',_BSI_BACK_BTN);cb.innerHTML='↩ Indietro';cb.onclick=function(){ov.style.display='none';};ov.appendChild(tb);ov.appendChild(fr);ov.appendChild(cb);document.body.appendChild(ov);}else{ov.style.display='flex';};};
+</script>
 </body>
 </html>
 </script>

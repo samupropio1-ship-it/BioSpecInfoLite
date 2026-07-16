@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<script>
+/* ===== BSI GUARD v14 — localStorage sicuro (incognito / cookie bloccati / WebView) =====
+   Senza questa guardia, un accesso a localStorage in modalita' privata lancia
+   SecurityError e INTERROMPE l'intero script della pagina (sezioni vuote). */
+(function(){
+  var ok=false;
+  try{var t="__bsi_probe";window.localStorage.setItem(t,t);window.localStorage.removeItem(t);ok=true;}catch(e){ok=false;}
+  if(!ok){
+    var mem={};
+    try{
+      Object.defineProperty(window,"localStorage",{
+        value:{
+          getItem:function(k){return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null;},
+          setItem:function(k,v){mem[k]=String(v);},
+          removeItem:function(k){delete mem[k];},
+          clear:function(){mem={};},
+          key:function(i){return Object.keys(mem)[i]||null;},
+          get length(){return Object.keys(mem).length;}
+        },
+        configurable:true
+      });
+    }catch(e2){}
+  }
+  /* JSON.parse sicuro riutilizzabile */
+  window.bsiSafeParse=function(raw,fallback){
+    try{ var v=JSON.parse(raw); return (v===null||v===undefined)?fallback:v; }
+    catch(e){ return fallback; }
+  };
+  window.bsiLoadJSON=function(key,fallback){
+    try{ return window.bsiSafeParse(window.localStorage.getItem(key), fallback); }
+    catch(e){ return fallback; }
+  };
+  window.bsiSaveJSON=function(key,val){
+    try{ window.localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch(e){ return false; }
+  };
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Simulazioni — BioSpecInfo</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d1522">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root{
+    --bg:#0a1b2e; --bg2:#0e2338; --card:#11294080; --line:#ffffff14;
+    --teal:#00c9b7; --teal2:#5ce6d8; --gold:#f4c04e; --txt:#e8eef4; --sub:#9fb3c8;
+    --acid:#ff6b5b; --base:#5b8cff; --neutral:#4caf80;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:linear-gradient(160deg,#0a1b2e,#0c1f36 60%,#0a1728);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    min-height:100vh;padding:14px;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:800;color:var(--teal);letter-spacing:-.3px}
+  .lead{color:var(--sub);font-size:.85rem;margin:2px 0 16px}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{flex:1;min-width:110px;padding:9px 8px;border-radius:11px;border:1px solid var(--line);
+    background:var(--card);color:var(--sub);font-weight:700;font-size:.82rem;cursor:pointer;
+    text-align:center;transition:.2s}
+  .tab.on{background:linear-gradient(135deg,var(--teal),#0a9d8f);color:#04121e;border-color:transparent}
+  .sim{display:none} .sim.on{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;backdrop-filter:blur(8px)}
+  canvas{display:block;width:100%;border-radius:12px;background:radial-gradient(120% 100% at 50% 0%,#0e2740,#081627)}
+  .row{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .slider-wrap{margin:14px 0}
+  .slider-lbl{display:flex;justify-content:space-between;font-size:.8rem;color:var(--sub);margin-bottom:6px}
+  input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:6px;outline:none;
+    background:linear-gradient(90deg,#ff5b4b,#ff9d3b,#f4d13b,#7ed957,#39d0c4,#4c86ff,#8b6bff)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+    background:#fff;border:3px solid var(--teal);cursor:pointer;box-shadow:0 2px 8px #0008}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--teal);cursor:pointer}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .stat{background:#0c2036;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+  .stat .k{font-size:.7rem;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.15rem;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:800;font-size:.9rem;margin-top:4px}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .preset{padding:7px 11px;border-radius:10px;border:1px solid var(--line);background:#0c2036;
+    color:var(--txt);font-size:.76rem;cursor:pointer;transition:.15s}
+  .preset:active{transform:scale(.95)}
+  .legend{display:flex;gap:16px;justify-content:center;font-size:.76rem;color:var(--sub);margin-top:10px}
+  .legend b{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:.9rem;cursor:pointer;
+    background:linear-gradient(135deg,var(--teal),#0a9d8f);color:#04121e;margin-top:10px}
+  .btn.ghost{background:transparent;border:1px solid var(--teal);color:var(--teal)}
+  .note{font-size:.78rem;color:var(--sub);margin-top:10px;line-height:1.6}
+  .titr-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+</style>
+</head>
+<body>
+<style>/* spazio in fondo: i pulsanti flottanti dell'hub non coprono il contenuto */body{padding-bottom:172px}</style>
+<div class="wrap">
+  <h1>🧪 Simulazioni Interattive</h1>
+  <div class="lead">Esperimenti di chimica in tempo reale — stile PhET. Tocca e trascina per esplorare.</div>
+
+  <div class="tabs">
+    <div class="tab on" data-sim="ph" onclick="switchSim(this,'ph')">Scala del pH</div>
+    <div class="tab" data-sim="titr" onclick="switchSim(this,'titr')">Titolazione</div>
+    <div class="tab" data-sim="buf" onclick="switchSim(this,'buf')">Tamponi</div>
+    <div class="tab" data-sim="beer" onclick="switchSim(this,'beer')">Beer-Lambert</div>
+    <div class="tab" data-sim="gas" onclick="switchSim(this,'gas')">Gas ideali</div>
+    <div class="tab" data-sim="kin" onclick="switchSim(this,'kin')">Cinetica</div>
+  </div>
+
+  <!-- ═══════════ SIMULAZIONE 1: SCALA pH ═══════════ -->
+  <section class="sim on" id="sim-ph">
+    <div class="card">
+      <canvas id="phCanvas" width="600" height="300"></canvas>
+      <div class="legend">
+        <span><b style="background:#ff6b5b"></b>ioni H⁺ (idronio)</span>
+        <span><b style="background:#5b8cff"></b>ioni OH⁻ (idrossido)</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Più acido</span><span>Neutro</span><span>Più basico</span></div>
+        <input type="range" id="phSlider" min="0" max="14" step="0.1" value="7">
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:1px">Valore pH</div>
+        <div id="phBig" style="font-size:2.6rem;font-weight:800;line-height:1.1">7.0</div>
+        <span class="pill" id="phPill">Neutro</span>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">[H⁺] mol/L</div><div class="v" id="hConc">1.0×10⁻⁷</div></div>
+        <div class="stat"><div class="k">[OH⁻] mol/L</div><div class="v" id="ohConc">1.0×10⁻⁷</div></div>
+        <div class="stat"><div class="k">pOH</div><div class="v" id="pohVal">7.0</div></div>
+        <div class="stat"><div class="k">Natura</div><div class="v" id="natureVal" style="font-size:.95rem">Neutra</div></div>
+      </div>
+      <div class="presets" id="phPresets"></div>
+      <div class="note" id="phNote">L'acqua pura ha pH 7: le concentrazioni di H⁺ e OH⁻ sono uguali (10⁻⁷ mol/L). Il prodotto [H⁺]·[OH⁻] resta sempre 10⁻¹⁴ (costante Kw).</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SIMULAZIONE 2: TITOLAZIONE ═══════════ -->
+  <section class="sim" id="sim-titr">
+    <div class="card">
+      <canvas id="titrCanvas" width="600" height="320"></canvas>
+    </div>
+    <div class="card">
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Base aggiunta (mL)</span><span id="volLbl">0.0 mL</span></div>
+        <input type="range" id="titrSlider" min="0" max="50" step="0.25" value="0">
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:1px">pH della soluzione</div>
+        <div id="titrPhBig" style="font-size:2.4rem;font-weight:800">1.0</div>
+        <span class="pill" id="titrPill">Acido forte</span>
+      </div>
+      <div class="titr-info">
+        <div class="stat"><div class="k">Punto equivalenza</div><div class="v" id="eqVol">25.0 mL</div></div>
+        <div class="stat"><div class="k">Indicatore</div><div class="v" id="indColor" style="font-size:.95rem">Incolore</div></div>
+      </div>
+      <div class="row" style="margin-top:14px;gap:8px">
+        <button class="btn ghost" onclick="setTitr(0)">↺ Reset</button>
+        <button class="btn" onclick="animateTitr()">▶ Titola automaticamente</button>
+      </div>
+      <div class="note">Titolazione di 25 mL di HCl 0,1 M (acido forte) con NaOH 0,1 M (base forte). Al punto di equivalenza (25 mL) il pH salta bruscamente a 7: tutto l'acido è stato neutralizzato. La fenolftaleina vira dall'incolore al rosa.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SIMULAZIONE 3: TAMPONI (Henderson-Hasselbalch) ═══════════ -->
+  <section class="sim" id="sim-buf">
+    <div class="card">
+      <canvas id="bufCanvas" width="600" height="260"></canvas>
+      <div class="legend">
+        <span><b style="background:#ff9d3b"></b>acido HA</span>
+        <span><b style="background:#5ce6d8"></b>base coniugata A⁻</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="slider-lbl" style="margin-bottom:8px"><span style="color:var(--sub);font-size:.78rem">Sistema tampone</span></div>
+      <div class="presets" id="bufPresets" style="margin-top:0;margin-bottom:14px"></div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>più acido (HA)</span><span id="ratioLbl">1 : 1</span><span>più base (A⁻)</span></div>
+        <input type="range" id="bufSlider" min="-1.3" max="1.3" step="0.05" value="0">
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:1px">pH del tampone</div>
+        <div id="bufPhBig" style="font-size:2.4rem;font-weight:800">4.76</div>
+        <span class="pill" id="bufCap">Capacità massima</span>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Sistema</div><div class="v" id="bufName" style="font-size:.9rem">Acetato</div></div>
+        <div class="stat"><div class="k">pKa</div><div class="v" id="bufPka">4.76</div></div>
+        <div class="stat"><div class="k">[A⁻] / [HA]</div><div class="v" id="bufRatio">1.00</div></div>
+        <div class="stat"><div class="k">Nel range utile?</div><div class="v" id="bufRange" style="font-size:.9rem">Sì</div></div>
+      </div>
+      <div class="note" id="bufNote">Equazione di Henderson-Hasselbalch: pH = pKa + log([A⁻]/[HA]). Quando le concentrazioni di acido e base coniugata sono uguali, pH = pKa e il tampone ha la massima capacità di resistere alle variazioni di pH. Il range utile è pKa ± 1.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SIMULAZIONE 4: BEER-LAMBERT (spettroscopia) ═══════════ -->
+  <section class="sim" id="sim-beer">
+    <div class="card">
+      <canvas id="beerCanvas" width="600" height="240"></canvas>
+      <div class="note" style="text-align:center;margin-top:8px">La luce attraversa la cuvetta: più soluto assorbe, meno luce esce.</div>
+    </div>
+    <div class="card">
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Concentrazione (c)</span><span id="beerCLbl">1.0×10⁻⁴ M</span></div>
+        <input type="range" id="beerC" min="0" max="2" step="0.02" value="1">
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Cammino ottico (b)</span><span id="beerBLbl">1.0 cm</span></div>
+        <input type="range" id="beerB" min="0.2" max="5" step="0.1" value="1">
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Assorbività molare (ε)</span><span id="beerELbl">5000</span></div>
+        <input type="range" id="beerE" min="500" max="20000" step="100" value="5000">
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Assorbanza (A)</div><div class="v" id="beerA" style="color:var(--teal)">0.500</div></div>
+        <div class="stat"><div class="k">Trasmittanza (T)</div><div class="v" id="beerT">31.6%</div></div>
+      </div>
+      <div class="note">Legge di Beer-Lambert: <b>A = ε · b · c</b>. L'assorbanza è proporzionale a concentrazione, cammino ottico e assorbività molare. È il principio alla base della spettrofotometria UV-Vis — il cuore di BioSpecInfo.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SIMULAZIONE 5: GAS IDEALI ═══════════ -->
+  <section class="sim" id="sim-gas">
+    <div class="card">
+      <canvas id="gasCanvas" width="600" height="260"></canvas>
+      <div class="note" style="text-align:center;margin-top:8px">Le particelle si muovono più veloci a temperatura alta e urtano più spesso le pareti (pressione).</div>
+    </div>
+    <div class="card">
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Volume (V)</span><span id="gasVLbl">10.0 L</span></div>
+        <input type="range" id="gasV" min="1" max="25" step="0.5" value="10">
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Temperatura (T)</span><span id="gasTLbl">298 K</span></div>
+        <input type="range" id="gasT" min="100" max="600" step="5" value="298">
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Moli (n)</span><span id="gasNLbl">1.0 mol</span></div>
+        <input type="range" id="gasN" min="0.2" max="3" step="0.1" value="1">
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Pressione (P)</div><div class="v" id="gasP" style="color:var(--teal)">2.45 atm</div></div>
+        <div class="stat"><div class="k">P · V</div><div class="v" id="gasPV">24.5</div></div>
+      </div>
+      <div class="note">Legge dei gas ideali: <b>P·V = n·R·T</b> (R = 0,0821 L·atm/mol·K). A T costante, P·V resta costante (Boyle); aumentando T aumenta P (Gay-Lussac). Osserva le particelle: più calde = più veloci.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SIMULAZIONE 6: CINETICA DI REAZIONE ═══════════ -->
+  <section class="sim" id="sim-kin">
+    <div class="card">
+      <canvas id="kinCanvas" width="600" height="280"></canvas>
+      <div class="note" style="text-align:center;margin-top:8px">Curva di decadimento del reagente [A] nel tempo. Cambia l'ordine di reazione e la costante k.</div>
+    </div>
+    <div class="card">
+      <div class="slider-lbl" style="margin-bottom:8px"><span style="color:var(--sub);font-size:.78rem">Ordine di reazione</span></div>
+      <div class="presets" id="kinOrder" style="margin-top:0;margin-bottom:14px"></div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Costante di velocità k</span><span id="kinKLbl">0.10</span></div>
+        <input type="range" id="kinK" min="0.02" max="0.5" step="0.01" value="0.1">
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-lbl"><span>Concentrazione iniziale [A]₀</span><span id="kinA0Lbl">1.0 M</span></div>
+        <input type="range" id="kinA0" min="0.2" max="2" step="0.1" value="1">
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Legge di velocità</div><div class="v" id="kinLaw" style="font-size:.9rem">v = k[A]</div></div>
+        <div class="stat"><div class="k">Tempo dimezzamento t½</div><div class="v" id="kinT12">6.9</div></div>
+      </div>
+      <div class="note" id="kinNote">Reazione del <b>primo ordine</b>: v = k[A], la concentrazione decade esponenzialmente [A] = [A]₀·e^(−kt). Il tempo di dimezzamento t½ = ln2/k è costante, indipendente dalla concentrazione iniziale.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE pH — chimica verificata (Kw = 1e-14)
+   ══════════════════════════════════════════════════════════ */
+function switchSim(el,id){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.sim').forEach(function(s){s.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('sim-'+id).classList.add('on');
+  if(id==='ph') drawPh(); else if(id==='titr') drawTitr(); else if(id==='buf') drawBuf();
+  else if(id==='beer') updateBeer(); else if(id==='gas'){ updateGas(); drawGas(); } else if(id==='kin'){ updateKin(); }
+}
+
+// formattazione notazione scientifica leggibile: 1.0×10⁻⁷
+function sci(x){
+  if(x===0) return '0';
+  var e=Math.floor(Math.log10(x));
+  var m=(x/Math.pow(10,e));
+  var sup={'−':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  var es=(e<0?'−':'')+String(Math.abs(e)).split('').map(function(d){return sup[d];}).join('');
+  return m.toFixed(1)+'×10'+es;
+}
+
+var phPresets=[
+  {n:'🔋 Acido batteria',ph:0.5},{n:'🍋 Limone',ph:2.3},{n:'🥤 Cola',ph:2.5},
+  {n:'☕ Caffè',ph:5.0},{n:'💧 Acqua pura',ph:7.0},{n:'🩸 Sangue',ph:7.4},
+  {n:'🧼 Sapone',ph:10.0},{n:'🧴 Ammoniaca',ph:11.5},{n:'🧽 Candeggina',ph:12.6}
+];
+
+var phCanvas=document.getElementById('phCanvas'), phCtx=phCanvas.getContext('2d');
+var particles=[];
+function initParticles(){
+  particles=[];
+  for(var i=0;i<80;i++){
+    particles.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.003,vy:(Math.random()-.5)*.003,type:0,r:3+Math.random()*3});
+  }
+}
+initParticles();
+
+function phColor(ph){
+  // gradiente rosso(acido)→verde(neutro)→blu(basico)
+  var stops=[[0,'#c0392b'],[3,'#ff6b3b'],[6,'#e0c040'],[7,'#4caf80'],[8,'#3fb0c0'],[11,'#4c86ff'],[14,'#7b3ff2']];
+  for(var i=0;i<stops.length-1;i++){
+    if(ph>=stops[i][0]&&ph<=stops[i+1][0]){
+      var t=(ph-stops[i][0])/(stops[i+1][0]-stops[i][0]);
+      return lerpC(stops[i][1],stops[i+1][1],t);
+    }
+  }
+  return stops[stops.length-1][1];
+}
+function lerpC(a,b,t){
+  var ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),16);
+  var ar=ah>>16,ag=(ah>>8)&255,ab=ah&255, br=bh>>16,bg=(bh>>8)&255,bb=bh&255;
+  var r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bl=Math.round(ab+(bb-ab)*t);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+bl).toString(16).slice(1);
+}
+
+var curPh=7;
+function updatePh(ph){
+  curPh=ph;
+  document.getElementById('phBig').textContent=ph.toFixed(1);
+  var H=Math.pow(10,-ph), OH=Math.pow(10,-(14-ph));
+  document.getElementById('hConc').textContent=sci(H);
+  document.getElementById('ohConc').textContent=sci(OH);
+  document.getElementById('pohVal').textContent=(14-ph).toFixed(1);
+  var nat,pill,pc;
+  if(ph<6.5){nat='Acida';pill='Acido';pc='#ff6b5b';}
+  else if(ph>7.5){nat='Basica';pill='Basico';pc='#5b8cff';}
+  else{nat='Neutra';pill='Neutro';pc='#4caf80';}
+  document.getElementById('natureVal').textContent=nat;
+  var p=document.getElementById('phPill');p.textContent=pill;p.style.background=pc;p.style.color='#04121e';
+  document.getElementById('phBig').style.color=phColor(ph);
+  // proporzione particelle H+ vs OH-: a pH basso più H+, a pH alto più OH-
+  var fracH=1-(ph/14);
+  particles.forEach(function(pt,i){ pt.type=(i/particles.length < fracH)?0:1; });
+}
+
+function drawPh(){
+  var w=phCanvas.width,h=phCanvas.height;
+  phCtx.clearRect(0,0,w,h);
+  // liquido colorato
+  var col=phColor(curPh);
+  var g=phCtx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,col+'33'); g.addColorStop(1,col+'66');
+  phCtx.fillStyle=g; phCtx.fillRect(0,0,w,h);
+  // particelle con glow
+  particles.forEach(function(pt){
+    pt.x+=pt.vx; pt.y+=pt.vy;
+    if(pt.x<0||pt.x>1)pt.vx*=-1; if(pt.y<0||pt.y>1)pt.vy*=-1;
+    pt.x=Math.max(0,Math.min(1,pt.x)); pt.y=Math.max(0,Math.min(1,pt.y));
+    var px=pt.x*w,py=pt.y*h;
+    var c=pt.type===0?'#ff6b5b':'#5b8cff';
+    phCtx.beginPath();
+    var grd=phCtx.createRadialGradient(px,py,0,px,py,pt.r*3);
+    grd.addColorStop(0,c); grd.addColorStop(1,c+'00');
+    phCtx.fillStyle=grd; phCtx.arc(px,py,pt.r*3,0,7); phCtx.fill();
+    phCtx.beginPath();phCtx.fillStyle=c;phCtx.arc(px,py,pt.r,0,7);phCtx.fill();
+    // etichetta ione
+    phCtx.fillStyle='#fff';phCtx.font='bold 9px sans-serif';phCtx.textAlign='center';
+    phCtx.fillText(pt.type===0?'H⁺':'OH⁻',px,py-pt.r-2);
+  });
+  requestAnimationFrame(function(){ if(document.getElementById('sim-ph').classList.contains('on')) drawPh(); });
+}
+
+document.getElementById('phSlider').addEventListener('input',function(e){ updatePh(parseFloat(e.target.value)); });
+
+// presets
+var pc=document.getElementById('phPresets');
+phPresets.forEach(function(p){
+  var b=document.createElement('button');b.className='preset';b.textContent=p.n;
+  b.onclick=function(){ document.getElementById('phSlider').value=p.ph; updatePh(p.ph);
+    document.getElementById('phNote').textContent=p.n.replace(/[^\wàèéìòù ]/g,'').trim()+': pH '+p.ph+'. '+
+      (p.ph<7?'Soluzione acida — prevalgono gli ioni H⁺.':(p.ph>7?'Soluzione basica — prevalgono gli ioni OH⁻.':'Soluzione neutra — H⁺ e OH⁻ in equilibrio.'));
+  };
+  pc.appendChild(b);
+});
+
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE TITOLAZIONE — HCl 0.1M con NaOH 0.1M
+   ══════════════════════════════════════════════════════════ */
+var titrCanvas=document.getElementById('titrCanvas'), titrCtx=titrCanvas.getContext('2d');
+var Va=25, Ca=0.1, Cb=0.1; // 25 mL HCl 0.1M, NaOH 0.1M
+var curVb=0, titrCurve=[];
+
+function titrPh(Vb){
+  // moli
+  var molA=Ca*Va/1000, molB=Cb*Vb/1000;
+  var Vtot=(Va+Vb)/1000;
+  if(molB<molA){ // acido in eccesso
+    var Hexc=(molA-molB)/Vtot; return -Math.log10(Hexc);
+  } else if(Math.abs(molB-molA)<1e-9){ // equivalenza
+    return 7.0;
+  } else { // base in eccesso
+    var OHexc=(molB-molA)/Vtot; return 14+Math.log10(OHexc);
+  }
+}
+// precalcolo curva
+for(var v=0;v<=50;v+=0.25){ titrCurve.push({v:v,ph:titrPh(v)}); }
+
+function updateTitr(Vb){
+  curVb=Vb;
+  var ph=titrPh(Vb);
+  document.getElementById('titrPhBig').textContent=ph.toFixed(1);
+  document.getElementById('titrPhBig').style.color=phColor(ph);
+  document.getElementById('volLbl').textContent=Vb.toFixed(1)+' mL';
+  var pill,pc2,ind;
+  if(ph<6){pill='Acido';pc2='#ff6b5b';ind='Incolore';}
+  else if(ph>8){pill='Basico';pc2='#5b8cff';ind='Rosa (fenolftaleina)';}
+  else{pill='Equivalenza';pc2='#4caf80';ind='Viraggio';}
+  var p=document.getElementById('titrPill');p.textContent=pill;p.style.background=pc2;p.style.color='#04121e';
+  document.getElementById('indColor').textContent=ind;
+  drawTitr();
+}
+
+function drawTitr(){
+  var w=titrCanvas.width,h=titrCanvas.height,pad=42;
+  titrCtx.clearRect(0,0,w,h);
+  // assi
+  titrCtx.strokeStyle='#ffffff22';titrCtx.lineWidth=1;
+  titrCtx.beginPath();titrCtx.moveTo(pad,10);titrCtx.lineTo(pad,h-pad);titrCtx.lineTo(w-10,h-pad);titrCtx.stroke();
+  // etichette assi
+  titrCtx.fillStyle='#9fb3c8';titrCtx.font='10px sans-serif';titrCtx.textAlign='center';
+  titrCtx.fillText('Volume NaOH (mL)',(w+pad)/2,h-8);
+  titrCtx.save();titrCtx.translate(14,h/2);titrCtx.rotate(-Math.PI/2);titrCtx.fillText('pH',0,0);titrCtx.restore();
+  // griglia pH
+  for(var p2=0;p2<=14;p2+=2){
+    var y=10+(h-pad-10)*(1-p2/14);
+    titrCtx.fillStyle='#ffffff40';titrCtx.textAlign='right';titrCtx.fillText(p2,pad-5,y+3);
+    titrCtx.strokeStyle='#ffffff0a';titrCtx.beginPath();titrCtx.moveTo(pad,y);titrCtx.lineTo(w-10,y);titrCtx.stroke();
+  }
+  function X(v){return pad+(w-10-pad)*(v/50);}
+  function Y(ph){return 10+(h-pad-10)*(1-ph/14);}
+  // curva
+  titrCtx.strokeStyle='#00c9b7';titrCtx.lineWidth=2.5;titrCtx.beginPath();
+  titrCurve.forEach(function(pt,i){ i===0?titrCtx.moveTo(X(pt.v),Y(pt.ph)):titrCtx.lineTo(X(pt.v),Y(pt.ph)); });
+  titrCtx.stroke();
+  // punto equivalenza
+  titrCtx.fillStyle='#f4c04e';titrCtx.beginPath();titrCtx.arc(X(25),Y(7),4,0,7);titrCtx.fill();
+  titrCtx.fillStyle='#f4c04e';titrCtx.font='9px sans-serif';titrCtx.textAlign='left';
+  titrCtx.fillText('equivalenza',X(25)+6,Y(7)-4);
+  // punto corrente
+  var cph=titrPh(curVb);
+  titrCtx.fillStyle='#fff';titrCtx.beginPath();titrCtx.arc(X(curVb),Y(cph),6,0,7);titrCtx.fill();
+  titrCtx.strokeStyle='#00c9b7';titrCtx.lineWidth=2;titrCtx.stroke();
+}
+
+document.getElementById('titrSlider').addEventListener('input',function(e){ updateTitr(parseFloat(e.target.value)); });
+function setTitr(v){ document.getElementById('titrSlider').value=v; updateTitr(v); }
+var titrAnim=null;
+function animateTitr(){
+  if(titrAnim){clearInterval(titrAnim);titrAnim=null;return;}
+  var v=0; setTitr(0);
+  titrAnim=setInterval(function(){
+    v+=0.5; if(v>50){clearInterval(titrAnim);titrAnim=null;return;}
+    setTitr(v);
+  },60);
+}
+
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE TAMPONI — Henderson-Hasselbalch (verificata)
+   ══════════════════════════════════════════════════════════ */
+var bufSystems=[
+  {n:'Acetato',pka:4.76,ha:'CH₃COOH',a:'CH₃COO⁻'},
+  {n:'Fosfato',pka:7.21,ha:'H₂PO₄⁻',a:'HPO₄²⁻'},
+  {n:'Bicarbonato',pka:6.10,a:'HCO₃⁻',ha:'H₂CO₃'},
+  {n:'Ammonio',pka:9.25,ha:'NH₄⁺',a:'NH₃'},
+  {n:'TRIS',pka:8.07,ha:'TRIS-H⁺',a:'TRIS'}
+];
+var curBuf=bufSystems[0], bufLogRatio=0;
+var bufCanvas=document.getElementById('bufCanvas'), bufCtx=bufCanvas.getContext('2d');
+var bufParticles=[];
+for(var i=0;i<60;i++) bufParticles.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.003,vy:(Math.random()-.5)*.003,r:3+Math.random()*3});
+
+function updateBuf(){
+  var ratio=Math.pow(10,bufLogRatio); // [A-]/[HA]
+  var ph=curBuf.pka+bufLogRatio;
+  document.getElementById('bufPhBig').textContent=ph.toFixed(2);
+  document.getElementById('bufPhBig').style.color=phColor(ph);
+  document.getElementById('bufName').textContent=curBuf.n;
+  document.getElementById('bufPka').textContent=curBuf.pka.toFixed(2);
+  document.getElementById('bufRatio').textContent=ratio.toFixed(2);
+  // rapporto etichetta
+  var rl;
+  if(Math.abs(bufLogRatio)<0.03) rl='1 : 1';
+  else if(bufLogRatio>0) rl='1 : '+ratio.toFixed(1);
+  else rl=(1/ratio).toFixed(1)+' : 1';
+  document.getElementById('ratioLbl').textContent=rl;
+  // range utile pKa ± 1
+  var inRange=Math.abs(bufLogRatio)<=1;
+  document.getElementById('bufRange').textContent=inRange?'Sì ✓':'No ✗';
+  document.getElementById('bufRange').style.color=inRange?'#4caf80':'#ff6b5b';
+  // capacità: massima vicino a 1:1
+  var cap=document.getElementById('bufCap');
+  if(Math.abs(bufLogRatio)<0.15){cap.textContent='Capacità massima';cap.style.background='#4caf80';}
+  else if(inRange){cap.textContent='Buona capacità';cap.style.background='#f4c04e';}
+  else{cap.textContent='Fuori range';cap.style.background='#ff6b5b';}
+  cap.style.color='#04121e';
+  // assegno particelle: frazione A- vs HA
+  var fracA=ratio/(1+ratio);
+  bufParticles.forEach(function(pt,i){ pt.type=(i/bufParticles.length<fracA)?1:0; });
+}
+
+function drawBuf(){
+  var w=bufCanvas.width,h=bufCanvas.height;
+  bufCtx.clearRect(0,0,w,h);
+  bufCtx.fillStyle='#0c2036';bufCtx.fillRect(0,0,w,h);
+  bufParticles.forEach(function(pt){
+    pt.x+=pt.vx;pt.y+=pt.vy;
+    if(pt.x<0||pt.x>1)pt.vx*=-1;if(pt.y<0||pt.y>1)pt.vy*=-1;
+    pt.x=Math.max(0,Math.min(1,pt.x));pt.y=Math.max(0,Math.min(1,pt.y));
+    var px=pt.x*w,py=pt.y*h;
+    var c=pt.type===1?'#5ce6d8':'#ff9d3b';
+    var grd=bufCtx.createRadialGradient(px,py,0,px,py,pt.r*3);
+    grd.addColorStop(0,c);grd.addColorStop(1,c+'00');
+    bufCtx.fillStyle=grd;bufCtx.beginPath();bufCtx.arc(px,py,pt.r*3,0,7);bufCtx.fill();
+    bufCtx.fillStyle=c;bufCtx.beginPath();bufCtx.arc(px,py,pt.r,0,7);bufCtx.fill();
+  });
+  requestAnimationFrame(function(){ if(document.getElementById('sim-buf').classList.contains('on')) drawBuf(); });
+}
+
+document.getElementById('bufSlider').addEventListener('input',function(e){ bufLogRatio=parseFloat(e.target.value); updateBuf(); });
+var bp=document.getElementById('bufPresets');
+bufSystems.forEach(function(sys){
+  var b=document.createElement('button');b.className='preset';b.textContent=sys.n+' (pKa '+sys.pka+')';
+  b.onclick=function(){ curBuf=sys; updateBuf();
+    document.getElementById('bufNote').textContent=sys.n+' ('+sys.ha+' ⇌ '+sys.a+'): tampona efficacemente attorno a pH '+sys.pka+'. '+
+      (sys.n==='Fosfato'?'È il principale tampone intracellulare.':(sys.n==='Bicarbonato'?'È il tampone del sangue: a rapporto 20:1 mantiene il pH a 7,4.':(sys.n==='TRIS'?'Molto usato in biochimica e biologia molecolare.':'')));
+  };
+  bp.appendChild(b);
+});
+
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE BEER-LAMBERT — A = ε·b·c (verificata)
+   ══════════════════════════════════════════════════════════ */
+var beerCanvas=document.getElementById('beerCanvas'), beerCtx=beerCanvas.getContext('2d');
+function updateBeer(){
+  var c=parseFloat(document.getElementById('beerC').value)*1e-4;
+  var b=parseFloat(document.getElementById('beerB').value);
+  var eps=parseFloat(document.getElementById('beerE').value);
+  var A=eps*b*c, T=Math.pow(10,-A);
+  document.getElementById('beerCLbl').textContent=sci(c)+' M';
+  document.getElementById('beerBLbl').textContent=b.toFixed(1)+' cm';
+  document.getElementById('beerELbl').textContent=Math.round(eps);
+  document.getElementById('beerA').textContent=A.toFixed(3);
+  document.getElementById('beerT').textContent=(T*100).toFixed(1)+'%';
+  drawBeer(T,c);
+}
+function drawBeer(T,c){
+  var w=beerCanvas.width,h=beerCanvas.height;
+  beerCtx.clearRect(0,0,w,h);
+  // raggio di luce entrante (sinistra)
+  var beamY=h/2;
+  // sorgente
+  beerCtx.fillStyle='#f4c04e';beerCtx.font='bold 11px sans-serif';beerCtx.textAlign='center';
+  beerCtx.fillText('💡 Sorgente',60,beamY-40);
+  // cuvetta
+  var cx=180,cw=240;
+  var intensity=Math.min(1,c/2e-4);
+  beerCtx.fillStyle='rgba(0,201,183,'+(0.15+intensity*0.55)+')';
+  beerCtx.fillRect(cx,40,cw,h-80);
+  beerCtx.strokeStyle='#ffffff44';beerCtx.lineWidth=2;beerCtx.strokeRect(cx,40,cw,h-80);
+  // raggio entrante (pieno)
+  beerCtx.strokeStyle='#f4d13b';beerCtx.lineWidth=6;
+  beerCtx.beginPath();beerCtx.moveTo(20,beamY);beerCtx.lineTo(cx,beamY);beerCtx.stroke();
+  // raggio uscente (attenuato secondo T)
+  beerCtx.strokeStyle='rgba(244,209,59,'+Math.max(0.08,T)+')';
+  beerCtx.lineWidth=6*Math.max(0.15,T);
+  beerCtx.beginPath();beerCtx.moveTo(cx+cw,beamY);beerCtx.lineTo(w-20,beamY);beerCtx.stroke();
+  // rivelatore
+  beerCtx.fillStyle='#5ce6d8';beerCtx.fillText('📟 Rivelatore',w-60,beamY-40);
+  beerCtx.fillStyle='#e8eef4';beerCtx.font='bold 13px sans-serif';
+  beerCtx.fillText('T = '+(T*100).toFixed(0)+'%',w-60,beamY+50);
+}
+['beerC','beerB','beerE'].forEach(function(id){ document.getElementById(id).addEventListener('input',updateBeer); });
+
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE GAS IDEALI — PV = nRT (verificata)
+   ══════════════════════════════════════════════════════════ */
+var gasCanvas=document.getElementById('gasCanvas'), gasCtx=gasCanvas.getContext('2d');
+var R_gas=0.0821;
+var gasParticles=[];
+function initGas(){
+  gasParticles=[];
+  for(var i=0;i<40;i++) gasParticles.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5),vy:(Math.random()-.5)});
+}
+initGas();
+function updateGas(){
+  var V=parseFloat(document.getElementById('gasV').value);
+  var T=parseFloat(document.getElementById('gasT').value);
+  var n=parseFloat(document.getElementById('gasN').value);
+  var P=n*R_gas*T/V;
+  document.getElementById('gasVLbl').textContent=V.toFixed(1)+' L';
+  document.getElementById('gasTLbl').textContent=Math.round(T)+' K';
+  document.getElementById('gasNLbl').textContent=n.toFixed(1)+' mol';
+  document.getElementById('gasP').textContent=P.toFixed(2)+' atm';
+  document.getElementById('gasPV').textContent=(P*V).toFixed(1);
+  gasCanvas._V=V; gasCanvas._T=T; gasCanvas._n=n;
+}
+function drawGas(){
+  var w=gasCanvas.width,h=gasCanvas.height;
+  gasCtx.clearRect(0,0,w,h);
+  var V=gasCanvas._V||10, T=gasCanvas._T||298, n=gasCanvas._n||1;
+  // il contenitore si restringe col volume
+  var boxW=w*(0.3+0.65*(V/25)), boxH=h-40, bx=(w-boxW)/2, by=20;
+  gasCtx.strokeStyle='#00c9b7';gasCtx.lineWidth=2;gasCtx.strokeRect(bx,by,boxW,boxH);
+  // velocità proporzionale a sqrt(T), numero attivo proporzionale a n
+  var speed=Math.sqrt(T/298)*1.6;
+  var nActive=Math.round(gasParticles.length*(n/3));
+  var col=T<250?'#5b8cff':(T>400?'#ff6b5b':'#5ce6d8');
+  gasParticles.forEach(function(pt,i){
+    if(i>=nActive)return;
+    pt.x+=pt.vx*speed*0.006; pt.y+=pt.vy*speed*0.006;
+    if(pt.x<0){pt.x=0;pt.vx*=-1;} if(pt.x>1){pt.x=1;pt.vx*=-1;}
+    if(pt.y<0){pt.y=0;pt.vy*=-1;} if(pt.y>1){pt.y=1;pt.vy*=-1;}
+    var px=bx+pt.x*boxW, py=by+pt.y*boxH;
+    var grd=gasCtx.createRadialGradient(px,py,0,px,py,9);
+    grd.addColorStop(0,col);grd.addColorStop(1,col+'00');
+    gasCtx.fillStyle=grd;gasCtx.beginPath();gasCtx.arc(px,py,9,0,7);gasCtx.fill();
+    gasCtx.fillStyle=col;gasCtx.beginPath();gasCtx.arc(px,py,3.5,0,7);gasCtx.fill();
+  });
+  requestAnimationFrame(function(){ if(document.getElementById('sim-gas').classList.contains('on')) drawGas(); });
+}
+['gasV','gasT','gasN'].forEach(function(id){ document.getElementById(id).addEventListener('input',updateGas); });
+
+/* ══════════════════════════════════════════════════════════
+   SIMULAZIONE CINETICA — ordini 0, 1, 2 (verificata)
+   ══════════════════════════════════════════════════════════ */
+var kinOrder=1, kinK=0.1, kinA0=1;
+var kinCanvas=document.getElementById('kinCanvas'), kinCtx=kinCanvas.getContext('2d');
+
+// concentrazione [A] al tempo t secondo l'ordine
+function kinConc(t){
+  if(kinOrder===0){ return Math.max(0, kinA0 - kinK*t); }        // [A] = [A]0 - kt
+  if(kinOrder===1){ return kinA0*Math.exp(-kinK*t); }             // [A] = [A]0·e^(-kt)
+  return kinA0/(1+kinK*kinA0*t);                                  // 1/[A] = 1/[A]0 + kt
+}
+function kinHalfLife(){
+  if(kinOrder===0) return kinA0/(2*kinK);      // t½ = [A]0/2k
+  if(kinOrder===1) return Math.log(2)/kinK;    // t½ = ln2/k
+  return 1/(kinK*kinA0);                        // t½ = 1/(k[A]0)
+}
+
+function updateKin(){
+  document.getElementById('kinKLbl').textContent=kinK.toFixed(2);
+  document.getElementById('kinA0Lbl').textContent=kinA0.toFixed(1)+' M';
+  var law = kinOrder===0?'v = k (costante)':(kinOrder===1?'v = k[A]':'v = k[A]²');
+  document.getElementById('kinLaw').textContent=law;
+  document.getElementById('kinT12').textContent=kinHalfLife().toFixed(1);
+  var notes={
+    0:'Reazione di <b>ordine zero</b>: v = k, la velocità è costante e non dipende dalla concentrazione. [A] cala in modo lineare. Il t½ = [A]₀/2k dipende dalla concentrazione iniziale.',
+    1:'Reazione del <b>primo ordine</b>: v = k[A]. Decadimento esponenziale [A] = [A]₀·e^(−kt). Il t½ = ln2/k è costante, indipendente da [A]₀ (come il decadimento radioattivo).',
+    2:'Reazione del <b>secondo ordine</b>: v = k[A]². La curva 1/[A] è lineare nel tempo. Il t½ = 1/(k[A]₀) aumenta man mano che la reazione procede.'
+  };
+  document.getElementById('kinNote').innerHTML=notes[kinOrder];
+  drawKin();
+}
+
+function drawKin(){
+  var w=kinCanvas.width,h=kinCanvas.height,pad=42;
+  kinCtx.clearRect(0,0,w,h);
+  kinCtx.fillStyle='#0c2036';kinCtx.fillRect(0,0,w,h);
+  // assi
+  kinCtx.strokeStyle='#ffffff22';kinCtx.lineWidth=1;
+  kinCtx.beginPath();kinCtx.moveTo(pad,10);kinCtx.lineTo(pad,h-pad);kinCtx.lineTo(w-10,h-pad);kinCtx.stroke();
+  kinCtx.fillStyle='#9fb3c8';kinCtx.font='10px sans-serif';kinCtx.textAlign='center';
+  kinCtx.fillText('tempo →',(w+pad)/2,h-8);
+  kinCtx.save();kinCtx.translate(14,h/2);kinCtx.rotate(-Math.PI/2);kinCtx.fillText('[A] mol/L',0,0);kinCtx.restore();
+  var tmax=30, amax=2;
+  function X(t){return pad+(w-10-pad)*(t/tmax);}
+  function Y(a){return 10+(h-pad-10)*(1-a/amax);}
+  // griglia
+  for(var a=0;a<=2;a+=0.5){
+    var y=Y(a);kinCtx.fillStyle='#ffffff40';kinCtx.textAlign='right';kinCtx.fillText(a.toFixed(1),pad-5,y+3);
+    kinCtx.strokeStyle='#ffffff0a';kinCtx.beginPath();kinCtx.moveTo(pad,y);kinCtx.lineTo(w-10,y);kinCtx.stroke();
+  }
+  // curva
+  kinCtx.strokeStyle='#00c9b7';kinCtx.lineWidth=2.5;kinCtx.beginPath();
+  for(var t=0;t<=tmax;t+=0.2){ var a=kinConc(t); t===0?kinCtx.moveTo(X(t),Y(a)):kinCtx.lineTo(X(t),Y(a)); }
+  kinCtx.stroke();
+  // linea t½
+  var t12=kinHalfLife();
+  if(t12<=tmax){
+    kinCtx.strokeStyle='#f4c04e';kinCtx.setLineDash([4,3]);kinCtx.lineWidth=1.5;
+    kinCtx.beginPath();kinCtx.moveTo(X(t12),Y(kinA0/2));kinCtx.lineTo(X(t12),h-pad);kinCtx.stroke();
+    kinCtx.setLineDash([]);
+    kinCtx.fillStyle='#f4c04e';kinCtx.font='9px sans-serif';kinCtx.textAlign='center';
+    kinCtx.fillText('t½',X(t12),h-pad+12);
+  }
+}
+
+// preset ordini
+var ko=document.getElementById('kinOrder');
+[[0,'Ordine 0'],[1,'Ordine 1'],[2,'Ordine 2']].forEach(function(o){
+  var b=document.createElement('button');b.className='preset';b.textContent=o[1];
+  if(o[0]===1)b.style.borderColor='#00c9b7';
+  b.onclick=function(){ kinOrder=o[0];
+    ko.querySelectorAll('.preset').forEach(function(x){x.style.borderColor='';});
+    b.style.borderColor='#00c9b7'; updateKin();
+  };
+  ko.appendChild(b);
+});
+document.getElementById('kinK').addEventListener('input',function(e){ kinK=parseFloat(e.target.value); updateKin(); });
+document.getElementById('kinA0').addEventListener('input',function(e){ kinA0=parseFloat(e.target.value); updateKin(); });
+
+// avvio
+updatePh(7); drawPh();
+updateTitr(0);
+updateBuf();
+updateBeer();
+updateGas();
+updateKin();
+</script>
+</body>
+</html>
