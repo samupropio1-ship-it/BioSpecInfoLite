@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BioSpecInfo PRO Hub</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030812;--panel:#071221;--border:#0d2340;
+  --accent:#00c9b7;--accent2:#7c6fff;--coral:#ff6b8a;
+  --amber:#f59e0b;--green:#22c55e;--text:#e2e8f0;--muted:#64748b;--card:#0a1929
+}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* TOP */
+#top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(3,8,18,.97);border-bottom:1px solid var(--border);flex-shrink:0}
+.app-title{font-size:15px;font-weight:800;background:linear-gradient(90deg,#00c9b7,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.badge-pro{background:linear-gradient(135deg,#7c6fff,#00c9b7);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:.5px;flex-shrink:0}
+
+/* TABS */
+#tabs{display:flex;gap:4px;padding:8px 10px;background:rgba(7,18,33,.97);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#tabs::-webkit-scrollbar{height:3px}
+#tabs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.tb{padding:6px 13px;border-radius:16px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.tb.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.tb:hover:not(.active){border-color:var(--accent2);color:var(--accent2)}
+
+/* CONTENT */
+#content{flex:1;overflow:hidden}
+.pane{display:none;width:100%;height:100%;overflow-y:auto;padding:14px}
+.pane.active{display:block}
+
+/* Common */
+.sec{margin-bottom:20px}
+.sec-h{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sec-sub{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+label{font-size:12px;color:var(--muted)}
+input[type=text],input[type=number],select,textarea{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input[type=text]::placeholder,input[type=number]::placeholder,textarea::placeholder{color:var(--muted)}
+select{cursor:pointer}
+input[type=range]{accent-color:var(--accent2);width:120px}
+.btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#000;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+.btn:hover{opacity:.82}
+.btn-sec{background:transparent;color:var(--accent);border-color:rgba(0,201,183,.4)}
+.btn-v{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.result-box{background:rgba(0,201,183,.06);border:1.5px solid rgba(0,201,183,.25);border-radius:10px;padding:12px;margin-top:10px;font-size:13px;line-height:1.7}
+.result-box .rk{color:var(--muted);font-size:11px}
+.result-box .rv{color:var(--accent);font-weight:700;font-size:15px}
+.bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:4px 0}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .4s}
+.chip{display:inline-block;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:600;margin:2px}
+.chip-g{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.chip-r{background:rgba(255,107,138,.15);color:var(--coral);border:1px solid rgba(255,107,138,.3)}
+.chip-a{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.chip-b{background:rgba(0,201,183,.1);color:var(--accent);border:1px solid rgba(0,201,183,.25)}
+.chip-v{background:rgba(124,111,255,.15);color:#a78bfa;border:1px solid rgba(124,111,255,.3)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:rgba(0,201,183,.1);color:var(--accent);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);font-size:11px}
+td{padding:6px 8px;border-bottom:1px solid rgba(13,35,64,.6);color:var(--text)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.acc-head{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:13px;font-weight:600;color:var(--text);transition:border-color .2s}
+.acc-head:hover{border-color:var(--accent2)}
+.acc-body{display:none;padding:10px 12px;border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:rgba(10,25,41,.6);margin-bottom:8px}
+.acc-body.open{display:block}
+canvas{display:block}
+.formula{font-family:monospace;background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.25);border-radius:6px;padding:4px 8px;font-size:12px;color:#c4b5fd;display:inline-block;margin:3px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:480px){.grid3{grid-template-columns:1fr}}
+.stat-box{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px}
+.stat-box .sv{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-box .sl{font-size:10px;color:var(--muted);margin-top:2px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,201,183,.15);border:1.5px solid var(--accent);backdrop-filter:blur(8px);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--accent);display:none;z-index:9999;pointer-events:none}
+
+/* Dashboard cards */
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.pro-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.pro-card:hover{border-color:var(--accent2);box-shadow:0 0 16px rgba(124,111,255,.2);transform:translateY(-1px)}
+.pro-card .pc-icon{font-size:28px;margin-bottom:8px}
+.pro-card .pc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pro-card .pc-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.pro-card .pc-badge{font-size:9px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border-radius:6px;padding:2px 6px;display:inline-block;margin-top:6px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <span style="font-size:20px">⚗️</span>
+    <span class="app-title">BioSpecInfo PRO Hub</span>
+    <span class="badge-pro">PRO</span>
+  </div>
+  <div id="tabs">
+    <button class="tb active" onclick="switchTab('dash')">🏠 Dashboard</button>
+    <button class="tb" onclick="switchTab('ml')">🤖 ML Chimica</button>
+    <button class="tb" onclick="switchTab('qm')">⚛️ Meccanica Q.</button>
+    <button class="tb" onclick="switchTab('fis')">🔥 Chimica Fisica</button>
+    <button class="tb" onclick="switchTab('stat')">📊 Ch. Statistica</button>
+    <button class="tb" onclick="switchTab('tools')">🔬 Strumenti</button>
+    <button class="tb" onclick="switchTab('inter')">🧬 Interdisciplinare</button>
+    <button class="tb" onclick="switchTab('batch')">⚙️ Batch</button>
+  </div>
+  <div id="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="pane active" id="pane-dash">
+      <div class="sec">
+        <div class="sec-h">🚀 BioSpecInfo PRO — Moduli Disponibili</div>
+        <div class="sec-sub">Piattaforma avanzata per chimica farmaceutica, computazionale e astrochimica. Seleziona un modulo per iniziare.</div>
+        <div class="pro-grid">
+          <div class="pro-card" onclick="switchTab('ml')"><div class="pc-icon">🤖</div><div class="pc-title">ML in Chimica</div><div class="pc-desc">QSAR, ADMET, BBB, hERG, Drug Score</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('qm')"><div class="pc-icon">⚛️</div><div class="pc-title">Meccanica Quantistica</div><div class="pc-desc">Particle-in-Box, Oscillatore, Atomo H</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('fis')"><div class="pc-icon">🔥</div><div class="pc-title">Chimica Fisica</div><div class="pc-desc">ΔG, Arrhenius, Nernst, Equilibri</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('stat')"><div class="pc-icon">📊</div><div class="pc-title">Chimica Statistica</div><div class="pc-desc">Boltzmann, partizione Z, ensemble</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('tools')"><div class="pc-icon">🔬</div><div class="pc-title">Strumenti Avanzati</div><div class="pc-desc">PubChem API, costanti, convertitore</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('inter')"><div class="pc-icon">🧬</div><div class="pc-title">Interdisciplinare</div><div class="pc-desc">Drug design, bioisosteri, materiali</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" onclick="switchTab('batch')"><div class="pc-icon">⚙️</div><div class="pc-title">Batch Processing</div><div class="pc-desc">Analisi CSV multi-molecola Lipinski</div><div class="pc-badge">NEW</div></div>
+          <div class="pro-card" style="border-color:rgba(0,201,183,.4);background:rgba(0,201,183,.04)"><div class="pc-icon">🌌</div><div class="pc-title">Astrochimica 3D</div><div class="pc-desc">Apri dal menu principale</div><div class="pc-badge" style="background:#2d3748;color:var(--muted)">EXT</div></div>
+          <div class="pro-card" style="border-color:rgba(0,201,183,.4);background:rgba(0,201,183,.04)"><div class="pc-icon">🧪</div><div class="pc-title">RDKit Lab</div><div class="pc-desc">13 tab di cheminformatica</div><div class="pc-badge" style="background:#2d3748;color:var(--muted)">EXT</div></div>
+          <div class="pro-card" style="border-color:rgba(0,201,183,.4);background:rgba(0,201,183,.04)"><div class="pc-icon">📁</div><div class="pc-title">File Manager</div><div class="pc-desc">Foto, HTML, Note — protetto</div><div class="pc-badge" style="background:#2d3748;color:var(--muted)">EXT</div></div>
+        </div>
+        <div class="grid3">
+          <div class="stat-box"><div class="sv">10</div><div class="sl">Moduli PRO totali</div></div>
+          <div class="stat-box"><div class="sv">323</div><div class="sl">Domande Accademia</div></div>
+          <div class="stat-box"><div class="sv">324</div><div class="sl">Reazioni Sintesi</div></div>
+          <div class="stat-box"><div class="sv">50+</div><div class="sl">Molecole ISM</div></div>
+          <div class="stat-box"><div class="sv">13</div><div class="sl">Tab RDKit Lab</div></div>
+          <div class="stat-box"><div class="sv">8</div><div class="sl">Sezioni PRO Hub</div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">✨ Ultime novità</div>
+        <div class="card">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;display:flex;gap:8px;align-items:flex-start"><span class="chip chip-g">NEW</span><span><b>PRO Hub</b> — ML QSAR, Meccanica Quantistica, Chimica Fisica, Statistica, Strumenti avanzati</span></div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:flex-start"><span class="chip chip-g">NEW</span><span><b>Astrochimica 3D</b> — 50+ molecole ISM, esopianeti JWST, nucleosintesi, chimica cometaria</span></div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:flex-start"><span class="chip chip-g">NEW</span><span><b>File Manager PRO</b> — upload foto/HTML, note, auth SHA-256, IndexedDB</span></div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:flex-start"><span class="chip chip-b">UPD</span><span><b>Accademia</b> — 323 domande in 13 categorie universitarie</span></div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:flex-start"><span class="chip chip-b">FIX</span><span><b>RDKit.js</b> — loader robusto 8 CDN, script-tag con crossOrigin, fallback SmilesDrawer</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ML IN CHIMICA ═══ -->
+    <div class="pane" id="pane-ml">
+      <div class="sec">
+        <div class="sec-h">🤖 ML in Chimica — QSAR & ADMET</div>
+        <div class="sec-sub">Predizioni QSAR basate su euristica strutturale da SMILES. Modelli semplificati per scopo didattico.</div>
+        <div class="card">
+          <div class="row">
+            <div style="flex:1"><label>SMILES</label><br><input type="text" id="ml-smiles" placeholder="CC(=O)Oc1ccccc1C(=O)O" style="width:100%;margin-top:4px"></div>
+          </div>
+          <div class="row" style="flex-wrap:wrap">
+            <button class="btn" onclick="mlPredict()">▶ Predici</button>
+            <button class="btn btn-sec" onclick="mlSetPreset('aspirina')">Aspirina</button>
+            <button class="btn btn-sec" onclick="mlSetPreset('ibuprofene')">Ibuprofene</button>
+            <button class="btn btn-sec" onclick="mlSetPreset('caffeina')">Caffeina</button>
+            <button class="btn btn-sec" onclick="mlSetPreset('atorvastatina')">Atorvastatina</button>
+            <button class="btn btn-sec" onclick="mlSetPreset('paracetamolo')">Paracetamolo</button>
+          </div>
+          <div id="ml-result" style="display:none">
+            <div class="grid2" style="margin-top:12px" id="ml-props"></div>
+            <div style="margin-top:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">ADMET Radar</div>
+              <canvas id="ml-radar" width="240" height="180" style="max-width:100%"></canvas>
+            </div>
+            <div id="ml-verdict" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="acc-head" onclick="toggleAcc(this)">📖 Come funziona il QSAR? <span>▾</span></div>
+        <div class="acc-body">
+          <p style="font-size:12px;color:var(--muted);line-height:1.7">Il <b>QSAR</b> (Quantitative Structure–Activity Relationship) correla la struttura chimica con l'attività biologica tramite descrittori molecolari. I modelli classici usano regressione lineare multipla (MLR); quelli moderni usano Random Forest, GNN (Graph Neural Network) e Transformer molecolari (es. ChemBERTa). I descrittori includono: MW, logP, TPSA, HBD/HBA, rotatable bonds, fingerprint Morgan. La logS stimata usa: logS ≈ 0.5 – 0.01·MW – 0.3·logP + 0.3·HBA. La BBB permeabilità si stima da: MW &lt; 450, PSA &lt; 90 Å², logP 1–5. hERG risk dipende da ammine aromatiche e strutture planari.</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">📚 Concetti ML per Farmaci</div>
+        <table>
+          <tr><th>Metodo</th><th>Tipo</th><th>Uso tipico</th><th>Pro</th></tr>
+          <tr><td>MLR / PLS</td><td>Lineare</td><td>LogP, LogS, ADMET base</td><td>Interpretabile</td></tr>
+          <tr><td>Random Forest</td><td>Ensemble</td><td>pIC50, solubilità</td><td>Robusto, importanza feature</td></tr>
+          <tr><td>SVM</td><td>Kernel</td><td>Classificazione attività</td><td>Alta accuratezza set piccoli</td></tr>
+          <tr><td>GNN (MPNN)</td><td>Deep</td><td>Proprietà molecolari</td><td>Apprende direttamente da grafo</td></tr>
+          <tr><td>Transformer (ChemBERTa)</td><td>Deep</td><td>SMILES → proprietà</td><td>Pre-trained su milioni di molecole</td></tr>
+          <tr><td>Docking scoring</td><td>Fisico</td><td>Affinità ligando–target</td><td>Interpretazione strutturale</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ MECCANICA QUANTISTICA ═══ -->
+    <div class="pane" id="pane-qm">
+      <div class="sec" id="qm-theory-block">
+        <div class="sec-h">⚛️ Fondamenti di Meccanica Quantistica</div>
+        <div class="card" style="line-height:1.7;font-size:13px;color:#cdd9e6">
+          <b style="color:var(--accent)">I postulati fondamentali:</b><br>
+          1. Lo stato di un sistema è descritto da una <b>funzione d'onda ψ</b>; |ψ|² è la densità di probabilità.<br>
+          2. Ad ogni osservabile corrisponde un <b>operatore</b> (energia → Hamiltoniano Ĥ).<br>
+          3. I valori misurabili sono gli <b>autovalori</b>: Ĥψ = Eψ.<br>
+          4. L'evoluzione temporale segue l'equazione di Schrödinger dipendente dal tempo.<br><br>
+          <b style="color:var(--accent)">Equazione di Schrödinger (stazionaria):</b><br>
+          <span style="font-family:monospace;color:#e9eef6">[−(ℏ²/2m)∇² + V]ψ = Eψ</span><br>
+          Le soluzioni danno le energie permesse (quantizzate) e gli orbitali.<br><br>
+          <b style="color:var(--accent)">HOMO / LUMO — orbitali di frontiera:</b><br>
+          HOMO (occupato più alto) e LUMO (vuoto più basso) governano reattività, colore e conducibilità. Il loro <b>gap</b> piccolo → molecola più reattiva/colorata (teoria di Fukui).<br><br>
+          <b style="color:var(--accent)">Metodi di calcolo:</b><br>
+          <b>Hartree-Fock</b>: campo medio. <b>DFT</b>: usa la densità ρ(r), standard costo/accuratezza. <b>Post-HF</b> (MP2, CCSD): includono la correlazione elettronica.
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">⚛️ Particle in a Box (1D)</div>
+        <div class="card">
+          <div class="row">
+            <label>Livello quantico n:</label>
+            <select id="qm-n" onchange="drawPIB()"><option>1</option><option>2</option><option>3</option><option selected>4</option></select>
+            <label>Lunghezza L (Å):</label>
+            <input type="range" id="qm-L" min="1" max="20" value="10" oninput="document.getElementById('qm-Lv').textContent=this.value;drawPIB()">
+            <span id="qm-Lv" style="color:var(--accent);font-weight:700;font-size:13px">10</span>Å
+          </div>
+          <canvas id="pib-canvas" width="320" height="200" style="max-width:100%;border-radius:8px;background:#020508"></canvas>
+          <div id="pib-En" class="result-box" style="margin-top:8px"></div>
+        </div>
+        <div class="acc-head" onclick="toggleAcc(this)">📖 Teoria <span>▾</span></div>
+        <div class="acc-body">
+          <div class="formula">Eₙ = n²π²ℏ²/(2mL²) = n² · 0.376 eV / L[Å]²</div>
+          <div class="formula">ψₙ(x) = √(2/L) · sin(nπx/L)</div>
+          <p style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6">Il modello della buca di potenziale infinita descrive elettroni π in sistemi coniugati (polieni, porfirine). La spaziatura tra livelli decresce all'aumentare di L → spostamento bathocromico. Il grafico mostra ψ (viola) e |ψ|² (teal).</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">🌊 Oscillatore Armonico Quantistico</div>
+        <div class="card">
+          <div class="row">
+            <label>Livello v:</label>
+            <select id="qm-v" onchange="drawHO()"><option>0</option><option selected>1</option><option>2</option><option>3</option></select>
+          </div>
+          <canvas id="ho-canvas" width="320" height="180" style="max-width:100%;border-radius:8px;background:#020508"></canvas>
+          <div class="formula" style="margin-top:8px">Eᵥ = ℏω(v + ½) &nbsp; ψᵥ ∝ Hᵥ(x)·e^(-x²/2)</div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">🔴 Funzioni d'onda Atomo H</div>
+        <div class="card">
+          <div class="row">
+            <label>Orbitale:</label>
+            <select id="qm-orb" onchange="drawHydrogen()">
+              <option value="1s">1s</option><option value="2s">2s</option>
+              <option value="2p">2p</option><option value="3s">3s</option><option value="3p">3p</option>
+            </select>
+          </div>
+          <canvas id="h-canvas" width="320" height="160" style="max-width:100%;border-radius:8px;background:#020508"></canvas>
+          <div id="h-info" class="result-box" style="margin-top:8px;font-size:12px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHIMICA FISICA ═══ -->
+    <div class="pane" id="pane-fis">
+      <div class="sec-h">🔥 Chimica Fisica</div><br>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🌡️ Termodinamica — ΔG = ΔH − TΔS <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row" style="flex-wrap:wrap">
+          <div><label>ΔH (kJ/mol)</label><br><input type="number" id="td-dH" value="-100" style="width:110px;margin-top:4px"></div>
+          <div><label>ΔS (J/mol·K)</label><br><input type="number" id="td-dS" value="-80" style="width:110px;margin-top:4px"></div>
+          <div><label>T (K)</label><br><input type="number" id="td-T" value="298" style="width:90px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcTD()">Calcola</button></div>
+        </div>
+        <div id="td-result" class="result-box" style="display:none"></div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">⚡ Cinetica — Arrhenius <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row" style="flex-wrap:wrap">
+          <div><label>Ea (kJ/mol)</label><br><input type="number" id="arr-Ea" value="80" style="width:110px;margin-top:4px"></div>
+          <div><label>A (s⁻¹)</label><br><input type="number" id="arr-A" value="1e13" style="width:120px;margin-top:4px"></div>
+          <div><label>T (K)</label><br><input type="number" id="arr-T" value="298" style="width:90px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcArr()">Calcola k</button></div>
+        </div>
+        <div id="arr-result" class="result-box" style="display:none"></div>
+        <canvas id="arr-canvas" width="280" height="140" style="max-width:100%;margin-top:10px;border-radius:8px;background:#020508;display:none"></canvas>
+        <div class="formula" style="margin-top:6px">k = A · e^(-Eₐ/RT) &nbsp; t₁/₂(1°) = ln2/k</div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🔋 Elettrochimica — Nernst <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row" style="flex-wrap:wrap">
+          <div><label>E° (V)</label><br><input type="number" id="nst-E0" value="1.10" step="0.01" style="width:100px;margin-top:4px"></div>
+          <div><label>n (elettroni)</label><br><input type="number" id="nst-n" value="2" min="1" max="8" style="width:80px;margin-top:4px"></div>
+          <div><label>Q (reaz.)</label><br><input type="number" id="nst-Q" value="0.01" style="width:100px;margin-top:4px"></div>
+          <div><label>T (K)</label><br><input type="number" id="nst-T" value="298" style="width:90px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcNernst()">Calcola E</button></div>
+        </div>
+        <div id="nst-result" class="result-box" style="display:none"></div>
+        <div class="formula" style="margin-top:6px">E = E° − (RT/nF)·ln Q &nbsp; F = 96485 C/mol</div>
+        <div style="margin-top:10px;font-size:12px;font-weight:700;color:var(--muted)">Potenziali standard (selezione)</div>
+        <table style="margin-top:6px">
+          <tr><th>Semireazione</th><th>E° (V)</th></tr>
+          <tr><td>F₂ + 2e⁻ → 2F⁻</td><td style="color:var(--green)">+2.87</td></tr>
+          <tr><td>MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O</td><td style="color:var(--green)">+1.51</td></tr>
+          <tr><td>Cl₂ + 2e⁻ → 2Cl⁻</td><td style="color:var(--green)">+1.36</td></tr>
+          <tr><td>O₂ + 4H⁺ + 4e⁻ → 2H₂O</td><td style="color:var(--green)">+1.23</td></tr>
+          <tr><td>Fe³⁺ + e⁻ → Fe²⁺</td><td style="color:var(--amber)">+0.77</td></tr>
+          <tr><td>Cu²⁺ + 2e⁻ → Cu</td><td style="color:var(--amber)">+0.34</td></tr>
+          <tr><td>2H⁺ + 2e⁻ → H₂</td><td>0.00</td></tr>
+          <tr><td>Fe²⁺ + 2e⁻ → Fe</td><td style="color:var(--coral)">−0.44</td></tr>
+          <tr><td>Zn²⁺ + 2e⁻ → Zn</td><td style="color:var(--coral)">−0.76</td></tr>
+          <tr><td>Al³⁺ + 3e⁻ → Al</td><td style="color:var(--coral)">−1.66</td></tr>
+          <tr><td>Li⁺ + e⁻ → Li</td><td style="color:var(--coral)">−3.04</td></tr>
+        </table>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">⚖️ Equilibrio — pH / Buffer / Ksp <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row" style="flex-wrap:wrap">
+          <div><label>Ka (acido)</label><br><input type="number" id="eq-Ka" value="1.8e-5" style="width:120px;margin-top:4px"></div>
+          <div><label>C (mol/L)</label><br><input type="number" id="eq-C" value="0.1" step="0.01" style="width:100px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcPH()">Calcola pH</button></div>
+        </div>
+        <div id="eq-result" class="result-box" style="display:none"></div>
+        <div class="row" style="flex-wrap:wrap;margin-top:12px">
+          <div><label>pKa buffer</label><br><input type="number" id="buf-pKa" value="4.74" step="0.1" style="width:100px;margin-top:4px"></div>
+          <div><label>[A⁻]/[HA]</label><br><input type="number" id="buf-r" value="1" step="0.1" style="width:100px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcBuffer()">pH buffer</button></div>
+        </div>
+        <div id="buf-result" class="result-box" style="display:none"></div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">💨 Gas Reali — van der Waals <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row" style="flex-wrap:wrap">
+          <div><label>Gas</label><br>
+            <select id="vdw-gas" onchange="setVdWGas()" style="margin-top:4px">
+              <option value="H2">H₂ (a=0.244, b=26.7)</option>
+              <option value="N2">N₂ (a=1.39, b=38.7)</option>
+              <option value="O2">O₂ (a=1.36, b=31.8)</option>
+              <option value="CO2" selected>CO₂ (a=3.59, b=42.7)</option>
+              <option value="CH4">CH₄ (a=2.25, b=42.8)</option>
+              <option value="H2O">H₂O (a=5.53, b=30.5)</option>
+            </select>
+          </div>
+          <div><label>a (L²·atm/mol²)</label><br><input type="number" id="vdw-a" value="3.59" step="0.01" style="width:110px;margin-top:4px"></div>
+          <div><label>b (cm³/mol)</label><br><input type="number" id="vdw-b" value="42.7" step="0.1" style="width:100px;margin-top:4px"></div>
+          <div><label>n (mol)</label><br><input type="number" id="vdw-n" value="1" step="0.1" style="width:80px;margin-top:4px"></div>
+          <div><label>T (K)</label><br><input type="number" id="vdw-T" value="300" style="width:80px;margin-top:4px"></div>
+          <div><label>V (L)</label><br><input type="number" id="vdw-V" value="1" step="0.1" style="width:80px;margin-top:4px"></div>
+          <div style="align-self:flex-end"><button class="btn" onclick="calcVdW()">Calcola P</button></div>
+        </div>
+        <div id="vdw-result" class="result-box" style="display:none"></div>
+        <div class="formula">(P + an²/V²)(V−nb) = nRT</div>
+      </div>
+    </div>
+
+    <!-- ═══ CHIMICA STATISTICA ═══ -->
+    <div class="pane" id="pane-stat">
+      <div class="sec-h">📊 Chimica Statistica</div><br>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🌡️ Distribuzione di Boltzmann <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row">
+          <label>Temperatura T (K):</label>
+          <input type="range" id="bolt-T" min="50" max="3000" value="298" oninput="document.getElementById('bolt-Tv').textContent=this.value;drawBoltzmann()">
+          <span id="bolt-Tv" style="color:var(--accent);font-weight:700;font-size:13px">298</span>K
+        </div>
+        <canvas id="bolt-canvas" width="320" height="180" style="max-width:100%;border-radius:8px;background:#020508"></canvas>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">Distribuzione delle velocità molecolari (Maxwell-Boltzmann) per N₂ a variare di T.</div>
+        <div class="formula" style="margin-top:6px">f(v) = 4π(M/2πRT)^(3/2) · v² · e^(-Mv²/2RT)</div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">⚡ Distribuzione di Fermi-Dirac <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row">
+          <label>T (K):</label>
+          <input type="range" id="fd-T" min="0" max="5000" value="300" oninput="document.getElementById('fd-Tv').textContent=this.value;drawFD()">
+          <span id="fd-Tv" style="color:var(--accent2);font-weight:700;font-size:13px">300</span>K
+        </div>
+        <canvas id="fd-canvas" width="320" height="160" style="max-width:100%;border-radius:8px;background:#020508"></canvas>
+        <div class="formula">f(E) = 1/(1 + e^((E−Eᶠ)/kT)) &nbsp; Eᶠ ≈ 7 eV (Cu)</div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🔵 Funzione di Partizione Z <span>▾</span></div>
+      <div class="acc-body">
+        <div class="card" style="margin-bottom:0">
+          <div class="row" style="flex-wrap:wrap">
+            <div><label>Molecola</label><br>
+              <select id="zp-mol" onchange="calcPartition()" style="margin-top:4px">
+                <option value="N2">N₂</option><option value="O2">O₂</option>
+                <option value="HCl">HCl</option><option value="CO">CO</option>
+                <option value="H2O">H₂O</option>
+              </select>
+            </div>
+            <div><label>T (K)</label><br><input type="number" id="zp-T" value="298" style="width:90px;margin-top:4px" oninput="calcPartition()"></div>
+          </div>
+          <div id="zp-result" class="result-box" style="margin-top:8px"></div>
+        </div>
+        <div class="formula" style="margin-top:8px">Z_tot = Z_trans · Z_rot · Z_vib · Z_el</div>
+        <div class="formula">Z_trans = (2πmkT/h²)^(3/2) · V</div>
+        <div class="formula">Z_rot = kT/hcB̃ (molecola lineare)</div>
+        <div class="formula">Z_vib = 1/(1 − e^(−hν/kT))</div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🔬 Ensemble Termodinamici <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Ensemble</th><th>Variabili fisse</th><th>Funzione caratteristica</th><th>Applicazione</th></tr>
+          <tr><td>Microcanonico (NVE)</td><td>N, V, E</td><td>S = k_B ln Ω</td><td>Sistemi isolati</td></tr>
+          <tr><td>Canonico (NVT)</td><td>N, V, T</td><td>F = −kT ln Z</td><td>Bagno termico</td></tr>
+          <tr><td>Gran canonico (μVT)</td><td>μ, V, T</td><td>Ω = −PV = −kT ln Z_gc</td><td>Sistemi aperti</td></tr>
+          <tr><td>Isobarico-isotermo (NPT)</td><td>N, P, T</td><td>G = −kT ln Δ</td><td>Simulazioni MD</td></tr>
+        </table>
+        <div class="formula" style="margin-top:8px">U = kT² (∂ln Z/∂T)_V &nbsp; S = k(ln Z + T·∂ln Z/∂T)</div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🧱 Solido di Einstein — Calore specifico <span>▾</span></div>
+      <div class="acc-body">
+        <canvas id="einstein-canvas" width="320" height="160" style="max-width:100%;border-radius:8px;background:#020508;margin-bottom:8px"></canvas>
+        <div class="formula">Cᵥ = 3R(θ_E/T)²·e^(θ_E/T)/(e^(θ_E/T)−1)² &nbsp; θ_E = hν/k_B</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">Confronto: Dulong-Petit (3R, linea tratteggiata), Einstein (curva teal), alta T → convergono a 3R = 24.94 J/mol·K.</div>
+      </div>
+    </div>
+
+    <!-- ═══ STRUMENTI AVANZATI ═══ -->
+    <div class="pane" id="pane-tools">
+      <div class="sec-h">🔬 Strumenti Avanzati</div><br>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🔍 PubChem — Ricerca per nome <span>▾</span></div>
+      <div class="acc-body">
+        <div class="row"><input type="text" id="pc-name" placeholder="es. Aspirin, Caffeine, Ibuprofen…" style="flex:1"><button class="btn" onclick="pubchemSearch()">Cerca</button></div>
+        <div id="pc-spinner" style="display:none;color:var(--muted);font-size:12px;padding:8px 0">⏳ Caricamento PubChem…</div>
+        <div id="pc-result" style="display:none"></div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">📐 Convertitore Unità <span>▾</span></div>
+      <div class="acc-body">
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">Energia</div>
+          <div class="row" style="flex-wrap:wrap">
+            <input type="number" id="conv-eV" placeholder="eV" style="width:90px" oninput="convEnergy('eV',this.value)">
+            <span style="color:var(--muted);font-size:12px">=</span>
+            <input type="number" id="conv-kcal" placeholder="kcal/mol" style="width:100px" oninput="convEnergy('kcal',this.value)">
+            <span style="color:var(--muted);font-size:12px">=</span>
+            <input type="number" id="conv-kJ" placeholder="kJ/mol" style="width:90px" oninput="convEnergy('kJ',this.value)">
+            <span style="color:var(--muted);font-size:12px">=</span>
+            <input type="number" id="conv-cm" placeholder="cm⁻¹" style="width:90px" oninput="convEnergy('cm',this.value)">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">Lunghezza</div>
+          <div class="row" style="flex-wrap:wrap">
+            <input type="number" id="conv-ang" placeholder="Å" style="width:80px" oninput="convLen('ang',this.value)">
+            <span style="color:var(--muted);font-size:12px">=</span>
+            <input type="number" id="conv-nm" placeholder="nm" style="width:80px" oninput="convLen('nm',this.value)">
+            <span style="color:var(--muted);font-size:12px">=</span>
+            <input type="number" id="conv-pm" placeholder="pm" style="width:80px" oninput="convLen('pm',this.value)">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">Pressione</div>
+          <div class="row" style="flex-wrap:wrap">
+            <input type="number" id="conv-atm" placeholder="atm" style="width:80px" oninput="convP('atm',this.value)">
+            <input type="number" id="conv-bar" placeholder="bar" style="width:80px" oninput="convP('bar',this.value)">
+            <input type="number" id="conv-Pa" placeholder="Pa" style="width:90px" oninput="convP('Pa',this.value)">
+            <input type="number" id="conv-mmHg" placeholder="mmHg" style="width:90px" oninput="convP('mmHg',this.value)">
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">📏 Costanti Fondamentali <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Costante</th><th>Simbolo</th><th>Valore</th><th>Unità</th></tr>
+          <tr><td>Velocità della luce</td><td>c</td><td>2.99792458×10⁸</td><td>m/s</td></tr>
+          <tr><td>Costante di Planck</td><td>h</td><td>6.62607×10⁻³⁴</td><td>J·s</td></tr>
+          <tr><td>Costante ridotta di Planck</td><td>ℏ</td><td>1.05457×10⁻³⁴</td><td>J·s</td></tr>
+          <tr><td>Costante di Boltzmann</td><td>k_B</td><td>1.38065×10⁻²³</td><td>J/K</td></tr>
+          <tr><td>Numero di Avogadro</td><td>N_A</td><td>6.02214×10²³</td><td>mol⁻¹</td></tr>
+          <tr><td>Costante dei gas</td><td>R</td><td>8.31446</td><td>J/(mol·K)</td></tr>
+          <tr><td>Carica elementare</td><td>e</td><td>1.60218×10⁻¹⁹</td><td>C</td></tr>
+          <tr><td>Massa elettrone</td><td>m_e</td><td>9.10938×10⁻³¹</td><td>kg</td></tr>
+          <tr><td>Massa protone</td><td>m_p</td><td>1.67262×10⁻²⁷</td><td>kg</td></tr>
+          <tr><td>Faraday</td><td>F</td><td>96485</td><td>C/mol</td></tr>
+          <tr><td>Costante di gravitazione</td><td>G</td><td>6.67430×10⁻¹¹</td><td>m³/(kg·s²)</td></tr>
+          <tr><td>Permittività vuoto</td><td>ε₀</td><td>8.85419×10⁻¹²</td><td>F/m</td></tr>
+          <tr><td>Raggio di Bohr</td><td>a₀</td><td>5.29177×10⁻¹¹</td><td>m = 0.529 Å</td></tr>
+          <tr><td>Frequenza ionizzazione H</td><td>Ry</td><td>13.6057</td><td>eV</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ APPLICAZIONI INTERDISCIPLINARI ═══ -->
+    <div class="pane" id="pane-inter">
+      <div class="sec-h">🧬 Applicazioni Interdisciplinari</div><br>
+
+      <div class="acc-head" onclick="toggleAcc(this)">💊 Bioisosteri — Sostituzioni chiave in Drug Design <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Gruppo originale</th><th>Bioisostero</th><th>Razionale</th></tr>
+          <tr><td>–COOH</td><td>Tetrazolo, –SO₂NH₂, –PO₃H₂, –NHSO₂CF₃</td><td>pKa simile, migliore metabolismo</td></tr>
+          <tr><td>–OH (fenolico)</td><td>–F, –NH₂, –NHCH₃, –SCH₃</td><td>Evita glucuronidazione</td></tr>
+          <tr><td>–NH₂</td><td>–OH, –F, –SCH₃</td><td>Riduce basicità, migliora BBB</td></tr>
+          <tr><td>Anello fenilico</td><td>Tiofene, piridina, pirazolo, cicloesilico</td><td>Migliora solubilità/selettività</td></tr>
+          <tr><td>–C=C– (E)</td><td>–CH₂CH₂–, –C≡C–, ciclopropanico</td><td>Conformazione simile</td></tr>
+          <tr><td>–C=O (chetone)</td><td>–C=S, –SO–, α-keto</td><td>Elettronica simile</td></tr>
+          <tr><td>–F</td><td>–Cl, –CH₃, –CF₃</td><td>Ingombro sterico simile</td></tr>
+          <tr><td>Anello N (piridina)</td><td>Pirimidina, pirazina, triazina</td><td>Posizioni diverse del N per SAR</td></tr>
+        </table>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🧪 Farmaci da Prodotti Naturali <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Farmaco</th><th>Sorgente</th><th>Meccanismo</th><th>Uso clinico</th></tr>
+          <tr><td>Taxol (Paclitaxel)</td><td>Taxus brevifolia</td><td>Stabilizzazione microtubuli</td><td>Cancro ovarico/mammella</td></tr>
+          <tr><td>Morfina</td><td>Papaver somniferum</td><td>Agonista μ-oppioide</td><td>Analgesico oppioide</td></tr>
+          <tr><td>Penicillina G</td><td>Penicillium notatum</td><td>Inibizione transpeptidasi PBP</td><td>Infezioni batteriche</td></tr>
+          <tr><td>Chinina</td><td>Cinchona officinalis</td><td>Intercalazione DNA parassita</td><td>Malaria (P. falciparum)</td></tr>
+          <tr><td>Artemisinina</td><td>Artemisia annua</td><td>Radicali liberi (Fe-Fenton)</td><td>Malaria resistente</td></tr>
+          <tr><td>Digitossina</td><td>Digitalis purpurea</td><td>Inibizione Na⁺/K⁺-ATPasi</td><td>Insufficienza cardiaca</td></tr>
+          <tr><td>Vincristina</td><td>Catharanthus roseus</td><td>Depolimerizzazione microtubuli</td><td>Leucemia linfoblastica</td></tr>
+          <tr><td>Resveratrolo</td><td>Vitis vinifera</td><td>Attivazione sirtuine (SIRT1)</td><td>Antiossidante, cardioprotettivo</td></tr>
+          <tr><td>Caffeina</td><td>Coffea arabica</td><td>Antagonista A₁/A₂A adenosina</td><td>Stimolante SNC</td></tr>
+          <tr><td>Curcumina</td><td>Curcuma longa</td><td>Inibizione NF-κB, COX-2</td><td>Antinfiammatorio (studio)</td></tr>
+        </table>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🏗️ Chimica dei Materiali — MOF, COF, Zeoliti <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Materiale</th><th>Formula/Struttura</th><th>Superficie (m²/g)</th><th>Applicazioni</th></tr>
+          <tr><td>Zeolite Y</td><td>Na₅₆[(AlO₂)₅₆(SiO₂)₁₃₆]·250H₂O</td><td>700–1000</td><td>Cracking petrolio, scambio ionico</td></tr>
+          <tr><td>MOF-5 (IRMOF-1)</td><td>Zn₄O(BDC)₃</td><td>2900–3800</td><td>Immagazzinamento H₂, CO₂</td></tr>
+          <tr><td>MIL-101(Cr)</td><td>Cr₃F(H₂O)₂O(BDC)₃</td><td>4100–5900</td><td>Catalisi, drug delivery</td></tr>
+          <tr><td>UiO-66</td><td>Zr₆O₄(OH)₄(BDC)₁₂</td><td>1000–1500</td><td>Stabilità chimica, adsorbimento</td></tr>
+          <tr><td>COF-1</td><td>B₂O₃ + benzendiol → boroxina</td><td>711</td><td>Semiconduttori organici</td></tr>
+          <tr><td>Perovskite (BaTiO₃)</td><td>ABO₃</td><td>—</td><td>Ferroelettricità, celle solari, LED</td></tr>
+        </table>
+      </div>
+
+      <div class="acc-head" onclick="toggleAcc(this)">🔬 CYP450 Polimorfismi — Farmacogenetica <span>▾</span></div>
+      <div class="acc-body">
+        <table>
+          <tr><th>Enzima</th><th>% Metabolizzatori lenti</th><th>Farmaci substrato</th><th>Implicazione clinica</th></tr>
+          <tr><td>CYP2D6</td><td>7–10% europei</td><td>Codeina, Tamoxifene, Aloperidolo</td><td>Codeina: no analgesia; Tamoxifene: ridotta efficacia</td></tr>
+          <tr><td>CYP2C19</td><td>2–5% europei, 20% asiatici</td><td>Clopidogrel, Omeprazolo, Escitalopram</td><td>Clopidogrel: aumentato rischio trombotico</td></tr>
+          <tr><td>CYP2C9</td><td>1–3%</td><td>Warfarina, Fenitoina, FANS</td><td>Warfarina: range terapeutico stretto!</td></tr>
+          <tr><td>CYP3A4/5</td><td>5–10% (3A5)</td><td>Tacrolimus, Midazolam, Atorvastatina</td><td>Tacrolimus: tossicità renale se metabolizzatori lenti</td></tr>
+          <tr><td>TPMT</td><td>0.3% omozigoti</td><td>Azatioprina, 6-Mercaptopurina</td><td>Mielotossicità grave</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ BATCH PROCESSING ═══ -->
+    <div class="pane" id="pane-batch">
+      <div class="sec">
+        <div class="sec-h">⚙️ Batch Processing — Analisi CSV</div>
+        <div class="sec-sub">Carica un CSV con colonna SMILES. Calcolo automatico di MW, LogP, HBD, HBA, PSA, RB e check Lipinski.</div>
+        <div class="card">
+          <div style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:10px" id="batch-drop" onclick="document.getElementById('batch-file').click()">
+            <div style="font-size:30px;margin-bottom:6px">📂</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Carica CSV / TSV</div>
+            <div style="font-size:11px;color:var(--muted)">Colonne: name, smiles (o solo smiles)</div>
+          </div>
+          <input type="file" id="batch-file" accept=".csv,.tsv,.txt" style="display:none" onchange="parseBatch(this.files[0])">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sec" onclick="loadExampleBatch()">📋 CSV esempio (10 molecole)</button>
+            <button class="btn btn-sec" onclick="clearBatch()">🗑️ Cancella</button>
+            <button class="btn" id="batch-export-btn" style="display:none" onclick="exportBatch()">📤 Export CSV</button>
+          </div>
+        </div>
+        <div id="batch-stats" style="display:none" class="card"></div>
+        <div id="batch-table" style="overflow-x:auto;margin-top:8px"></div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function switchTab(id){
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('active');});
+  var p=document.getElementById('pane-'+id);
+  if(p) p.classList.add('active');
+  document.querySelectorAll('.tb').forEach(function(b){if(b.getAttribute('onclick')==="switchTab('"+id+"')") b.classList.add('active');});
+  if(id==='qm'&&!window._qmInited){window._qmInited=true;setTimeout(initQM,80);}
+  if(id==='stat'&&!window._statInited){window._statInited=true;setTimeout(initStat,80);}
+}
+function toggleAcc(el){
+  var body=el.nextElementSibling;
+  body.classList.toggle('open');
+  el.querySelector('span').textContent=body.classList.contains('open')?'▴':'▾';
+}
+var _toastT=null;
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.style.display='block';if(_toastT)clearTimeout(_toastT);_toastT=setTimeout(function(){t.style.display='none';},2800);}
+
+// ─── ML ──────────────────────────────────────────────────────────────────────
+var ML_PRESETS={
+  aspirina:'CC(=O)Oc1ccccc1C(=O)O',
+  ibuprofene:'CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O',
+  caffeina:'Cn1cnc2c1c(=O)n(c(=O)n2C)C',
+  atorvastatina:'CC(C)c1c(C(=O)Nc2ccccc2)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CC[C@@H](O)C[C@@H](O)CC(=O)O',
+  paracetamolo:'CC(=O)Nc1ccc(O)cc1'
+};
+function mlSetPreset(k){document.getElementById('ml-smiles').value=ML_PRESETS[k]||'';mlPredict();}
+
+function parseSMILES(smi){
+  var heavy=((smi.match(/[A-Z]/g)||[]).length);
+  var rings=(smi.match(/\d/g)||[]).length/2;
+  var hbd=(smi.match(/[NH]/g)||[]).length+(smi.match(/OH/g)||[]).length;
+  var hba=(smi.match(/[NOFn]/g)||[]).length;
+  var rb=(smi.match(/-/g)||[]).length+(smi.match(/CC/g)||[]).length;
+  var mw=heavy*12+(hbd*1)+(smi.match(/O/g)||[]).length*4+(smi.match(/N/g)||[]).length*2+(smi.match(/F/g)||[]).length*7+(smi.match(/Cl/g)||[]).length*23+(smi.match(/Br/g)||[]).length*63+(smi.match(/S/g)||[]).length*20;
+  var logP=0.5*rings-0.1*hba+0.3*rb-0.5*hbd+0.01*heavy;
+  var psa=20*hbd+10*hba;
+  return {mw:Math.max(50,mw),hbd:Math.max(0,hbd),hba:Math.max(0,hba),rings:Math.max(0,rings),rb:Math.max(0,rb),logP:parseFloat(logP.toFixed(2)),psa:Math.max(0,Math.min(250,psa))};
+}
+
+function mlPredict(){
+  var smi=document.getElementById('ml-smiles').value.trim();
+  if(!smi){toast('⚠️ Inserisci uno SMILES');return;}
+  var d=parseSMILES(smi);
+  var logS=(0.5-0.01*d.mw-0.3*d.logP+0.3*d.hba).toFixed(2);
+  var bbb=(d.mw<450&&d.psa<90&&d.logP>1&&d.logP<5)?'Probabile':'Improbabile';
+  var herg=(d.rings>2&&d.logP>3&&smi.includes('N'))?'⚠️ Attenzione':'✅ Basso rischio';
+  var lipinski=(d.mw<=500&&d.hbd<=5&&d.hba<=10&&d.logP<=5);
+  var score=Math.max(0,Math.min(100,100-(Math.abs(logS)-3)*10-(d.mw>500?20:0)-(d.hbd>5?15:0)-(d.psa>140?20:0)));
+  var propsEl=document.getElementById('ml-props');
+  propsEl.innerHTML=[
+    {k:'MW (est.)',v:d.mw+' Da',ok:d.mw<=500},
+    {k:'LogP (est.)',v:d.logP,ok:d.logP>=-2&&d.logP<=5},
+    {k:'HBD',v:d.hbd,ok:d.hbd<=5},
+    {k:'HBA',v:d.hba,ok:d.hba<=10},
+    {k:'PSA (est.)',v:d.psa+' Å²',ok:d.psa<=140},
+    {k:'LogS (est.)',v:logS,ok:parseFloat(logS)>-4},
+    {k:'BBB',v:bbb,ok:bbb==='Probabile'},
+    {k:'hERG',v:herg,ok:!herg.includes('Attenzione')},
+    {k:'Lipinski',v:lipinski?'✅ Pass':'❌ Fail',ok:lipinski},
+    {k:'Drug Score',v:Math.round(score)+'/100',ok:score>=60}
+  ].map(function(x){
+    return '<div class="result-box" style="padding:8px;margin:0"><div class="rk">'+x.k+'</div>'+
+      '<div class="rv" style="color:'+(x.ok?'var(--accent)':'var(--coral)')+'">'+x.v+'</div></div>';
+  }).join('');
+  document.getElementById('ml-result').style.display='';
+  document.getElementById('ml-verdict').innerHTML='<div class="result-box"><b style="color:'+(score>=60?'var(--accent)':'var(--coral)')+'">Drug Score: '+Math.round(score)+'/100</b> — '+(score>=80?'Ottimo candidato drug-like':score>=60?'Discreto, ottimizzabile':score>=40?'Mediocre, richiede ottimizzazione significativa':'Scarso — non drug-like')+'</div>';
+  drawRadar(d.mw,d.logP,d.hbd,d.psa,parseFloat(logS));
+}
+
+function drawRadar(mw,logP,hbd,psa,logS){
+  var c=document.getElementById('ml-radar');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var W=240,H=180,cx=W/2,cy=H/2,R=70;
+  c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var labels=['MW','LogP','HBD','PSA','LogS'];
+  var vals=[Math.min(1,mw/500),(logP+2)/7,Math.min(1,hbd/5),Math.min(1,psa/140),Math.min(1,(logS+6)/6)];
+  var angles=labels.map(function(_,i){return (i/labels.length)*Math.PI*2-Math.PI/2;});
+  // Grid
+  [0.25,0.5,0.75,1.0].forEach(function(r){
+    ctx.beginPath();
+    angles.forEach(function(a,i){var x=cx+R*r*Math.cos(a),y=cy+R*r*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.closePath();ctx.strokeStyle='rgba(13,35,64,.8)';ctx.stroke();
+  });
+  angles.forEach(function(a){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.strokeStyle='rgba(13,35,64,.8)';ctx.stroke();});
+  // Data
+  ctx.beginPath();
+  angles.forEach(function(a,i){var v=vals[i];var x=cx+R*v*Math.cos(a),y=cy+R*v*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.closePath();ctx.fillStyle='rgba(0,201,183,.2)';ctx.fill();ctx.strokeStyle='var(--accent)';ctx.lineWidth=2;ctx.stroke();
+  // Labels
+  ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='center';
+  angles.forEach(function(a,i){var x=cx+(R+14)*Math.cos(a),y=cy+(R+14)*Math.sin(a);ctx.fillText(labels[i],x,y+4);});
+}
+
+// ─── QM ──────────────────────────────────────────────────────────────────────
+function initQM(){drawPIB();drawHO();drawHydrogen();}
+
+function drawPIB(){
+  var c=document.getElementById('pib-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=200;
+  c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var n=parseInt(document.getElementById('qm-n').value)||1;
+  var L=parseFloat(document.getElementById('qm-L').value)||10;
+  var En=(n*n*3.76)/(L*L);
+  // Box walls
+  ctx.strokeStyle='rgba(0,201,183,.5)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(30,10);ctx.lineTo(30,H-20);ctx.lineTo(W-10,H-20);ctx.lineTo(W-10,10);ctx.stroke();
+  var bx=32,bW=W-44;
+  // ψ (violet)
+  ctx.beginPath();ctx.strokeStyle='#c084fc';ctx.lineWidth=2;
+  var scale=60;
+  for(var xi=0;xi<=bW;xi++){
+    var x=xi/bW;
+    var psi=Math.sin(n*Math.PI*x)*scale;
+    var py=H/2-psi;
+    if(xi===0)ctx.moveTo(bx+xi,py);else ctx.lineTo(bx+xi,py);
+  }
+  ctx.stroke();
+  // |ψ|² (teal)
+  ctx.beginPath();ctx.strokeStyle='#00c9b7';ctx.lineWidth=2;
+  for(var xi=0;xi<=bW;xi++){
+    var x=xi/bW;
+    var psi2=Math.pow(Math.sin(n*Math.PI*x),2)*scale;
+    var py=H-20-psi2;
+    if(xi===0)ctx.moveTo(bx+xi,py);else ctx.lineTo(bx+xi,py);
+  }
+  ctx.stroke();
+  // Baseline
+  ctx.strokeStyle='rgba(100,116,139,.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(30,H/2);ctx.lineTo(W-10,H/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(30,H-20);ctx.lineTo(W-10,H-20);ctx.stroke();
+  // Legend
+  ctx.font='11px sans-serif';ctx.fillStyle='#c084fc';ctx.fillText('ψ',W-35,20);
+  ctx.fillStyle='#00c9b7';ctx.fillText('|ψ|²',W-50,35);
+  document.getElementById('pib-En').innerHTML='<span class="rk">Energia E'+n+'</span><br><span class="rv">'+En.toFixed(3)+' eV</span> = n²·E₁ = '+n+'²·'+(3.76/L/L).toFixed(4)+' eV';
+}
+
+function drawHO(){
+  var c=document.getElementById('ho-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=180;
+  c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var v=parseInt(document.getElementById('qm-v').value)||0;
+  // Parabola potential
+  ctx.beginPath();ctx.strokeStyle='rgba(245,158,11,.5)';ctx.lineWidth=1.5;
+  for(var xi=0;xi<W;xi++){var x=(xi-W/2)/40;var py=H-20-x*x*6;if(xi===0)ctx.moveTo(xi,py);else ctx.lineTo(xi,py);}ctx.stroke();
+  // Energy levels
+  var colors=['#00c9b7','#7c6fff','#ff6b8a','#f59e0b'];
+  for(var vv=0;vv<=3;vv++){
+    var Ey=H-20-(vv+0.5)*25;
+    ctx.strokeStyle=colors[vv];ctx.lineWidth=vv===v?2:1;ctx.globalAlpha=vv===v?1:0.4;
+    ctx.beginPath();ctx.moveTo(W/2-50,Ey);ctx.lineTo(W/2+50,Ey);ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.font='10px sans-serif';ctx.fillStyle=colors[vv];ctx.fillText('v='+vv,W/2+55,Ey+4);
+  }
+  // Wave function for selected v
+  var cx=W/2;var scale=30;
+  function hermite(x,v){if(v===0)return 1;if(v===1)return 2*x;if(v===2)return 4*x*x-2;return 8*x*x*x-12*x;}
+  var Ey=H-20-(v+0.5)*25;
+  ctx.beginPath();ctx.strokeStyle=colors[v];ctx.lineWidth=2.5;
+  for(var xi=0;xi<W;xi++){var x=(xi-cx)/30;var H_val=hermite(x,v);var psi=H_val*Math.exp(-x*x/2)*scale;var py=Ey-psi;if(xi===0)ctx.moveTo(xi,py);else ctx.lineTo(xi,py);}
+  ctx.stroke();
+}
+
+function drawHydrogen(){
+  var c=document.getElementById('h-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=160;
+  c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var orb=document.getElementById('qm-orb').value;
+  var R=W-20;
+  function R_1s(r){return 2*Math.exp(-r);}
+  function R_2s(r){return (2-r)*Math.exp(-r/2)/Math.sqrt(8);}
+  function R_2p(r){return r*Math.exp(-r/2)/Math.sqrt(24);}
+  function R_3s(r){return (27-18*r+2*r*r)*Math.exp(-r/3)/81/Math.sqrt(3);}
+  function R_3p(r){return (6*r-r*r)*Math.exp(-r/3)/81/Math.sqrt(6);}
+  var fn={'1s':R_1s,'2s':R_2s,'2p':R_2p,'3s':R_3s,'3p':R_3p}[orb]||R_1s;
+  var max=0,vals=[];
+  for(var i=0;i<=W;i++){var r=i/W*20;var v=fn(r)*r;vals.push(v);if(Math.abs(v)>max)max=Math.abs(v);}
+  var scale=(H-30)/max*0.9;
+  ctx.strokeStyle='var(--accent2)';ctx.lineWidth=2;ctx.beginPath();
+  for(var i=0;i<=W;i++){var v=vals[i]*scale;var py=H-15-v;if(i===0)ctx.moveTo(10+i,py);else ctx.lineTo(10+i,py);}ctx.stroke();
+  // R²(r)·r² — radial distribution
+  max=0;vals=[];
+  for(var i=0;i<=W;i++){var r=i/W*20;var v2=Math.pow(fn(r),2)*r*r;vals.push(v2);if(v2>max)max=v2;}
+  scale=(H-30)/max*0.9;
+  ctx.strokeStyle='var(--accent)';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();
+  for(var i=0;i<=W;i++){var v2=vals[i]*scale;var py=H-15-v2;if(i===0)ctx.moveTo(10+i,py);else ctx.lineTo(10+i,py);}ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';
+  ctx.fillText('r →',W-30,H-2);
+  ctx.fillStyle='var(--accent2)';ctx.fillText('R(r)',10,15);
+  ctx.fillStyle='var(--accent)';ctx.fillText('R²r²',50,15);
+  var infos={'1s':'E₁s = −13.6 eV  n=1, l=0  Raggio più probabile: a₀=0.529 Å','2s':'E₂s = −3.4 eV  n=2, l=0  Un nodo radiale. Più diffuso di 1s.','2p':'E₂p = −3.4 eV  n=2, l=1  Lobo direzionale. Massimo a ∼4a₀','3s':'E₃s = −1.5 eV  n=3, l=0  Due nodi radiali.','3p':'E₃p = −1.5 eV  n=3, l=1  Un nodo radiale, un nodo angolare.'};
+  document.getElementById('h-info').innerHTML='<b style="color:var(--accent2)">Orbitale '+orb+'</b><br>'+infos[orb];
+}
+
+// ─── CHIMICA FISICA ───────────────────────────────────────────────────────────
+function calcTD(){
+  var dH=parseFloat(document.getElementById('td-dH').value);
+  var dS=parseFloat(document.getElementById('td-dS').value);
+  var T=parseFloat(document.getElementById('td-T').value);
+  var dG=dH-T*dS/1000;
+  var spont=dG<0?'✅ Spontanea (ΔG < 0)':'❌ Non spontanea (ΔG > 0)';
+  var Keq=Math.exp(-dG*1000/(8.314*T));
+  document.getElementById('td-result').innerHTML=spont+'<br><b>ΔG = '+dG.toFixed(2)+' kJ/mol</b><br>Keq = '+Keq.toExponential(3)+'<br>T di inversione: '+(dH/dS*1000).toFixed(0)+' K';
+  document.getElementById('td-result').style.display='';
+}
+function calcArr(){
+  var Ea=parseFloat(document.getElementById('arr-Ea').value)*1000;
+  var A=parseFloat(document.getElementById('arr-A').value);
+  var T=parseFloat(document.getElementById('arr-T').value);
+  var k=A*Math.exp(-Ea/(8.314*T));
+  var t12=Math.log(2)/k;
+  document.getElementById('arr-result').innerHTML='<b>k = '+k.toExponential(3)+' s⁻¹</b><br>t₁/₂ (1° ordine) = '+t12.toExponential(3)+' s<br>('+( t12<60?t12.toFixed(2)+'s':t12<3600?(t12/60).toFixed(2)+'min':(t12/3600).toFixed(2)+'h')+')';
+  document.getElementById('arr-result').style.display='';
+  // Draw Arrhenius canvas
+  var cv=document.getElementById('arr-canvas');cv.style.display='block';
+  var ctx=cv.getContext('2d'),W=cv.offsetWidth||280,H=140;cv.width=W;cv.height=H;
+  ctx.clearRect(0,0,W,H);
+  var Ts=[T*0.5,T*0.7,T,T*1.5,T*2,T*3];
+  var ks=Ts.map(function(t){return A*Math.exp(-Ea/(8.314*t));});
+  var logMin=Math.log10(Math.min.apply(null,ks.filter(function(x){return x>0;})));
+  var logMax=Math.log10(Math.max.apply(null,ks));
+  ctx.strokeStyle='var(--accent)';ctx.lineWidth=2;ctx.beginPath();
+  Ts.forEach(function(t,i){var x=10+i*(W-20)/(Ts.length-1);var lk=Math.log10(ks[i])||logMin;var y=H-10-(lk-logMin)/(logMax-logMin+0.01)*(H-20);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+  ctx.stroke();
+  ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.fillText('T (K) →',W-40,H-2);ctx.fillText('log k',2,12);
+}
+function calcNernst(){
+  var E0=parseFloat(document.getElementById('nst-E0').value);
+  var n=parseFloat(document.getElementById('nst-n').value);
+  var Q=parseFloat(document.getElementById('nst-Q').value);
+  var T=parseFloat(document.getElementById('nst-T').value);
+  var E=E0-(8.314*T)/(n*96485)*Math.log(Q);
+  var dG=-n*96485*E/1000;
+  document.getElementById('nst-result').innerHTML='<b>E = '+E.toFixed(4)+' V</b><br>ΔG = '+dG.toFixed(2)+' kJ/mol<br>'+(E>0?'✅ Reazione spontanea':'❌ Non spontanea');
+  document.getElementById('nst-result').style.display='';
+}
+function calcPH(){
+  var Ka=parseFloat(document.getElementById('eq-Ka').value);
+  var C=parseFloat(document.getElementById('eq-C').value);
+  var x=(-Ka+Math.sqrt(Ka*Ka+4*Ka*C))/2;
+  var pH=-Math.log10(x);
+  document.getElementById('eq-result').innerHTML='<b>pH = '+pH.toFixed(2)+'</b><br>[H⁺] = '+x.toExponential(3)+' M<br>Grado dissociazione α = '+(x/C*100).toFixed(2)+'%';
+  document.getElementById('eq-result').style.display='';
+}
+function calcBuffer(){
+  var pKa=parseFloat(document.getElementById('buf-pKa').value);
+  var r=parseFloat(document.getElementById('buf-r').value);
+  var pH=pKa+Math.log10(r);
+  document.getElementById('buf-result').innerHTML='<b>pH buffer = '+pH.toFixed(2)+'</b><br>Henderson-Hasselbalch: pH = pKa + log([A⁻]/[HA]) = '+pKa+' + '+Math.log10(r).toFixed(3);
+  document.getElementById('buf-result').style.display='';
+}
+var VDW_PARAMS={H2:{a:0.244,b:26.7},N2:{a:1.39,b:38.7},O2:{a:1.36,b:31.8},CO2:{a:3.59,b:42.7},CH4:{a:2.25,b:42.8},H2O:{a:5.53,b:30.5}};
+function setVdWGas(){var g=document.getElementById('vdw-gas').value;var p=VDW_PARAMS[g]||VDW_PARAMS.CO2;document.getElementById('vdw-a').value=p.a;document.getElementById('vdw-b').value=p.b;}
+function calcVdW(){
+  var a=parseFloat(document.getElementById('vdw-a').value);
+  var b=parseFloat(document.getElementById('vdw-b').value)/1e6; // m³/mol→ L/mol *1e3
+  var bL=b*1000;
+  var n=parseFloat(document.getElementById('vdw-n').value);
+  var T=parseFloat(document.getElementById('vdw-T').value);
+  var V=parseFloat(document.getElementById('vdw-V').value);
+  var P=(n*0.08206*T/(V-n*bL))-(a*n*n/(V*V));
+  var Pideal=n*0.08206*T/V;
+  document.getElementById('vdw-result').innerHTML='<b>P (vdW) = '+P.toFixed(4)+' atm</b><br>P (ideale) = '+Pideal.toFixed(4)+' atm<br>Deviazione: '+((P-Pideal)/Pideal*100).toFixed(2)+'%<br>Z (fattore comprimibilità) = '+(P*V/(n*0.08206*T)).toFixed(4);
+  document.getElementById('vdw-result').style.display='';
+}
+
+// ─── STATISTICA ───────────────────────────────────────────────────────────────
+function initStat(){drawBoltzmann();drawFD();calcPartition();drawEinstein();}
+
+function drawBoltzmann(){
+  var c=document.getElementById('bolt-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=180;c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var T=parseInt(document.getElementById('bolt-T').value)||298;
+  var M=0.028; // N2 kg/mol
+  var R=8.314;
+  var vmax=Math.sqrt(2*R*T/M);
+  var pts=[],maxf=0;
+  for(var i=0;i<=200;i++){var v=i/200*3*vmax;var f=4*Math.PI*Math.pow(M/(2*Math.PI*R*T),1.5)*v*v*Math.exp(-M*v*v/(2*R*T));pts.push({v:v,f:f});if(f>maxf)maxf=f;}
+  var scaleX=(W-20)/pts[pts.length-1].v;
+  var scaleY=(H-20)/maxf;
+  // Gradient fill
+  var grd=ctx.createLinearGradient(0,0,W,0);
+  grd.addColorStop(0,'rgba(0,201,183,0.4)');grd.addColorStop(1,'rgba(124,111,255,0.1)');
+  ctx.beginPath();ctx.moveTo(10,H-10);
+  pts.forEach(function(p){ctx.lineTo(10+p.v*scaleX,H-10-p.f*scaleY);});
+  ctx.lineTo(W-10,H-10);ctx.closePath();ctx.fillStyle=grd;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='var(--accent)';ctx.lineWidth=2;
+  pts.forEach(function(p,i){var x=10+p.v*scaleX,y=H-10-p.f*scaleY;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+  ctx.stroke();
+  // vmp line
+  var vmp=Math.sqrt(2*R*T/M);
+  ctx.strokeStyle='rgba(245,158,11,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(10+vmp*scaleX,H-10);ctx.lineTo(10+vmp*scaleX,10);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='var(--amber)';ctx.font='10px sans-serif';ctx.fillText('v_mp='+Math.round(vmp)+'m/s',10+vmp*scaleX+4,20);
+  ctx.fillStyle='#94a3b8';ctx.fillText('v (m/s) →',W-55,H-2);
+}
+
+function drawFD(){
+  var c=document.getElementById('fd-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=160;c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var T=parseInt(document.getElementById('fd-T').value)||300;
+  var Ef=7;var kB=8.617e-5;var Emax=15;
+  ctx.strokeStyle='var(--accent2)';ctx.lineWidth=2.5;ctx.beginPath();
+  for(var i=0;i<=W;i++){
+    var E=i/W*Emax;
+    var f=T<1?((E<Ef)?1:0):1/(1+Math.exp((E-Ef)/(kB*T)));
+    var y=H-10-f*(H-20);
+    if(i===0)ctx.moveTo(i,y);else ctx.lineTo(i,y);
+  }
+  ctx.stroke();
+  ctx.strokeStyle='rgba(0,201,183,.4)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  var xEf=Ef/Emax*W;ctx.beginPath();ctx.moveTo(xEf,10);ctx.lineTo(xEf,H-10);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='var(--accent)';ctx.font='10px sans-serif';ctx.fillText('Eᶠ='+Ef+'eV',xEf+4,20);
+  ctx.fillStyle='#94a3b8';ctx.fillText('E (eV) →',W-55,H-2);ctx.fillText('f(E)',2,14);
+}
+
+var ZP_DATA={
+  N2:{M:0.028016,Be:1.998,nu:2359,De:9.756},
+  O2:{M:0.032,Be:1.438,nu:1580,De:5.116},
+  HCl:{M:0.03646,Be:10.593,nu:2991,De:4.618},
+  CO:{M:0.028,Be:1.923,nu:2170,De:11.108},
+  H2O:{M:0.018,Be:27.8,nu:3657,De:5.11}
+};
+function calcPartition(){
+  var mol=document.getElementById('zp-mol').value;
+  var T=parseFloat(document.getElementById('zp-T').value)||298;
+  var d=ZP_DATA[mol]||ZP_DATA.N2;
+  var h=6.626e-34,kB=1.381e-23,NA=6.022e23,R=8.314;
+  var Zt=Math.pow(2*Math.PI*d.M/NA*kB*T/(h*h),1.5)*0.0224;
+  var Zr=kB*T/(2*6.626e-34*3e10*d.Be*kB/h);
+  var Zv=1/(1-Math.exp(-h*3e10*d.nu/(kB*T)));
+  var Ztot=Zt*Zr*Zv;
+  document.getElementById('zp-result').innerHTML=
+    '<b style="color:var(--accent)">Z_tot = '+Ztot.toExponential(3)+'</b><br>'+
+    'Z_trans = '+Zt.toExponential(3)+'<br>'+
+    'Z_rot = '+Zr.toFixed(2)+'<br>'+
+    'Z_vib = '+Zv.toFixed(4)+'<br>'+
+    'U (stima) ≈ '+(3.5*R*T/1000).toFixed(2)+' kJ/mol<br>'+
+    'S (stima) ≈ '+(R*(Math.log(Ztot)+2.5)/1).toFixed(2)+' J/mol·K';
+}
+
+function drawEinstein(){
+  var c=document.getElementById('einstein-canvas');if(!c)return;
+  var ctx=c.getContext('2d'),W=c.offsetWidth||320,H=160;c.width=W;c.height=H;
+  ctx.clearRect(0,0,W,H);
+  var thetaE=300;var R=8.314;
+  // Dulong-Petit
+  ctx.strokeStyle='rgba(100,116,139,.5)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(10,H-10-3*R*(H-20)/(4*R));ctx.lineTo(W-10,H-10-3*R*(H-20)/(4*R));ctx.stroke();
+  ctx.setLineDash([]);
+  // Einstein Cv
+  ctx.strokeStyle='var(--accent)';ctx.lineWidth=2.5;ctx.beginPath();
+  for(var i=1;i<=W;i++){
+    var T=i/W*1500+10;
+    var x=thetaE/T;
+    var Cv=3*R*x*x*Math.exp(x)/Math.pow(Math.exp(x)-1,2);
+    var y=H-10-Cv*(H-20)/(4*R);
+    if(i===1)ctx.moveTo(10+i,Math.max(10,y));else ctx.lineTo(10+i,Math.max(10,y));
+  }
+  ctx.stroke();
+  ctx.fillStyle='var(--accent)';ctx.font='10px sans-serif';ctx.fillText('Einstein',W-62,20);
+  ctx.fillStyle='#64748b';ctx.fillText('Dulong-Petit (3R)',10,H-10-3*R*(H-20)/(4*R)-4);
+  ctx.fillStyle='#94a3b8';ctx.fillText('T (K) →',W-50,H-2);ctx.fillText('Cᵥ',2,14);
+}
+
+// ─── TOOLS ───────────────────────────────────────────────────────────────────
+async function pubchemSearch(){
+  var name=document.getElementById('pc-name').value.trim();
+  if(!name){toast('⚠️ Inserisci un nome molecola');return;}
+  document.getElementById('pc-spinner').style.display='';
+  document.getElementById('pc-result').style.display='none';
+  try{
+    var url='https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/'+encodeURIComponent(name)+'/JSON';
+    var res=await fetch(url);
+    if(!res.ok)throw new Error('Non trovato ('+res.status+')');
+    var json=await res.json();
+    var cpd=json.PC_Compounds[0];
+    var cid=cpd.id.id.cid;
+    var props={};
+    (cpd.props||[]).forEach(function(p){var k=p.urn.label+(p.urn.name?' '+p.urn.name:'');props[k]=p.value.sval||p.value.fval||p.value.ival||'';});
+    var mf=props['Molecular Formula']||'N/A';
+    var mw=props['Molecular Weight']||'N/A';
+    var smiles=props['SMILES Canonical']||props['Canonical SMILES']||'N/A';
+    var iupac=props['IUPAC Name Preferred']||props['IUPAC Name']||'N/A';
+    var xlogP=props['Log P']||props['XLogP3']||'N/A';
+    var tpsa=props['Topological Polar Surface Area']||'N/A';
+    document.getElementById('pc-result').innerHTML=
+      '<div class="result-box">'+
+      '<b style="color:var(--accent);font-size:14px">CID '+cid+' — '+name+'</b><br>'+
+      '<div style="margin-top:8px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+      '<div><span class="rk">Formula</span><br><b>'+escHtml(String(mf))+'</b></div>'+
+      '<div><span class="rk">MW</span><br><b>'+escHtml(String(mw))+'</b></div>'+
+      '<div><span class="rk">XLogP3</span><br><b>'+escHtml(String(xlogP))+'</b></div>'+
+      '<div><span class="rk">TPSA (Å²)</span><br><b>'+escHtml(String(tpsa))+'</b></div>'+
+      '</div>'+
+      '<div style="margin-top:8px"><span class="rk">SMILES</span><br><code style="font-size:11px;word-break:break-all;color:var(--accent2)">'+escHtml(String(smiles).slice(0,200))+'</code></div>'+
+      '<div style="margin-top:6px"><span class="rk">IUPAC</span><br><span style="font-size:11px;color:var(--muted)">'+escHtml(String(iupac).slice(0,150))+'</span></div>'+
+      '<div style="margin-top:8px"><a href="https://pubchem.ncbi.nlm.nih.gov/compound/'+cid+'" target="_blank" style="color:var(--accent2);font-size:11px">🔗 Apri su PubChem ↗</a></div>'+
+      '</div>';
+    document.getElementById('pc-result').style.display='';
+  }catch(e){
+    document.getElementById('pc-result').innerHTML='<div class="result-box" style="border-color:var(--coral);color:var(--coral)">❌ '+escHtml(e.message)+'</div>';
+    document.getElementById('pc-result').style.display='';
+  }
+  document.getElementById('pc-spinner').style.display='none';
+}
+
+// Converters
+function convEnergy(from,val){var v=parseFloat(val);if(isNaN(v))return;var eV;if(from==='eV')eV=v;else if(from==='kcal')eV=v/23.0609;else if(from==='kJ')eV=v/96.4853;else if(from==='cm')eV=v/8065.54;
+  if(from!=='eV')document.getElementById('conv-eV').value=eV.toExponential(4);
+  if(from!=='kcal')document.getElementById('conv-kcal').value=(eV*23.0609).toExponential(4);
+  if(from!=='kJ')document.getElementById('conv-kJ').value=(eV*96.4853).toExponential(4);
+  if(from!=='cm')document.getElementById('conv-cm').value=(eV*8065.54).toExponential(4);}
+function convLen(from,val){var v=parseFloat(val);if(isNaN(v))return;var ang;if(from==='ang')ang=v;else if(from==='nm')ang=v*10;else if(from==='pm')ang=v*0.01;
+  if(from!=='ang')document.getElementById('conv-ang').value=ang;
+  if(from!=='nm')document.getElementById('conv-nm').value=ang/10;
+  if(from!=='pm')document.getElementById('conv-pm').value=ang*100;}
+function convP(from,val){var v=parseFloat(val);if(isNaN(v))return;var Pa;if(from==='atm')Pa=v*101325;else if(from==='bar')Pa=v*1e5;else if(from==='Pa')Pa=v;else if(from==='mmHg')Pa=v*133.322;
+  if(from!=='atm')document.getElementById('conv-atm').value=(Pa/101325).toPrecision(6);
+  if(from!=='bar')document.getElementById('conv-bar').value=(Pa/1e5).toPrecision(6);
+  if(from!=='Pa')document.getElementById('conv-Pa').value=Pa.toPrecision(6);
+  if(from!=='mmHg')document.getElementById('conv-mmHg').value=(Pa/133.322).toPrecision(6);}
+
+// ─── BATCH ────────────────────────────────────────────────────────────────────
+var _batchData=[];
+function loadExampleBatch(){
+  var csv='name,smiles\nAspirina,CC(=O)Oc1ccccc1C(=O)O\nIbuprofene,CC(C)Cc1ccc(cc1)C(C)C(=O)O\nParacetamolo,CC(=O)Nc1ccc(O)cc1\nCaffeina,Cn1cnc2c1c(=O)n(C)c(=O)n2C\nAtorvastatin,CC(C)c1c(C(=O)Nc2ccccc2)c(-c2ccccc2)c(-c2ccc(F)cc2)n1CCC(O)CC(O)CC(=O)O\nWarfarina,CC(=O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O\nMetformina,CN(C)C(=N)NC(=N)N\nSildenafil,CCCC1=NN(C)C(=O)C1=Cc1cc(S(=O)(=O)N2CCN(CC2)CC2=CC=CC=C2)ccc1OCC\nOmeprazolo,COc1ccc2[nH]c(CS(=O)c3nc4ccccc4n3C)nc2c1\nClopidogrel,COC(=O)[C@@H]1CCCN1Cc1ccc(Cl)cc1';
+  processBatchText(csv);
+}
+function parseBatch(file){if(!file)return;var fr=new FileReader();fr.onload=function(){processBatchText(fr.result);};fr.readAsText(file);}
+function processBatchText(text){
+  var lines=text.trim().split('\n');
+  var header=lines[0].toLowerCase().split(/[,\t]/);
+  var nameIdx=header.indexOf('name'),smiIdx=header.findIndex(function(h){return h.includes('smil');});
+  if(smiIdx<0){toast('⚠️ Colonna SMILES non trovata');return;}
+  _batchData=lines.slice(1).map(function(l){
+    var cols=l.split(/[,\t]/);
+    var name=nameIdx>=0?cols[nameIdx]:'Molecola';
+    var smi=cols[smiIdx]||'';
+    if(!smi)return null;
+    var d=parseSMILES(smi);
+    var lip=(d.mw<=500&&d.hbd<=5&&d.hba<=10&&d.logP<=5);
+    return {name:name,smi:smi,mw:d.mw,logP:d.logP,hbd:d.hbd,hba:d.hba,psa:d.psa,lip:lip};
+  }).filter(Boolean);
+  renderBatch();
+}
+function renderBatch(){
+  if(!_batchData.length)return;
+  var pass=_batchData.filter(function(d){return d.lip;}).length;
+  var avgMW=(_batchData.reduce(function(a,d){return a+d.mw;},0)/_batchData.length).toFixed(0);
+  document.getElementById('batch-stats').style.display='';
+  document.getElementById('batch-stats').innerHTML='<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px">'+
+    '<span>📊 <b>'+_batchData.length+'</b> molecole</span>'+
+    '<span><b style="color:var(--accent)">'+pass+'</b> pass Lipinski ('+Math.round(pass/_batchData.length*100)+'%)</span>'+
+    '<span>MW media: <b>'+avgMW+' Da</b></span>'+
+    '</div>';
+  var html='<table><tr><th>#</th><th>Nome</th><th>SMILES</th><th>MW</th><th>LogP</th><th>HBD</th><th>HBA</th><th>PSA</th><th>Lipinski</th></tr>'+
+    _batchData.map(function(d,i){
+      return '<tr><td>'+(i+1)+'</td><td>'+escHtml(d.name)+'</td>'+
+        '<td style="font-family:monospace;font-size:10px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(d.smi.slice(0,30))+'</td>'+
+        '<td>'+d.mw+'</td><td style="color:'+(d.logP>5?'var(--coral)':'var(--text)')+'">'+d.logP+'</td>'+
+        '<td style="color:'+(d.hbd>5?'var(--coral)':'var(--text)')+'">'+d.hbd+'</td>'+
+        '<td style="color:'+(d.hba>10?'var(--coral)':'var(--text)')+'">'+d.hba+'</td>'+
+        '<td>'+d.psa+'</td>'+
+        '<td><span class="chip '+(d.lip?'chip-g':'chip-r')+'">'+(d.lip?'✅ Pass':'❌ Fail')+'</span></td></tr>';
+    }).join('')+'</table>';
+  document.getElementById('batch-table').innerHTML=html;
+  document.getElementById('batch-export-btn').style.display='';
+}
+function exportBatch(){
+  if(!_batchData.length)return;
+  var csv='name,smiles,mw,logP,hbd,hba,psa,lipinski\n'+
+    _batchData.map(function(d){return [d.name,d.smi,d.mw,d.logP,d.hbd,d.hba,d.psa,d.lip?'pass':'fail'].join(',');}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='bsi_batch_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function clearBatch(){_batchData=[];document.getElementById('batch-table').innerHTML='';document.getElementById('batch-stats').style.display='none';document.getElementById('batch-export-btn').style.display='none';}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Setup batch drag
+window.addEventListener('load',function(){
+  var zone=document.getElementById('batch-drop');
+  zone.addEventListener('dragover',function(e){e.preventDefault();zone.style.borderColor='var(--accent)';});
+  zone.addEventListener('dragleave',function(){zone.style.borderColor='';});
+  zone.addEventListener('drop',function(e){e.preventDefault();zone.style.borderColor='';if(e.dataTransfer.files.length)parseBatch(e.dataTransfer.files[0]);});
+});
+</script>
+</body>
+</html>

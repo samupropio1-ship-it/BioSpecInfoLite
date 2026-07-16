@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>File Manager — BioSpecInfo PRO</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030812;--panel:#071221;--border:#0d2340;
+  --accent:#00c9b7;--accent2:#7c6fff;--coral:#ff6b8a;
+  --amber:#f59e0b;--text:#e2e8f0;--muted:#64748b;--card:#0a1929
+}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif}
+#fm-app{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+#top{display:flex;align-items:center;gap:12px;padding:10px 16px;
+  background:rgba(3,8,18,.97);border-bottom:1px solid var(--border);flex-shrink:0}
+#top h1{font-size:16px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.badge-pro{background:linear-gradient(135deg,#7c6fff,#00c9b7);color:#fff;font-size:10px;
+  font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+#user-status{font-size:11px;color:var(--muted);margin-left:auto;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot-green{background:#22c55e}
+.dot-red{background:var(--coral)}
+
+/* Login Screen */
+#login-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+  padding:32px 24px;max-width:340px;width:100%;text-align:center}
+.login-icon{font-size:48px;margin-bottom:12px}
+.login-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.login-input{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;
+  transition:border-color .2s;margin-bottom:10px;-webkit-text-security:disc}
+.login-input:focus{border-color:var(--accent)}
+.login-input::placeholder{color:var(--muted)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;
+  font-weight:700;cursor:pointer;margin-top:6px;transition:opacity .2s}
+.login-btn:hover{opacity:.85}
+.login-err{color:var(--coral);font-size:12px;margin-top:8px;display:none}
+.login-warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);
+  border-radius:8px;padding:10px;margin-top:16px;font-size:11px;color:var(--amber);
+  line-height:1.5;text-align:left}
+
+/* Main Dashboard */
+#main-screen{flex:1;display:none;flex-direction:column;overflow:hidden}
+#tabs{display:flex;gap:4px;padding:8px 12px;background:rgba(7,18,33,.97);
+  border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#tabs::-webkit-scrollbar{height:3px}
+#tabs::-webkit-scrollbar-thumb{background:var(--border)}
+.tab-btn{padding:6px 14px;border-radius:16px;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:all .2s}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
+.tab-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+
+#content{flex:1;overflow:hidden}
+.tab-pane{display:none;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;padding:14px}
+.tab-pane.active{display:block}
+
+/* Upload zones */
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:28px;
+  text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;
+  background:rgba(255,255,255,.02)}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,201,183,.05)}
+.drop-icon{font-size:36px;margin-bottom:8px}
+.drop-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.drop-sub{font-size:12px;color:var(--muted)}
+input[type=file]{display:none}
+
+/* File grid */
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}
+.file-card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;
+  overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.file-card:hover{border-color:var(--accent2);box-shadow:0 0 12px rgba(124,111,255,.2)}
+.file-thumb{width:100%;height:100px;object-fit:cover;background:#020508;
+  display:flex;align-items:center;justify-content:center;font-size:32px}
+.file-thumb img{width:100%;height:100%;object-fit:cover}
+.file-info{padding:7px 8px}
+.file-name{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.file-del{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;
+  background:rgba(255,107,138,.9);border:none;color:#fff;font-size:11px;
+  cursor:pointer;display:none;align-items:center;justify-content:center}
+.file-card:hover .file-del{display:flex}
+
+/* HTML Viewer */
+#html-viewer{width:100%;height:100%;border:none}
+
+/* Custom Sections */
+.section-card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;
+  padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;display:flex;gap:10px;align-items:center}
+.section-card:hover{border-color:var(--accent2)}
+.section-card .sc-icon{font-size:24px;flex-shrink:0}
+.section-card .sc-title{font-size:13px;font-weight:700;color:var(--text)}
+.section-card .sc-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.section-card .sc-del{margin-left:auto;background:transparent;border:none;color:var(--coral);font-size:16px;cursor:pointer;padding:4px}
+.section-card .sc-launch{background:var(--accent2);color:#fff;border:none;border-radius:8px;
+  padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer}
+
+/* Upload HTML form */
+.upload-form{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.form-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.form-input{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;
+  transition:border-color .2s;margin-bottom:8px}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--muted)}
+textarea.form-input{height:100px;resize:vertical;font-family:monospace;font-size:12px}
+.btn{padding:8px 18px;border-radius:20px;border:1.5px solid var(--accent);
+  background:var(--accent);color:#000;font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.85}
+.btn-sec{background:transparent;color:var(--accent);border-color:rgba(0,201,183,.4)}
+.btn-red{background:var(--coral);border-color:var(--coral);color:#fff}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.stat-box{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px}
+.stat-box .sv{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-box .sl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Viewer overlay */
+#viewer-overlay{position:fixed;inset:0;z-index:9999;background:#000;display:none;flex-direction:column}
+#viewer-topbar{background:rgba(3,8,18,.97);border-bottom:1px solid var(--border);
+  padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+#viewer-title{font-size:13px;font-weight:700;color:var(--text);flex:1}
+#viewer-close{background:transparent;border:1.5px solid rgba(0,201,183,.4);
+  color:var(--accent);border-radius:8px;padding:5px 12px;font-size:12px;
+  font-weight:700;cursor:pointer}
+#viewer-iframe{flex:1;border:none;width:100%;height:100%}
+
+/* Photo viewer */
+#photo-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.95);
+  display:none;align-items:center;justify-content:center;flex-direction:column}
+#photo-overlay img{max-width:90vw;max-height:80vh;border-radius:8px;object-fit:contain}
+#photo-overlay button{margin-top:16px;background:var(--card);border:1.5px solid var(--border);
+  color:var(--text);border-radius:8px;padding:6px 16px;font-size:13px;cursor:pointer}
+
+/* Section head */
+.sec-head{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sec-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+
+/* Progress */
+.prog-bar{background:var(--border);border-radius:4px;height:6px;margin-top:8px;overflow:hidden;display:none}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;width:0;transition:width .3s}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:rgba(0,201,183,.15);border:1.5px solid var(--accent);backdrop-filter:blur(8px);
+  border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--accent);
+  display:none;z-index:99999;text-align:center;pointer-events:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="fm-app">
+  <div id="top">
+    <div style="font-size:22px">📁</div>
+    <div>
+      <h1>File Manager</h1>
+    </div>
+    <span class="badge-pro">PRO</span>
+    <div id="user-status">
+      <div class="dot dot-red" id="status-dot"></div>
+      <span id="status-txt">Non autenticato</span>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-icon">🔐</div>
+      <div class="login-title">Accesso Riservato</div>
+      <div class="login-sub">Questa sezione è riservata al proprietario del repository. Inserisci la password per accedere.</div>
+      <input type="password" class="login-input" id="pwd-input" placeholder="Password…" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-btn" onclick="doLogin()">Accedi</button>
+      <div class="login-err" id="login-err">❌ Password errata. Accesso negato.</div>
+      <div class="login-warn">
+        ⚠️ <strong>Nota sicurezza:</strong> Questo file manager usa autenticazione client-side su GitHub Pages (sito statico). La password è verificata localmente tramite hash SHA-256. Non condividere il link diretto con persone non autorizzate. Per massima sicurezza usa un repository privato.
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="main-screen">
+    <div id="tabs">
+      <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+      <button class="tab-btn" onclick="switchTab('photos')">🖼️ Foto</button>
+      <button class="tab-btn" onclick="switchTab('sections')">📄 Sezioni HTML</button>
+      <button class="tab-btn" onclick="switchTab('notes')">📝 Note</button>
+      <button class="tab-btn" onclick="switchTab('docs')">📄 Documenti</button>
+    </div>
+
+    <div id="content">
+      <!-- OVERVIEW -->
+      <div class="tab-pane active" id="tab-overview">
+        <div class="stat-grid" id="stat-grid"></div>
+
+        <div class="sec-head">Attività recente</div>
+        <div id="activity-log" style="margin-top:8px"></div>
+
+        <div style="margin-top:16px">
+          <div class="sec-head">Quick Upload</div>
+          <div class="sec-sub">Trascina file direttamente qui per un upload rapido</div>
+          <div class="drop-zone" id="quick-drop" onclick="document.getElementById('quick-file').click()">
+            <div class="drop-icon">📤</div>
+            <div class="drop-title">Trascina o clicca per caricare</div>
+            <div class="drop-sub">Foto (JPG, PNG, WebP, GIF) · Pagine HTML · Testo</div>
+          </div>
+          <input type="file" id="quick-file" multiple accept="image/*,.html,.htm,.txt" onchange="handleQuickUpload(this.files)">
+          <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+        </div>
+
+        <div style="margin-top:16px">
+          <button class="btn btn-red" onclick="if(confirm('Cancellare TUTTI i file dal File Manager? Azione irreversibile.'))clearAll()">
+            🗑️ Cancella tutto
+          </button>
+        </div>
+      </div>
+
+      <!-- PHOTOS -->
+      <div class="tab-pane" id="tab-photos">
+        <div class="sec-head">🖼️ Galleria Foto</div>
+        <div class="sec-sub">Upload di immagini per uso personale, slide di ricerca o materiale di tesi. Salvate in IndexedDB.</div>
+
+        <div class="drop-zone" id="photo-drop" onclick="document.getElementById('photo-file').click()">
+          <div class="drop-icon">🖼️</div>
+          <div class="drop-title">Aggiungi foto</div>
+          <div class="drop-sub">JPG, PNG, WebP, GIF, SVG — max 20 MB per file</div>
+        </div>
+        <input type="file" id="photo-file" multiple accept="image/*" onchange="uploadPhotos(this.files)">
+
+        <div class="prog-bar" id="photo-prog"><div class="prog-fill" id="photo-fill"></div></div>
+
+        <div class="file-grid" id="photo-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">
+            Nessuna foto. Caricane una sopra.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTIONS HTML -->
+      <div class="tab-pane" id="tab-sections">
+        <div class="sec-head">📄 Sezioni HTML Personalizzate</div>
+        <div class="sec-sub">Carica pagine HTML complete o frammenti. Vengono salvati in IndexedDB e visualizzabili inline.</div>
+
+        <div class="upload-form">
+          <div class="form-label">Nome sezione *</div>
+          <input type="text" class="form-input" id="sec-name" placeholder="Es. Appunti NMR Avanzato…">
+          <div class="form-label">Icona (emoji)</div>
+          <input type="text" class="form-input" id="sec-icon" placeholder="📋" maxlength="4" style="width:80px">
+          <div class="form-label">Carica file HTML oppure incolla il codice qui sotto</div>
+          <div class="drop-zone" id="html-drop" onclick="document.getElementById('html-file').click()">
+            <div class="drop-icon">📄</div>
+            <div class="drop-title">Trascina un file .html/.htm</div>
+            <div class="drop-sub">oppure usa il campo testo sotto</div>
+          </div>
+          <input type="file" id="html-file" accept=".html,.htm,.txt" onchange="preloadHtmlFile(this.files[0])">
+          <div class="form-label" style="margin-top:8px">Codice HTML (alternativa al file)</div>
+          <textarea class="form-input" id="sec-html" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;..."></textarea>
+          <button class="btn" onclick="saveSection()">💾 Salva Sezione</button>
+        </div>
+
+        <div id="sections-list"></div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="tab-pane" id="tab-notes">
+        <div class="sec-head">📝 Note & Appunti</div>
+        <div class="sec-sub">Appunti rapidi, snippet, formule. Salvati in IndexedDB.</div>
+        <textarea class="form-input" id="notes-area" placeholder="Scrivi qui…" style="height:200px;margin-bottom:8px;width:100%"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="saveNote()">💾 Salva</button>
+          <button class="btn btn-sec" onclick="clearNote()">🗑️ Cancella nota</button>
+          <button class="btn btn-sec" onclick="exportNote()">📤 Esporta .txt</button>
+        </div>
+      </div>
+      <div class="tab-pane" id="tab-docs">
+        <div class="sec-head">📄 Documenti & PDF</div>
+        <div class="sec-sub">Carica PDF, documenti e file. Salvati offline nel tuo dispositivo (IndexedDB).</div>
+        <div id="docs-drop" style="border:2px dashed rgba(0,201,183,.4);border-radius:12px;padding:24px;text-align:center;cursor:pointer;margin:12px 0">
+          <div style="font-size:2rem">📄</div>
+          <div style="color:#cdd9e6;margin-top:6px">Trascina qui i file o tocca per selezionare</div>
+          <input type="file" id="docs-input" multiple style="display:none"/>
+        </div>
+        <div id="docs-list" style="display:grid;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HTML Viewer Overlay -->
+<div id="viewer-overlay">
+  <div id="viewer-topbar">
+    <span id="viewer-title">Sezione</span>
+    <button id="viewer-close" onclick="closeViewer()">✕ Chiudi</button>
+  </div>
+  <iframe id="viewer-iframe" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+</div>
+
+<!-- Photo Overlay -->
+<div id="photo-overlay" onclick="closePhotoViewer()">
+  <img id="photo-big" src="" alt="">
+  <button>✕ Chiudi</button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ─── PASSWORD AUTH (SHA-256) ──────────────────────────────────────────────────
+// SHA-256 of "SamuEle25"
+var CORRECT_HASH = '5513fe48cae75fbece575572c97767e1f9bfc3ce01af8b8877c9fe740db03a7c';
+var SESSION_KEY = 'bsi_fm_session_v1';
+
+async function sha256(str){
+  var enc = new TextEncoder();
+  var buf = await crypto.subtle.digest('SHA-256', enc.encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin(){
+  var inp = document.getElementById('pwd-input');
+  var val = inp.value;
+  if(!val){ showErr('Inserisci la password.'); return; }
+  var hash = await sha256(val);
+  if(hash === CORRECT_HASH){
+    // Store session flag (hashed token, not password)
+    sessionStorage.setItem(SESSION_KEY, '1');
+    showApp();
+  } else {
+    showErr('❌ Password errata. Accesso negato.');
+    inp.value='';
+  }
+}
+
+function showErr(msg){
+  var err = document.getElementById('login-err');
+  err.textContent = msg;
+  err.style.display = 'block';
+  setTimeout(function(){ err.style.display='none'; }, 4000);
+}
+
+function checkSession(){
+  return sessionStorage.getItem(SESSION_KEY) === '1';
+}
+
+function showApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  var main = document.getElementById('main-screen');
+  main.style.display = 'flex';
+  document.getElementById('status-dot').className = 'dot dot-green';
+  document.getElementById('status-txt').textContent = 'Autenticato';
+  initDB();
+}
+
+function logout(){
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+
+// ─── INDEXEDDB ───────────────────────────────────────────────────────────────
+var db = null;
+var DB_NAME = 'bsi_filemanager_v1';
+var DB_VER = 2;
+
+function initDB(){
+  var req = indexedDB.open(DB_NAME, DB_VER);
+  req.onupgradeneeded = function(e){
+    var d = e.target.result;
+    if(!d.objectStoreNames.contains('photos')) d.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+    if(!d.objectStoreNames.contains('sections')) d.createObjectStore('sections',{keyPath:'id',autoIncrement:true});
+    if(!d.objectStoreNames.contains('notes')) d.createObjectStore('notes',{keyPath:'key'});
+    if(!d.objectStoreNames.contains('activity')) d.createObjectStore('activity',{keyPath:'id',autoIncrement:true});
+        if(!d.objectStoreNames.contains('docs')) d.createObjectStore('docs',{keyPath:'id',autoIncrement:true});
+  };
+  req.onsuccess = function(e){
+    db = e.target.result;
+    refreshAll();
+  };
+  req.onerror = function(){ showToast('❌ IndexedDB non disponibile.'); };
+}
+
+function dbStore(storeName, mode){
+  return db.transaction(storeName, mode).objectStore(storeName);
+}
+
+function dbGetAll(storeName){
+  return new Promise(function(res,rej){
+    var req = dbStore(storeName,'readonly').getAll();
+    req.onsuccess=function(){ res(req.result); };
+    req.onerror=function(){ rej(req.error); };
+  });
+}
+function dbAdd(storeName, obj){
+  return new Promise(function(res,rej){
+    var req = dbStore(storeName,'readwrite').add(obj);
+    req.onsuccess=function(){ res(req.result); };
+    req.onerror=function(){ rej(req.error); };
+  });
+}
+function dbDelete(storeName, id){
+  return new Promise(function(res,rej){
+    var req = dbStore(storeName,'readwrite').delete(id);
+    req.onsuccess=function(){ res(); };
+    req.onerror=function(){ rej(req.error); };
+  });
+}
+function dbPut(storeName, obj){
+  return new Promise(function(res,rej){
+    var req = dbStore(storeName,'readwrite').put(obj);
+    req.onsuccess=function(){ res(); };
+    req.onerror=function(){ rej(req.error); };
+  });
+}
+
+// ─── ACTIVITY LOG ─────────────────────────────────────────────────────────────
+function logActivity(icon, msg){
+  if(!db) return;
+  var now = new Date();
+  var entry = {icon:icon, msg:msg, time:now.toLocaleString('it-IT')};
+  dbAdd('activity', entry).catch(function(){});
+  renderActivity();
+}
+
+async function renderActivity(){
+  var items = await dbGetAll('activity');
+  items.reverse();
+  var log = document.getElementById('activity-log');
+  if(!items.length){
+    log.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px 0">Nessuna attività ancora.</div>';
+    return;
+  }
+  log.innerHTML = items.slice(0,8).map(function(i){
+    return '<div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">'+
+      '<span style="font-size:16px">'+i.icon+'</span>'+
+      '<span style="flex:1;color:var(--text)">'+escHtml(i.msg)+'</span>'+
+      '<span style="color:var(--muted);font-size:10px;white-space:nowrap">'+i.time+'</span>'+
+      '</div>';
+  }).join('');
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+async function updateStats(){
+  var photos = await dbGetAll('photos');
+  var sections = await dbGetAll('sections');
+  var notes = await dbGetAll('notes');
+  var el = document.getElementById('stat-grid');
+  var totalSize = photos.reduce(function(a,p){return a+(p.size||0);},0)
+                + sections.reduce(function(a,s){return a+(s.size||0);},0);
+  el.innerHTML=[
+    {v:photos.length,l:'Foto'},
+    {v:sections.length,l:'Sezioni HTML'},
+    {v:notes.length?'Sì':'No',l:'Note salvate'},
+    {v:fmtSize(totalSize),l:'Spazio usato'}
+  ].map(function(s){
+    return '<div class="stat-box"><div class="sv">'+s.v+'</div><div class="sl">'+s.l+'</div></div>';
+  }).join('');
+}
+
+function fmtSize(b){
+  if(b<1024) return b+'B';
+  if(b<1024*1024) return (b/1024).toFixed(1)+'KB';
+  return (b/1024/1024).toFixed(2)+'MB';
+}
+
+// ─── PHOTOS ──────────────────────────────────────────────────────────────────
+function setupPhotoDrop(){
+  var zone=document.getElementById('photo-drop');
+  zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',function(){zone.classList.remove('drag-over');});
+  zone.addEventListener('drop',function(e){
+    e.preventDefault();zone.classList.remove('drag-over');
+    uploadPhotos(e.dataTransfer.files);
+  });
+}
+
+async function uploadPhotos(files){
+  if(!files||!files.length) return;
+  var prog=document.getElementById('photo-prog');
+  var fill=document.getElementById('photo-fill');
+  prog.style.display='block';
+  var total=files.length, done=0;
+  for(var i=0;i<files.length;i++){
+    var file=files[i];
+    if(!file.type.startsWith('image/')){ done++;fill.style.width=(done/total*100)+'%';continue; }
+    if(file.size>20*1024*1024){ showToast('⚠️ '+file.name+' troppo grande (max 20MB)'); done++;continue; }
+    var dataUrl = await readFileAsDataURL(file);
+    var obj={name:file.name,type:file.type,size:file.size,data:dataUrl,added:Date.now()};
+    await dbAdd('photos',obj);
+    logActivity('🖼️','Foto caricata: '+file.name);
+    done++; fill.style.width=(done/total*100)+'%';
+  }
+  prog.style.display='none';
+  fill.style.width='0';
+  renderPhotos();
+  updateStats();
+}
+
+function readFileAsDataURL(file){
+  return new Promise(function(res,rej){
+    var fr=new FileReader();
+    fr.onload=function(){res(fr.result);};
+    fr.onerror=rej;
+    fr.readAsDataURL(file);
+  });
+}
+
+async function renderPhotos(){
+  var photos=await dbGetAll('photos');
+  var grid=document.getElementById('photo-grid');
+  if(!photos.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Nessuna foto. Caricane una sopra.</div>';
+    return;
+  }
+  grid.innerHTML=photos.map(function(p){
+    return '<div class="file-card" onclick="openPhoto('+p.id+')">'+
+      '<div class="file-thumb"><img src="'+p.data+'" alt="'+escHtml(p.name)+'" loading="lazy"></div>'+
+      '<div class="file-info">'+
+        '<div class="file-name">'+escHtml(p.name)+'</div>'+
+        '<div class="file-meta">'+fmtSize(p.size)+'</div>'+
+      '</div>'+
+      '<button class="file-del" onclick="event.stopPropagation();deletePhoto('+p.id+')">✕</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function openPhoto(id){
+  var photos=await dbGetAll('photos');
+  var p=photos.find(function(x){return x.id===id;});
+  if(!p) return;
+  document.getElementById('photo-big').src=p.data;
+  document.getElementById('photo-overlay').style.display='flex';
+}
+function closePhotoViewer(){ document.getElementById('photo-overlay').style.display='none'; }
+
+async function deletePhoto(id){
+  await dbDelete('photos',id);
+  logActivity('🗑️','Foto eliminata');
+  renderPhotos(); updateStats();
+}
+
+// ─── HTML SECTIONS ────────────────────────────────────────────────────────────
+function setupHtmlDrop(){
+  var zone=document.getElementById('html-drop');
+  zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',function(){zone.classList.remove('drag-over');});
+  zone.addEventListener('drop',function(e){
+    e.preventDefault();zone.classList.remove('drag-over');
+    if(e.dataTransfer.files.length) preloadHtmlFile(e.dataTransfer.files[0]);
+  });
+}
+
+function preloadHtmlFile(file){
+  if(!file) return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    document.getElementById('sec-html').value=fr.result;
+    if(!document.getElementById('sec-name').value) document.getElementById('sec-name').value=file.name.replace(/\.\w+$/,'');
+  };
+  fr.readAsText(file);
+}
+
+async function saveSection(){
+  var name=document.getElementById('sec-name').value.trim();
+  var html=document.getElementById('sec-html').value.trim();
+  var icon=document.getElementById('sec-icon').value.trim()||'📄';
+  if(!name){ showToast('⚠️ Inserisci un nome per la sezione'); return; }
+  if(!html){ showToast('⚠️ Inserisci il contenuto HTML'); return; }
+  var obj={name:name,icon:icon,html:html,size:html.length,added:Date.now()};
+  await dbAdd('sections',obj);
+  logActivity('📄','Sezione salvata: '+name);
+  document.getElementById('sec-name').value='';
+  document.getElementById('sec-html').value='';
+  document.getElementById('sec-icon').value='';
+  showToast('✅ Sezione "'+name+'" salvata!');
+  renderSections(); updateStats();
+}
+
+async function renderSections(){
+  var sections=await dbGetAll('sections');
+  var list=document.getElementById('sections-list');
+  if(!sections.length){
+    list.innerHTML='<div style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center">Nessuna sezione. Caricane una sopra.</div>';
+    return;
+  }
+  list.innerHTML=sections.map(function(s){
+    return '<div class="section-card">'+
+      '<span class="sc-icon">'+s.icon+'</span>'+
+      '<div style="flex:1">'+
+        '<div class="sc-title">'+escHtml(s.name)+'</div>'+
+        '<div class="sc-meta">'+fmtSize(s.size)+' · '+new Date(s.added).toLocaleDateString('it-IT')+'</div>'+
+      '</div>'+
+      '<button class="sc-launch" onclick="openSection('+s.id+')">▶ Apri</button>'+
+      '<button class="sc-del" onclick="deleteSection('+s.id+')" title="Elimina">🗑️</button>'+
+      '</div>';
+  }).join('');
+}
+
+async function openSection(id){
+  var sections=await dbGetAll('sections');
+  var s=sections.find(function(x){return x.id===id;});
+  if(!s) return;
+  document.getElementById('viewer-title').textContent=s.icon+' '+s.name;
+  var ov=document.getElementById('viewer-overlay');
+  ov.style.display='flex';
+  var iframe=document.getElementById('viewer-iframe');
+  var blob=new Blob([s.html],{type:'text/html'});
+  iframe.src=URL.createObjectURL(blob);
+}
+
+function closeViewer(){
+  document.getElementById('viewer-overlay').style.display='none';
+  var iframe=document.getElementById('viewer-iframe');
+  if(iframe.src.startsWith('blob:')) URL.revokeObjectURL(iframe.src);
+  iframe.src='about:blank';
+}
+
+async function deleteSection(id){
+  if(!confirm('Eliminare questa sezione? Azione irreversibile.')) return;
+  await dbDelete('sections',id);
+  logActivity('🗑️','Sezione eliminata');
+  renderSections(); updateStats();
+}
+
+// ─── NOTES ───────────────────────────────────────────────────────────────────
+async function loadNote(){
+  var notes=await dbGetAll('notes');
+  var n=notes.find(function(x){return x.key==='main';});
+  if(n) document.getElementById('notes-area').value=n.text||'';
+}
+async function saveNote(){
+  var text=document.getElementById('notes-area').value;
+  await dbPut('notes',{key:'main',text:text,updated:Date.now()});
+  showToast('✅ Nota salvata!');
+  logActivity('📝','Nota aggiornata');
+  updateStats();
+}
+function clearNote(){ document.getElementById('notes-area').value=''; }
+function exportNote(){
+  var text=document.getElementById('notes-area').value;
+  if(!text){ showToast('⚠️ Nessuna nota da esportare'); return; }
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download='bsi_note_'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+}
+
+// ─── QUICK UPLOAD ─────────────────────────────────────────────────────────────
+function setupQuickDrop(){
+  var zone=document.getElementById('quick-drop');
+  zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',function(){zone.classList.remove('drag-over');});
+  zone.addEventListener('drop',function(e){
+    e.preventDefault();zone.classList.remove('drag-over');
+    handleQuickUpload(e.dataTransfer.files);
+  });
+}
+
+function handleQuickUpload(files){
+  if(!files||!files.length) return;
+  var photos=[],htmls=[];
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(f.type.startsWith('image/')) photos.push(f);
+    else if(f.name.endsWith('.html')||f.name.endsWith('.htm')) htmls.push(f);
+  }
+  if(photos.length) uploadPhotos(photos);
+  if(htmls.length){
+    htmls.forEach(function(f){
+      var fr=new FileReader();
+      fr.onload=function(){
+        dbAdd('sections',{name:f.name.replace(/\.\w+$/,''),icon:'📄',html:fr.result,size:fr.result.length,added:Date.now()})
+          .then(function(){logActivity('📄','Sezione caricata: '+f.name);renderSections();updateStats();});
+      };
+      fr.readAsText(f);
+    });
+  }
+  showToast('📤 '+(photos.length+htmls.length)+' file caricati!');
+}
+
+// ─── CLEAR ALL ────────────────────────────────────────────────────────────────
+async function clearAll(){
+  var stores=['photos','sections','notes','activity'];
+  for(var s of stores){
+    var items=await dbGetAll(s);
+    for(var i of items) await dbDelete(s,i.id||i.key);
+  }
+  showToast('🗑️ Tutti i file eliminati');
+  refreshAll();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+var _tabInited={};
+function switchTab(id){ if(id==='docs'){ setTimeout(function(){setupDocsDrop();renderDocs();},50); }
+  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  var pane=document.getElementById('tab-'+id);
+  if(pane) pane.classList.add('active');
+  var tabs=document.querySelectorAll('.tab-btn');
+  tabs.forEach(function(b){if(b.getAttribute('onclick')==="switchTab('"+id+"')") b.classList.add('active');});
+  if(!_tabInited[id]){
+    _tabInited[id]=true;
+    if(id==='photos'){ setupPhotoDrop(); renderPhotos(); }
+    else if(id==='sections'){ setupHtmlDrop(); renderSections(); }
+    else if(id==='notes'){ loadNote(); }
+  }
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+var _toastTimer=null;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  if(_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){t.style.display='none';},2800);
+}
+
+async function refreshAll(){
+  updateStats();
+  renderActivity();
+  setupQuickDrop();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load',function(){
+  if(checkSession()) showApp();
+  document.getElementById('pwd-input').focus();
+});
+
+// ── GESTIONE DOCUMENTI (PDF e file generici) ──
+function setupDocsDrop(){
+  var drop=document.getElementById('docs-drop'), inp=document.getElementById('docs-input');
+  if(!drop||!inp||drop._w) return; drop._w=1;
+  drop.addEventListener('click',function(){inp.click();});
+  drop.addEventListener('dragover',function(e){e.preventDefault();drop.style.background='rgba(0,201,183,.1)';});
+  drop.addEventListener('dragleave',function(){drop.style.background='';});
+  drop.addEventListener('drop',function(e){e.preventDefault();drop.style.background='';uploadDocs(e.dataTransfer.files);});
+  inp.addEventListener('change',function(){uploadDocs(inp.files);inp.value='';});
+}
+async function uploadDocs(files){
+  if(!files||!files.length) return;
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    try{
+      var data=await readFileAsDataURL(f);
+      await dbAdd('docs',{name:f.name,type:f.type||'file',size:f.size,data:data,date:Date.now()});
+      await logActivity('📄 Documento caricato: '+f.name);
+    }catch(e){ showToast('Errore caricando '+f.name); }
+  }
+  showToast('Documenti caricati'); renderDocs(); refreshAll&&refreshAll();
+}
+async function renderDocs(){
+  var list=document.getElementById('docs-list'); if(!list) return;
+  try{
+    var docs=await dbGetAll('docs');
+    if(!docs.length){ list.innerHTML='<div style="color:#9fb3c8;text-align:center;padding:20px">Nessun documento caricato.</div>'; return; }
+    list.innerHTML=docs.map(function(d){
+      var icon=/pdf/i.test(d.type)?'📕':/image/i.test(d.type)?'🖼️':/word|doc/i.test(d.type)?'📘':/sheet|excel|xls/i.test(d.type)?'📗':'📄';
+      return '<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px">'
+        +'<div style="font-size:1.5rem">'+icon+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="color:#e9eef6;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(d.name)+'</div>'
+        +'<div style="color:#9fb3c8;font-size:.74rem">'+fmtSize(d.size)+' · '+new Date(d.date).toLocaleDateString()+'</div></div>'
+        +'<a href="'+d.data+'" download="'+escHtml(d.name)+'" style="background:#00c9b7;color:#04121e;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:.78rem;font-weight:700">⬇</a>'
+        +'<button onclick="deleteDoc('+d.id+')" style="background:rgba(224,103,139,.2);color:#e0678b;border:none;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.78rem">🗑</button></div>';
+    }).join('');
+  }catch(e){ list.innerHTML='<div style="color:#e0678b">Errore nel caricamento documenti.</div>'; }
+}
+async function deleteDoc(id){
+  if(!confirm('Eliminare questo documento?')) return;
+  try{ await dbDelete('docs',id); await logActivity('🗑 Documento eliminato'); renderDocs(); refreshAll&&refreshAll(); }catch(e){}
+}
+
+</script>
+</body>
+</html>

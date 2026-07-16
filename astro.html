@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Astrochimica 3D — BioSpecInfo PRO</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#030812;--panel:#071221;--border:#0d2340;--accent:#00c9b7;--accent2:#7c6fff;--coral:#ff6b8a;--amber:#f59e0b;--nebula:#c084fc;--text:#e2e8f0;--muted:#64748b;--card:#0a1929}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+#top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(3,8,18,.97);border-bottom:1px solid var(--border);flex-shrink:0}
+.app-title{font-size:15px;font-weight:800;background:linear-gradient(90deg,#00c9b7,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.badge-pro{background:linear-gradient(135deg,#7c6fff,#00c9b7);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+#tabs{display:flex;gap:4px;padding:8px 10px;background:rgba(7,18,33,.97);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#tabs::-webkit-scrollbar{height:3px}
+#tabs::-webkit-scrollbar-thumb{background:var(--border)}
+.tb{padding:6px 13px;border-radius:16px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.tb.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.tb:hover:not(.active){border-color:var(--accent2);color:var(--accent2)}
+#content{flex:1;overflow:hidden;position:relative}
+.pane{display:none;width:100%;height:100%;overflow-y:auto;overflow-x:hidden}
+.pane.active{display:flex;flex-direction:column}
+/* 3D viewer */
+#vwrap{position:relative;width:100%;background:#000;flex-shrink:0;height:min(50vw,300px)}
+#three-canvas{width:100%;height:100%;display:block}
+#mol-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid var(--accent);border-radius:8px;padding:5px 14px;font-size:13px;color:var(--accent);font-weight:700;text-align:center;white-space:nowrap}
+#vctrls{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;gap:5px}
+.vbtn{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(0,201,183,.4);background:rgba(7,18,33,.9);color:var(--accent);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vbtn:hover{background:var(--accent);color:#000}
+#mbtns{position:absolute;bottom:10px;left:10px;display:flex;gap:5px}
+.mbtn{padding:4px 10px;border-radius:10px;border:1px solid rgba(0,201,183,.35);background:rgba(7,18,33,.9);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+.mbtn.active,.mbtn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* stats row */
+.srow{display:flex;gap:8px;padding:8px 12px;overflow-x:auto;flex-shrink:0}
+.srow::-webkit-scrollbar{height:0}
+.sbox{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:100px}
+.sbox .sv{font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sbox .sl{font-size:10px;color:var(--muted);margin-top:1px}
+/* cat filter */
+.cfilter{display:flex;gap:5px;padding:6px 12px;overflow-x:auto;flex-shrink:0}
+.cfilter::-webkit-scrollbar{height:0}
+.cchip{padding:4px 11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.cchip.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* mol grid */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;padding:10px 12px}
+.mcard{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:9px;cursor:pointer;transition:all .2s}
+.mcard:hover,.mcard.sel{border-color:var(--accent);background:rgba(0,201,183,.07)}
+.mcard .mi{font-size:20px;margin-bottom:4px}
+.mcard .mn{font-size:12px;font-weight:700;color:var(--text)}
+.mcard .mf{font-size:11px;color:var(--accent);font-family:monospace;margin-top:1px}
+.mcard .ml{font-size:10px;color:var(--muted);margin-top:3px}
+/* info panel */
+.ipanel{background:var(--card);border-top:1px solid var(--border);padding:12px 14px;flex-shrink:0;display:none}
+.ipanel .iname{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px}
+.ipanel .idesc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.iprops{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px}
+.iprop{background:rgba(0,201,183,.07);border:1px solid rgba(0,201,183,.2);border-radius:6px;padding:5px 8px}
+.iprop .pk{font-size:10px;color:var(--muted)}
+.iprop .pv{font-size:12px;font-weight:600;color:var(--accent)}
+/* exo grid */
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;padding:12px}
+.ecard{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px}
+.ecard:hover{border-color:var(--accent2)}
+.ename{font-size:13px;font-weight:700;color:var(--text)}
+.estar{font-size:11px;color:var(--amber);margin:3px 0}
+.ehab{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;margin:4px 0;display:inline-block}
+.ehab.yes{background:rgba(0,201,183,.2);color:var(--accent)}
+.ehab.maybe{background:rgba(245,158,11,.2);color:var(--amber)}
+.ehab.no{background:rgba(255,107,138,.2);color:var(--coral)}
+.ebar{margin-top:6px}
+.ebl{font-size:10px;color:var(--muted);margin-bottom:2px}
+.ebt{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.ebf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+/* nebula */
+#neb-canvas{width:100%;flex:1;display:block}
+.nebinfo{position:absolute;bottom:14px;left:14px;right:14px;background:rgba(3,8,18,.88);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:10px;padding:11px}
+.nebinfo h3{font-size:14px;font-weight:700;color:var(--nebula);margin-bottom:3px}
+.nebinfo p{font-size:11px;color:var(--muted);line-height:1.5}
+/* spectra */
+.specgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+@media(max-width:480px){.specgrid{grid-template-columns:1fr}}
+.speccard{background:var(--card);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.speccard canvas{width:100%;height:70px;display:block}
+.specinfo{padding:8px 9px}
+.stype{font-size:11px;font-weight:700;color:var(--amber)}
+.sdesc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.slines{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.sline{font-size:10px;padding:2px 5px;border-radius:5px;font-weight:600}
+/* nucleosynthesis */
+.nuc-container{padding:12px;max-width:800px}
+.nuc-title{font-size:14px;font-weight:700;color:var(--text);margin:12px 0 6px}
+.nuc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:14px}
+.nuc-card{border-radius:8px;padding:8px;cursor:pointer;transition:all .2s;border:1.5px solid transparent}
+.nuc-card:hover{border-color:rgba(255,255,255,.2)}
+.nuc-card .el-sym{font-size:20px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.nuc-card .el-name{font-size:10px;color:rgba(255,255,255,.8);margin-top:2px}
+.nuc-card .el-src{font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;line-height:1.3}
+.nuc-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.nuc-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text)}
+.nuc-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.process-card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:11px;margin-bottom:8px}
+.process-card h4{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.process-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.process-card .formula{font-family:monospace;background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.25);border-radius:5px;padding:3px 7px;font-size:11px;color:#c4b5fd;margin-top:5px;display:inline-block}
+/* comets */
+.cometgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:9px;padding:12px}
+.cometcard{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px}
+.cometcard:hover{border-color:var(--accent)}
+.cname{font-size:13px;font-weight:700;color:var(--text)}
+.cperiod{font-size:11px;color:var(--amber);margin:3px 0}
+.cmol{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0}
+.cmol span{font-size:10px;padding:2px 6px;border-radius:5px;background:rgba(0,201,183,.1);border:1px solid rgba(0,201,183,.25);color:var(--accent);font-weight:600}
+.cmission{font-size:10px;color:var(--accent2);font-weight:600;margin-top:4px}
+.cdesc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+/* quiz */
+.qwrap{padding:14px;max-width:600px;margin:0 auto;width:100%}
+.qcard{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.qnum{font-size:11px;color:var(--muted);margin-bottom:6px}
+.qtext{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:10px}
+.qopts{display:flex;flex-direction:column;gap:6px}
+.qopt{background:transparent;border:1.5px solid var(--border);color:var(--text);padding:9px 14px;border-radius:8px;text-align:left;font-size:12px;cursor:pointer;transition:all .2s}
+.qopt:hover{border-color:var(--accent);color:var(--accent)}
+.qopt.ok{background:rgba(0,201,183,.12);border-color:var(--accent);color:var(--accent)}
+.qopt.ko{background:rgba(255,107,138,.12);border-color:var(--coral);color:var(--coral)}
+.qexp{font-size:12px;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:9px;margin-top:8px;display:none;line-height:1.6}
+.qscore{text-align:center;padding:24px;font-size:16px;font-weight:700;color:var(--accent)}
+.btn-next{margin-top:10px;background:var(--accent2);color:#fff;border:none;border-radius:18px;padding:7px 22px;font-size:12px;font-weight:700;cursor:pointer;display:none}
+.btn{padding:7px 16px;border-radius:18px;border:1.5px solid var(--accent);background:var(--accent);color:#000;font-size:12px;font-weight:700;cursor:pointer}
+/* common */
+.sec-head{padding:12px 14px 4px;font-size:14px;font-weight:700;color:var(--text)}
+.sec-sub{padding:0 14px 10px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <span style="font-size:20px">🌌</span>
+    <span class="app-title">Astrochimica 3D</span>
+    <span class="badge-pro">PRO</span>
+  </div>
+  <div id="tabs">
+    <button class="tb active" onclick="ST('mol')">🔭 Molecole ISM</button>
+    <button class="tb" onclick="ST('exo')">🪐 Esopianeti</button>
+    <button class="tb" onclick="ST('neb')">🌠 Nebule</button>
+    <button class="tb" onclick="ST('spec')">📊 Spettri</button>
+    <button class="tb" onclick="ST('nuc')">💥 Nucleosintesi</button><button class="tb" onclick="ST('theory')">📐 Teoria &amp; Formule</button><button class="tb" onclick="ST('extreme')">💫 Corpi Estremi</button><button class="tb" onclick="ST('reactions')">🔬 Reazioni Astrochimiche</button><button class="tb" onclick="ST('missions')">🛰️ Missioni &amp; Telescopi</button><button class="tb" onclick="ST('timeline')">⏳ Timeline Cosmica</button><button class="tb" onclick="ST('cosmo')">🌌 Cosmo 3D</button>
+    <button class="tb" onclick="ST('com')">☄️ Comete</button>
+    <button class="tb" onclick="ST('quiz')">🎯 Quiz</button>
+  </div>
+  <div id="content">
+
+    <!-- ═══ MOLECOLE ISM ═══ -->
+    <div class="pane active" id="p-mol">
+      <div id="vwrap">
+        <canvas id="three-canvas"></canvas>
+        <div id="mol-label">Seleziona una molecola</div>
+        <div id="vctrls">
+          <button class="vbtn" onclick="zoom(1)" title="+">+</button>
+          <button class="vbtn" onclick="zoom(-1)" title="−">−</button>
+          <button class="vbtn" onclick="resetV()" title="Reset">⟳</button>
+        </div>
+        <div id="mbtns">
+          <button class="mbtn active" id="mb-r" onclick="setMode('r')">Ruota</button>
+          <button class="mbtn" id="mb-f" onclick="setMode('f')">Fly</button>
+        </div>
+      </div>
+      <div class="srow">
+        <div class="sbox"><div class="sv">300+</div><div class="sl">Molecole ISM note</div></div>
+        <div class="sbox"><div class="sv">∼10⁻²¹</div><div class="sl">Densità ISM (g/cm³)</div></div>
+        <div class="sbox"><div class="sv">2.7 K</div><div class="sl">T fondo cosmico</div></div>
+        <div class="sbox"><div class="sv">1970</div><div class="sl">Prima rilevazione CO</div></div>
+      </div>
+      <div class="cfilter" id="cfilter">
+        <button class="cchip active" onclick="filterM('all',this)">Tutte</button>
+        <button class="cchip" onclick="filterM('diatomica',this)">Diatomiche</button>
+        <button class="cchip" onclick="filterM('organica',this)">Organiche</button>
+        <button class="cchip" onclick="filterM('pah',this)">PAH</button>
+        <button class="cchip" onclick="filterM('ghiaccio',this)">Ghiacci</button>
+        <button class="cchip" onclick="filterM('aminoacido',this)">Amminoacidi</button>
+        <button class="cchip" onclick="filterM('ione',this)">Ioni</button>
+        <button class="cchip" onclick="filterM('fullerene',this)">Fullereni</button>
+      </div>
+      <div class="mgrid" id="mgrid"></div>
+      <div class="ipanel" id="ipanel">
+        <div class="iname" id="iname"></div>
+        <div class="idesc" id="idesc"></div>
+        <div class="iprops" id="iprops"></div>
+      </div>
+    </div>
+
+    <!-- ═══ ESOPIANETI ═══ -->
+    <div class="pane" id="p-exo">
+      <div class="sec-head">🪐 Esopianeti con Chimica Rilevata</div>
+      <div class="sec-sub">Composizione atmosferica da JWST, Hubble, Spitzer. Indice abitabilità 0–100.</div>
+      <div class="egrid" id="egrid"></div>
+    </div>
+
+    <!-- ═══ NEBULE ═══ -->
+    <div class="pane" id="p-neb" style="position:relative">
+      <canvas id="neb-canvas"></canvas>
+      <div class="nebinfo">
+        <h3 id="nb-name">Caricamento…</h3>
+        <p id="nb-desc"></p>
+      </div>
+    </div>
+
+    <!-- ═══ SPETTRI ═══ -->
+    <div class="pane" id="p-spec">
+      <div class="sec-head">📊 Spettri Stellari — Classificazione Harvard</div>
+      <div class="sec-sub">Righe di assorbimento e molecole per tipo spettrale O→T</div>
+      <div class="specgrid" id="specgrid"></div>
+    </div>
+
+    <!-- ═══ NUCLEOSINTESI ═══ -->
+    <div class="pane" id="p-nuc">
+      <div class="nuc-container" id="nuc-container">
+        <div class="sec-head">💥 Nucleosintesi Stellare</div>
+        <div class="sec-sub">Origine degli elementi: dal Big Bang alle fusioni di stelle di neutroni.</div>
+        <div class="nuc-legend" id="nuc-legend"></div>
+        <div class="nuc-title">Elementi — origine cosmica</div>
+        <div class="nuc-grid" id="nuc-grid"></div>
+        <div class="nuc-title">Processi di nucleosintesi</div>
+        <div id="nuc-processes"></div>
+      </div>
+    </div>
+
+    <!-- ═══ COMETE ═══ -->
+    <div class="pane" id="p-com">
+      <div class="sec-head">☄️ Chimica delle Comete</div>
+      <div class="sec-sub">Molecole rilevate in chiome cometarie e via missioni spaziali dedicate.</div>
+      <div class="cometgrid" id="cometgrid"></div>
+    </div>
+
+    <!-- ═══ QUIZ ═══ -->
+    <div class="pane" id="p-quiz">
+      <div class="qwrap" id="qwrap"></div>
+    </div><div class="pane" id="p-theory"><div id="theory-container" style="padding:16px;max-width:900px;margin:0 auto"></div></div><div class="pane" id="p-extreme"><div id="extreme-container" style="padding:16px;max-width:960px;margin:0 auto"></div></div>
+<div class="pane" id="p-reactions"><div id="reactions-container" style="padding:16px;max-width:900px;margin:0 auto"></div></div>
+<div class="pane" id="p-missions"><div id="missions-container" style="padding:16px;max-width:960px;margin:0 auto"></div></div>
+<div class="pane" id="p-timeline"><div id="timeline-container" style="padding:16px;max-width:860px;margin:0 auto"></div></div>
+<div class="pane" id="p-cosmo">
+  <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;justify-content:center">
+    <button class="cosmo-btn" data-scene="blackhole" style="padding:6px 12px;border-radius:8px;border:1px solid #a78bfa;background:#a78bfa;color:#0a0a1a;font-weight:700;cursor:pointer;font-size:.78rem">🕳️ Gargantua</button>
+    <button class="cosmo-btn" data-scene="solar" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">☀️ Sistema Solare</button>
+    <button class="cosmo-btn" data-scene="exo" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">🪐 Esopianeti 3D</button>
+    <button class="cosmo-btn" data-scene="galaxy" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">🌀 Galassie</button>
+    <button class="cosmo-btn" data-scene="map" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">🗺️ Mappa Interstellare</button>
+    <button class="cosmo-btn" data-scene="universe" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">🌌 Mappa Universo</button>
+    <button class="cosmo-btn" data-scene="comet3d" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.78rem">☄️ Cometa 3D</button>
+  </div>
+  <div id="cosmo-wrap" style="position:relative;width:100%;height:460px;background:#000005;border-radius:12px;overflow:hidden;margin:0 auto;max-width:960px">
+    <canvas id="cosmo-canvas" style="width:100%;height:100%;display:block"></canvas>
+    <div id="cosmo-hud" style="position:absolute;top:10px;left:10px;color:#cdd9e6;font-size:.78rem;background:rgba(0,0,10,.6);padding:8px 12px;border-radius:8px;max-width:60%;pointer-events:none"></div>
+    <div id="cosmo-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#a78bfa;font-size:.9rem">Caricamento motore 3D…</div>
+  </div>
+  <div style="display:flex;gap:6px;justify-content:center;padding:8px;flex-wrap:wrap">
+    <button id="cosmo-speed" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.76rem">⏩ Velocità: 1×</button>
+    <button id="cosmo-pause" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;cursor:pointer;font-size:.76rem">⏸ Pausa moti</button>
+  </div>
+  <div id="cosmo-info" style="padding:12px 16px;max-width:960px;margin:0 auto"></div>
+</div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" crossorigin="anonymous"
+  onerror="var s=document.createElement('script');s.src='https://unpkg.com/three@0.160.0/build/three.min.js';document.head.appendChild(s)"></script>
+<script>
+'use strict';
+// ─── DATA ────────────────────────────────────────────────────────────────────
+var MOLS=[
+  // DIATOMICHE
+  {id:'h2',n:'Idrogeno molecolare',f:'H₂',cat:'diatomica',ic:'💫',loc:'Nubi molecolari dense',mw:2.02,det:'UV (1970)',desc:'Molecola più abbondante dell\'universo. Rilevata via eccitazione UV in 1970. Fondamentale per la formazione stellare e il raffreddamento delle nubi.',p:{T:'10–30 K','X(H₂)':'∼70% massa galattica',Abund:'dominante',Anno:'1970'}},
+  {id:'co',n:'Monossido di carbonio',f:'CO',cat:'diatomica',ic:'🌀',loc:'Nubi molecolari, dischi',mw:28.01,det:'Radio 115 GHz',desc:'Secondo tracer ISM più usato. La transizione J=1→0 a 115 GHz è standard per mappare le nubi galattiche.',p:{T:'10–50 K','J=1→0':'115 GHz','X(CO/H₂)':'10⁻⁴',Anno:'1970'}},
+  {id:'cs',n:'Solfuro di carbonio',f:'CS',cat:'diatomica',ic:'⚪',loc:'Nubi molecolari dense',mw:44.07,det:'Radio 49 GHz',desc:'Tracer eccellente per nubi dense (n>10⁴ cm⁻³) grazie al suo alto momento dipolare.',p:{T:'10–40 K','Dipolo':'2.0 D','Tracer':'alta densità',Anno:'1971'}},
+  {id:'sio',n:'Monossido di silicio',f:'SiO',cat:'diatomica',ic:'⚙️',loc:'Outflow stellari, supernovae',mw:44.09,det:'Radio 86 GHz',desc:'Tracer di shock e maser in regioni di formazione stellare. Emesso nelle onde d\'urto degli outflow protostellari.',p:{Maser:'43 GHz',Shock:'sì',Anno:'1971'}},
+  {id:'cn',n:'Radicale cianuro',f:'CN',cat:'diatomica',ic:'⚗️',loc:'Inviluppi circumstellari',mw:26.02,det:'Radio 113 GHz',desc:'Prima molecola interstellare rilevata via spettroscopia ottica (1940). Abbondante intorno a stelle di tipo carbonio.',p:{Anno:'1940','Prima':'interstellar molecule',Tipo:'radicale'}},
+  // ORGANICHE
+  {id:'hcn',n:'Acido cianidrico',f:'HCN',cat:'organica',ic:'⚠️',loc:'Nubi dense, comete, Titano',mw:27.03,det:'Radio 88.6 GHz',desc:'Molecola prebiotica chiave. Trovata in comete e atmosfera di Titano. Precursore di amminoacidi via sintesi di Strecker.',p:{Titano:'sì',Prebiotica:'sì',Anno:'1971'}},
+  {id:'hcho',n:'Formaldeide',f:'H₂CO',cat:'organica',ic:'🧪',loc:'ISM diffuso, nubi, comete',mw:30.03,det:'Radio 6 cm (4830 MHz)',desc:'Prima molecola organica poliatomica ISM (1969). Blocco costruttivo per zuccheri via reazione formosa.',p:{'4830 MHz':'assorbimento',Zuccheri:'precursore',Anno:'1969'}},
+  {id:'ch3oh',n:'Metanolo',f:'CH₃OH',cat:'organica',ic:'🍶',loc:'Regioni HMSFR, ghiacci',mw:32.04,det:'Radio + maser 6.7 GHz',desc:'Maser più luminosi dell\'ISM. Si forma per idrogenazione di CO su superfici di grani a T<20 K.',p:{Maser:'6.7 GHz (Classe II)',Forma:'CO+4H su grani',Anno:'1970'}},
+  {id:'nh3',n:'Ammoniaca',f:'NH₃',cat:'organica',ic:'🔵',loc:'Nubi molecolari dense',mw:17.03,det:'Radio 23 GHz (inversione)',desc:'Prima molecola poliatomica ISM (1968). Ottimo termometro per nubi fredde via le sue transizioni di inversione inversion.',p:{'23 GHz':'inversione',Anno:'1968',Termometro:'sì'}},
+  {id:'h2s',n:'Idrogeno solforato',f:'H₂S',cat:'organica',ic:'💛',loc:'Nubi molecolari, comete',mw:34.08,det:'Radio 169 GHz',desc:'Fonte di S nell\'ISM. Si ghiaccia sui grani a T<90 K. Contribuisce alla chimica dello zolfo nelle protostelle.',p:{Ghiaccio:'T<90 K',Zolfo:'sì',Anno:'1972'}},
+  {id:'ch3cn',n:'Acetonitrile',f:'CH₃CN',cat:'organica',ic:'🔬',loc:'Nubi calde, comete (Hale-Bopp)',mw:41.05,det:'Radio (mm)',desc:'Tracer di regioni calde attorno a protostelle massicce (hot corinos/hot cores). Rilevato in molte comete.',p:{HotCore:'sì',Comete:'Hale-Bopp',Anno:'1971'}},
+  {id:'ch3cho',n:'Acetaldeide',f:'CH₃CHO',cat:'organica',ic:'🌿',loc:'Hot cores, regioni di formazione stellare',mw:44.05,det:'Radio cm/mm',desc:'Molecola organica complessa (COM). Precursore di molecole biologicamente rilevanti. Prima COM rilevata (1973).',p:{COM:'sì',Anno:'1973',Precursore:'glicole etilenico'}},
+  {id:'hcooh',n:'Acido formico',f:'HCOOH',cat:'organica',ic:'🍋',loc:'Hot cores, comete',mw:46.03,det:'Radio 1.63 GHz',desc:'L\'acido carbossilico più semplice. Trovato nei ghiacci delle nubi molecolari e nelle chiome cometarie.',p:{Acido:'carbossilico',Comete:'sì',Anno:'1970'}},
+  {id:'c2h2',n:'Acetilene',f:'C₂H₂',cat:'organica',ic:'✨',loc:'Stelle AGB, gusci C-rich',mw:26.04,det:'IR medio 13.7 µm',desc:'Abbondante nelle stelle carbon-rich di tipo AGB. Precursore della formazione di PAH negli outflow stellari.',p:{Stelle:'AGB C-rich',PAH:'precursore',Anno:'1976'}},
+  {id:'c6h6',n:'Benzene',f:'C₆H₆',cat:'organica',ic:'⬡',loc:'CW Leo, Titano',mw:78.11,det:'IR 14.85 µm',desc:'Molecola aromatica più semplice. Rilevata in Titano (Cassini) e nella stella carboniosa CW Leonis.',p:{Titano:'Cassini/CIRS',CWLeo:'sì',Anno:'2001'}},
+  // PAH
+  {id:'naph',n:'Naftalene',f:'C₁₀H₈',cat:'pah',ic:'🔶',loc:'ISM diffuso, meteoriti',mw:128.17,det:'UIBs 3.3–11.3 µm',desc:'PAH bicyclico più semplice. Famiglia PAH contiene ∼15% del carbonio galattico. UIBs sono la loro firma.',p:{UIB:'3.3–11.3 µm','C galattico':'15%',Tipo:'PAH'}},
+  {id:'pyrene',n:'Pirene',f:'C₁₆H₁₀',cat:'pah',ic:'🔷',loc:'ISM, meteoriti, regioni HII',mw:202.25,det:'UIBs',desc:'PAH a 4 anelli aromatici condensati. Alta stabilità. Trovato in meteoriti carbonacei come Murchison.',p:{Anelli:'4',Meteoriti:'Murchison',Tipo:'PAH'}},
+  {id:'coron',n:'Coronene',f:'C₂₄H₁₂',cat:'pah',ic:'🌸',loc:'ISM, coda di comete',mw:300.35,det:'UIBs',desc:'PAH con 7 anelli. Struttura a "fiocco di neve". Molto stabile, si forma ad alta T nelle stelle carboniose.',p:{Anelli:'7','Struttura':'D₆h simmetria',Tipo:'PAH'}},
+  // GHIACCI
+  {id:'h2o',n:'Acqua',f:'H₂O',cat:'ghiaccio',ic:'❄️',loc:'Ghiacci ISM, comete, protoplaneti',mw:18.02,det:'IR + Maser 22 GHz',desc:'Ghiaccio più abbondante nell\'ISM. Maser H₂O a 22 GHz. Cruciale per la chimica prebiotica e la vita.',p:{Maser:'22 GHz',T_ghiaccio:'<100 K',Abund:'10⁻⁴',Anno:'1969'}},
+  {id:'co2ice',n:'CO₂ (ghiaccio)',f:'CO₂',cat:'ghiaccio',ic:'🧊',loc:'Mantelli ghiacciati, comete',mw:44.01,det:'IR 4.27 µm',desc:'Secondo ghiaccio più abbondante. Banda forte a 4.27 µm. Prodotto da ossidazione di CO su grani.',p:{Banda:'4.27 µm',Abund:'1/3 di H₂O',Anno:'1989'}},
+  {id:'ch4ice',n:'Metano (ghiaccio)',f:'CH₄',cat:'ghiaccio',ic:'💎',loc:'Comete, ghiacci ISM, Plutone',mw:16.04,det:'IR 7.67 µm',desc:'Ghiaccio volatile presente in comete e pianeti del sistema solare esterno.',p:{Banda:'7.67 µm',Volatile:'sì',Titano:'abbondante'}},
+  {id:'ch3ohice',n:'Metanolo (ghiaccio)',f:'CH₃OH',cat:'ghiaccio',ic:'🌨️',loc:'Ghiacci nubi molecolari',mw:32.04,det:'IR 9.75 µm',desc:'Componente importante dei ghiacci ISM. Rilevato fino al 30% del ghiaccio di H₂O in alcuni oggetti.',p:{Banda:'9.75 µm','Max abund':'30% vs H₂O',Anno:'1991'}},
+  // AMMINOACIDI
+  {id:'gly',n:'Glicina',f:'C₂H₅NO₂',cat:'aminoacido',ic:'🧬',loc:'Cometa Wild 2, meteoriti',mw:75.03,det:'GC-MS campioni Stardust',desc:'Amminoacido più semplice. Trovata nella cometa Wild 2 (missione Stardust 2009) e in meteoriti come Murchison.',p:{Stardust:'2009',Meteoriti:'Murchison, Murray',ISM:'non confermata'}},
+  {id:'adenine',n:'Adenina',f:'C₅H₅N₅',cat:'aminoacido',ic:'🔮',loc:'Meteoriti carbonacei',mw:135.13,det:'LC-MS/MS meteoriti',desc:'Base purinica del DNA/RNA. Si può sintetizzare da 5 HCN. Trovata in Murchison (Oro et al. 1961).',p:{Sintesi:'5×HCN',Meteoriti:'Murchison',Oro:'1961'}},
+  {id:'uracil',n:'Uracile',f:'C₄H₄N₂O₂',cat:'aminoacido',ic:'🧩',loc:'Meteoriti, asteroide Ryugu (Hayabusa2)',mw:112.09,det:'LC-HRMS',desc:'Base pirimidinidica dell\'RNA. Confermata nell\'asteroide Ryugu da Hayabusa2 nel 2022.',p:{Ryugu:'Hayabusa2 2022',RNA:'base',Foto:'sintesi UV'}},
+  // IONI
+  {id:'h3p',n:'H₃⁺ (protone tri-idrogeno)',f:'H₃⁺',cat:'ione',ic:'⚡',loc:'ISM diffuso, atmosfere planetarie',mw:3.02,det:'IR 3.5–4 µm',desc:'Ione più abbondante nell\'ISM. Motore della chimica interstellare: trasferisce protoni e avvia catene di reazione.',p:{Ruolo:'ioni-molecola chain',T:'∼20–8000 K',Jupiter:'abbondante'}},
+  {id:'hco',n:'Formile (HCO⁺)',f:'HCO⁺',cat:'ione',ic:'➕',loc:'Regioni PDR, nubi dense',mw:29.02,det:'Radio 89 GHz',desc:'Ione abbondante nelle regioni illuminate da UV (PDR). Si forma da H₃⁺ + CO → HCO⁺ + H₂.',p:{Formazione:'H₃⁺ + CO',Anno:'1970','PDR':'tracer'}},
+  {id:'c60p',n:'C₆₀⁺ (Buckyball ione)',f:'C₆₀⁺',cat:'ione',ic:'⊕',loc:'ISM diffuso, nebulose planetarie',mw:720.64,det:'DIBs 9577/9632 Å',desc:'C₆₀⁺ assegnato alle DIBs a 9577 e 9632 Å nel 2015. Prova di fullereni ionizzati nell\'ISM.',p:{DIBs:'9577, 9632 Å',Conferma:'2015',Nobel:'1996 (C₆₀)'}},
+  // FULLERENI
+  {id:'c60',n:'Buckminsterfullerene',f:'C₆₀',cat:'fullerene',ic:'⚽',loc:'Nebulose planetarie, ISM',mw:720.64,det:'IR 7.0/8.5/17.4/18.9 µm',desc:'Fullerene più stabile. Confermato nell\'ISM nel 2010 tramite nebulose planetarie. Più stabile molecola carboniosa.',p:{Conferma:'2010 nebulosa Tc 1','C₇₀':'anche rilevato',Nobel:'1996'}},
+  {id:'c70',n:'C₇₀ (Fullerene)',f:'C₇₀',cat:'fullerene',ic:'🏉',loc:'Nebulosa Tc 1',mw:840.75,det:'IR con Spitzer',desc:'Secondo fullerene rilevato nell\'ISM. Trovato insieme a C₆₀ nella nebulosa planetaria Tc 1 con Spitzer.',p:{Anno:'2010',Spitzer:'sì',Forma:'oblata, D₅h'}}
+];
+
+var EXOPLANETS=[
+  {n:'WASP-39 b',star:'WASP-39',ty:'Hot Jupiter',d:700,mol:['H₂O','CO₂','CO','SO₂','Na','K'],hab:'no',hs:2,desc:'Primo esopianeta con CO₂ confermata da JWST (2022). SO₂ indica fotocolisi. Eccellente banco di prova per spettroscopia di trasmissione.'},
+  {n:'K2-18 b',star:'K2-18',ty:'Sub-Neptuno / Hycean?',d:124,mol:['CH₄','CO₂','H₂O','DMS?'],hab:'maybe',hs:72,desc:'Possibile "Hycean world" con oceano. CH₄ e CO₂ rilevati da JWST. Tracce possibili di DMS (biosignature controversa, 2023).'},
+  {n:'55 Cancri e',star:'55 Cnc',ty:'Super-Terra rocciosa',d:41,mol:['CO₂','CO','SiO'],hab:'no',hs:1,desc:'T>2000 K. JWST ha rilevato atmosfera secondaria di CO₂/CO, probabilmente vulcanica. Prima Super-Terra con atmosfera confermata.'},
+  {n:'TRAPPIST-1 e',star:'TRAPPIST-1',ty:'Terra-like (ZA)',d:39,mol:['H₂O?','CO₂?','O₂?'],hab:'maybe',hs:85,desc:'Nella zona abitabile di TRAPPIST-1. Parametri compatibili con atmosfera terrestre. Target prioritario per ricerca biosignature.'},
+  {n:'TRAPPIST-1 f',star:'TRAPPIST-1',ty:'Terra-like (ZA esterna)',d:39,mol:['H₂O?','CO₂?'],hab:'maybe',hs:70,desc:'Orbita esterna alla zona abitabile. Potenziale per ghiaccio superficiale. Sistema TRAPPIST ha 7 pianeti terrestri.'},
+  {n:'HD 209458 b',star:'HD 209458',ty:'Hot Jupiter (Osiris)',d:159,mol:['H₂O','Na','He','H'],hab:'no',hs:1,desc:'Primo esopianeta con atmosfera rilevata (Hubble 2001). Escape di H a forma di cometa. Na ionizzato nell\'alta atmosfera.'},
+  {n:'GJ 1214 b',star:'GJ 1214',ty:'Mini-Nettuno',d:48,mol:['H₂O','CH₄','Nubi'],hab:'no',hs:15,desc:'Atmosfera densa e nebbiosa (JWST 2023). Abbondanti aerosol/nubi bloccano lo spettro. Composizione interna incerta.'},
+  {n:'WASP-121 b',star:'WASP-121',ty:'Hot Jupiter ultra-caldo',d:870,mol:['H₂O','Fe','V','TiO','VO'],hab:'no',hs:0,desc:'T>3000 K. Metalli gassosi rilevati (Fe, V). Stratosfera molto calda. Effetto greenhouse termico estremo.'},
+  {n:'LHS 3844 b',star:'LHS 3844',ty:'Super-Terra rocciosa',d:49,mol:['SiO₂?','basalto?'],hab:'no',hs:0,desc:'Assenza di atmosfera significativa (Spitzer). Superficie tipo basalto/roccia nuda. Irraggiamento eccessivo dalla stella.'},
+  {n:'Proxima b',star:'Proxima Centauri',ty:'Terra-like (ZA)',d:4.2,mol:['H₂O?','N₂?'],hab:'maybe',hs:60,desc:'L\'esopianeta più vicino (4.2 a.l.). Zona abitabile ma soggetto a intense flares UV. Composizione atmosferica sconosciuta.'},
+  {n:'TOI-700 d',star:'TOI-700',ty:'Terra-like (ZA)',d:101,mol:['CO₂?','H₂O?'],hab:'maybe',hs:65,desc:'Pianeta terrestre nella zona abitabile di una nana M. JWST ha rilevato segnali che richiedono atmosfera CO₂-dominante.'},
+  {n:'L 98-59 b',star:'L 98-59',ty:'Ultra-Terra (mini-Venus)',d:35,mol:['H₂O?','S?'],hab:'no',hs:5,desc:'Sistema con 3 pianeti, più piccolo dei pianeti TESS. L 98-59 c: candidato per atmosfera ricca in vapore acqueo.'}
+];
+
+var NEBULAE=[
+  {n:'Nebulosa di Orione (M42)',desc:'La più studiata regione di formazione stellare (450 a.l.). Contiene 300+ molecole ISM note. Il Trapezio (OB1) ionizza il gas circostante. T∼10 K nei core densi. Chimica: CO, H₂, HCN, PAH, H₂O.',col:'#ff6030'},
+  {n:'Nebulosa a Testa di Cavallo (B33)',desc:'Nebulosa oscura a 1375 a.l. Composta da grani di carbonio e silicati. Bordo PDR (Photo-Dissociation Region) illuminato da σ Orionis. Chimica bordo: CO, H₂, PAH, CH⁺.',col:'#c084fc'},
+  {n:'Nebulosa della Carena (NGC 3372)',desc:'Una delle più grandi regioni HII (7500 a.l.). Ospita Eta Carinae, tra le stelle più massive note (∼100 M☉). Chimica ionizzata: H II, He II, N II, O III.',col:'#60a5fa'},
+  {n:'Nebulosa del Granchio (M1)',desc:'Resto di supernova del 1054 d.C. (SN1054). Contiene una pulsar a 30 Hz. Arricchisce l\'ISM di Fe, Si, S, Mg. Gas in espansione a 1500 km/s.',col:'#f59e0b'},
+  {n:'Nebulosa Aquila (M16) — Pilastri della Creazione',desc:'Regione HII a 7000 a.l. Famosa per le colonne di gas fotoevaporato. Nuove stelle nascono all\'interno dei "pilastri". Chimica: H₂, CO, N₂, PAH.',col:'#34d399'},
+  {n:'Nebulosa Rosetta (NGC 2244)',desc:'Nebulosa HII a 5200 a.l. con cluster al centro. Simmetria quasi radiale. Chimica: H II, O III, S II ai bordi. Massa ∼10.000 M☉.',col:'#ff6b8a'},
+  {n:'Nebulosa Elica (NGC 7293)',desc:'Nebulosa planetaria più vicina (650 a.l.). Creata da una stella AGB espellente il suo inviluppo. Chimica: H₂, CO, HCN nel toro molecolare esterno.',col:'#00c9b7'},
+  {n:'Nebulosa Laguna (M8)',desc:'Nebulosa HII a 5200 a.l. nella costellazione del Sagittario. Struttura bilobata. Chimica: H II, N II, S II. Stelle O-type ionizzano il gas.',col:'#7c6fff'}
+];
+
+var SPECTRA=[
+  {ty:'O',T:'30.000–60.000 K',col:'#9bb0ff',rgb:[155,176,255],lines:['He II (forte)','N III','C IV','Si IV'],mol:[],desc:'Stelle più calde. UV e X morbidi dominanti. He ionizzato due volte.'},
+  {ty:'B',T:'10.000–30.000 K',col:'#aabfff',rgb:[170,191,255],lines:['He I','H Balmer','Mg II','Si II'],mol:[],desc:'Stelle calde (Rigel, Spica). Balmer si intensificano verso tipo A.'},
+  {ty:'A',T:'7.500–10.000 K',col:'#cad7ff',rgb:[202,215,255],lines:['H Balmer (max)','Ca II (inizio)','Fe I','Mg I'],mol:[],desc:'Sirio, Vega. Balmer al massimo. Temperatura ottimale per H atomico eccitato.'},
+  {ty:'F',T:'6.000–7.500 K',col:'#f8f7ff',rgb:[248,247,255],lines:['Ca II K,H','H (mod)','Fe I','Cr I'],mol:['CN (tracce)'],desc:'Procione. Inizio metalli ionizzati. Zona di transizione chimica.'},
+  {ty:'G',T:'5.200–6.000 K',col:'#fff4ea',rgb:[255,244,234],lines:['Ca II (forte)','Fe I','Mg I b','Na I D'],mol:['CH','CN','C₂'],desc:'Sole (G2V). Spettro ricco di metalli. Convettività profonda. Ciclo magnetico 11 anni.'},
+  {ty:'K',T:'3.700–5.200 K',col:'#ffd2a1',rgb:[255,210,161],lines:['Ca I','Fe I (molte)','Ti I','Na I D'],mol:['CH','CN','CaH','MgH'],desc:'Arturo, Aldebaran. Abbondanti righe metalliche. Molecole semplici compaiono nello spettro.'},
+  {ty:'M',T:'2.400–3.700 K',col:'#ff8c6a',rgb:[255,140,106],lines:['TiO (dom.)','VO','FeH','CaH'],mol:['TiO','VO','H₂O','FeH','CaH'],desc:'Betelgeuse, Proxima Cen. Bande molecolari TiO dominano. Atmosfera fredda per molecole.'},
+  {ty:'L/T (Nane Brune)',T:'700–2.400 K',col:'#8b0000',rgb:[139,0,0],lines:['Cs I','Rb I','H₂O','CH₄ (T)'],mol:['H₂O','CH₄','NH₃','FeS','MnS','CrH'],desc:'Troppo fredde per fusione H. Tipo L: nubi silicati. Tipo T: CH₄ abbondante. Ricchissime in chimica.'}
+];
+
+var NUC_ELEMENTS=[
+  {sym:'H',name:'Idrogeno',Z:1,src:'bigbang',col:'#3b82f6',desc:'Big Bang Nucleosynthesis (BBN). T∼10⁹ K. 75% massa universo.'},
+  {sym:'He',name:'Elio',Z:2,src:'bigbang',col:'#3b82f6',desc:'BBN. 25% massa universo. Anche prodotto nel ciclo pp stellare.'},
+  {sym:'Li',name:'Litio',Z:3,src:'bigbang',col:'#3b82f6',desc:'BBN + raggi cosmici. Problema "problema Li": osservato meno del previsto.'},
+  {sym:'Be',name:'Berillio',Z:4,src:'cosmicray',col:'#8b5cf6',desc:'Prodotto principalmente dallo spallation di raggi cosmici su C, N, O dell\'ISM.'},
+  {sym:'B',name:'Boro',Z:5,src:'cosmicray',col:'#8b5cf6',desc:'Come Be, prodotto da raggi cosmici. Non sintetizzato efficacemente nelle stelle.'},
+  {sym:'C',name:'Carbonio',Z:6,src:'helburn',col:'#10b981',desc:'Processo triple-alpha nelle stelle AGB e massive. ¹²C = 4He+4He+4He (via ⁸Be).'},
+  {sym:'N',name:'Azoto',Z:7,src:'cnobranch',col:'#f59e0b',desc:'Ciclo CNO nelle stelle. Prodotto principalmente come ¹⁴N nel ciclo CNO.'},
+  {sym:'O',name:'Ossigeno',Z:8,src:'helburn',col:'#10b981',desc:'Combustione dell\'He (triple-alpha + alpha). Elemento più abbondante della crosta terrestre.'},
+  {sym:'Ne',name:'Neon',Z:10,src:'cburn',col:'#ef4444',desc:'Combustione del C (C+C→Ne+α) e dell\'O. Sorgente interna stellare massiccia.'},
+  {sym:'Mg',name:'Magnesio',Z:12,src:'cburn',col:'#ef4444',desc:'Combustione C e O nelle stelle massicce. Rilasciato nelle esplosioni di supernova.'},
+  {sym:'Si',name:'Silicio',Z:14,src:'siburn',col:'#f97316',desc:'Combustione del Si nelle ultime ore di vita di una stella massiccia (T>3×10⁹ K).'},
+  {sym:'Fe',name:'Ferro',Z:26,src:'siburn',col:'#f97316',desc:'Elemento più stabile (max energia di legame per nucleone). Fine della fusione. Nucleo di ferro→supernova.'},
+  {sym:'Co',name:'Cobalto',Z:27,src:'rprocess',col:'#dc2626',desc:'Prodotto dal r-process nelle esplosioni di supernova o nelle fusioni di stelle di neutroni.'},
+  {sym:'Ni',name:'Nichel',Z:28,src:'siburn',col:'#f97316',desc:'⁵⁶Ni prodotto nella combustione del Si, decade in ⁵⁶Co→⁵⁶Fe (curva luce supernova).'},
+  {sym:'Sr',name:'Stronzio',Z:38,src:'sprocess',col:'#06b6d4',desc:'s-process (slow neutron capture) nelle stelle AGB. Confermato nelle fusioni di stelle di neutroni (GW170817).'},
+  {sym:'Ba',name:'Bario',Z:56,src:'sprocess',col:'#06b6d4',desc:'s-process principale nelle stelle AGB di massa intermedia (1.5–4 M☉).'},
+  {sym:'Au',name:'Oro',Z:79,src:'rprocess',col:'#dc2626',desc:'r-process (rapid neutron capture). Sintetizzato nelle fusioni di stelle di neutroni (kilonova GW170817 confermato).'},
+  {sym:'Pt',name:'Platino',Z:78,src:'rprocess',col:'#dc2626',desc:'r-process. Richiede condizioni estreme di densità neutronica (n>10²⁰ cm⁻³).'},
+  {sym:'Pb',name:'Piombo',Z:82,src:'sprocess',col:'#06b6d4',desc:'s-process "endpoint" nelle stelle AGB. Si accumula via cattura di neutroni lenta.'},
+  {sym:'U',name:'Uranio',Z:92,src:'rprocess',col:'#dc2626',desc:'r-process nelle fusioni di stelle di neutroni. Datazione cosmocrono per età della galassia.'}
+];
+
+var NUC_LEGEND=[
+  {key:'bigbang',col:'#3b82f6',name:'Big Bang (BBN)'},
+  {key:'cosmicray',col:'#8b5cf6',name:'Raggi cosmici (spallation)'},
+  {key:'helburn',col:'#10b981',name:'Combustione He (stelle)'},
+  {key:'cnobranch',col:'#f59e0b',name:'Ciclo CNO'},
+  {key:'cburn',col:'#ef4444',name:'Combustione C/O (stelle massicce)'},
+  {key:'siburn',col:'#f97316',name:'Combustione Si / Supernova core'},
+  {key:'sprocess',col:'#06b6d4',name:'s-process (stelle AGB)'},
+  {key:'rprocess',col:'#dc2626',name:'r-process (fusioni NS / supernovae)'}
+];
+
+var NUC_PROCESSES=[
+  {n:'Catena p-p (proton-proton)',col:'#3b82f6',
+   f:'4 ¹H → ¹⁴He + 2e⁺ + 2νₑ + 26.7 MeV',
+   desc:'Processo dominante nelle stelle come il Sole (T∼15×10⁶ K). Fonde 4 protoni in un nucleo di He-4. Libera energia che alimenta la stella per miliardi di anni. Tre rami: pp-I (91%), pp-II (9%), pp-III (<0.1% ma produce neutrini ad alta E).'},
+  {n:'Ciclo CNO (Carbon-Nitrogen-Oxygen)',col:'#f59e0b',
+   f:'¹²C → ¹³N → ¹³C → ¹⁴N → ¹⁵O → ¹⁵N → ¹²C (+4He)',
+   desc:'Dominante nelle stelle più massive del Sole (M>1.3M☉, T>20×10⁶ K). C, N, O agiscono da catalizzatori. Produce prevalentemente ¹⁴N. Scoperto da Bethe e von Weizsäcker nel 1938.'},
+  {n:'Processo Triple-Alpha (α)',col:'#10b981',
+   f:'3 ⁴He → ¹²C + 7.27 MeV (via ⁸Be instabile)',
+   desc:'Cruciale per produrre tutto il carbonio dell\'universo. Avviene nelle giganti rosse (T∼10⁸ K). Fred Hoyle predisse una "risonanza di Hoyle" nel ¹²C che poi fu trovata. Produce anche ¹⁶O (¹²C+⁴He→¹⁶O).'},
+  {n:'s-process (cattura neutronica lenta)',col:'#06b6d4',
+   f:'A → A+1 → … (τ_capt >> τ_decay)',
+   desc:'Avviene nelle stelle AGB (1.5–8 M☉) e stelle massive. Produce metalli pesanti fino a Bi-209. Il flusso di neutroni è ∼10⁷–10¹⁰ cm⁻². Produce ∼50% degli elementi oltre Fe inclusi Sr, Ba, La, Ce, Pb.'},
+  {n:'r-process (cattura neutronica rapida)',col:'#dc2626',
+   f:'A → A+1 → … (τ_capt << τ_decay)',
+   desc:'Richiede flussi di neutroni estremi (>10²⁰ cm⁻²). Sito confermato: fusioni di stelle di neutroni (kilonova GW170817, 2017). Produce i ∼50% degli elementi sopra Fe inclusi Au, Pt, U, Eu. Anche in supernovae di tipo II.'}
+];
+
+var COMETS=[
+  {n:'1P/Halley',p:'75.3 anni',last:'1986',mol:['H₂O','CO','CO₂','CH₄','NH₃','HCN','H₂CO'],miss:'Giotto (ESA 1986)',desc:'Cometa periodica più famosa. Missione Giotto ha sorvolato il nucleo (15×8 km) e rilevato la composizione della chioma.'},
+  {n:'C/1995 O1 (Hale-Bopp)',p:'∼2520 anni',last:'1997',mol:['H₂O','CO','CO₂','CH₃CN','HCOOH','HCOOCH₃','NH₂CHO'],miss:'Osservazioni da Terra',desc:'Grande cometa del 1997. Prima rilevazione di CH₃CN e molecole organiche complesse. Nucleo di ∼40 km.'},
+  {n:'81P/Wild 2',p:'6.4 anni',last:'2004',mol:['Glicina','H₂O','CO₂','CH₄','PAH'],miss:'Stardust (NASA 2004)',desc:'Campioni raccolti dalla missione Stardust. Trovata glicina — primo amminoacido confermato in una cometa. Silicati cristallini.'},
+  {n:'67P/Churyumov-Gerasimenko',p:'6.45 anni',last:'2015',mol:['H₂O','CO','CO₂','O₂','N₂','CH₃OH','C₂H₂','glicina','fosforo'],miss:'Rosetta + Philae (ESA 2014–16)',desc:'Cometa più studiata della storia. Rosetta in orbita per 2 anni. Trovata O₂ molecolare (sorpresa!) e glicina nel 2016.'},
+  {n:'9P/Tempel 1',p:'5.5 anni',last:'2005',mol:['H₂O','CO₂','CH₄','C₂H₂','C₂H₆'],miss:'Deep Impact (NASA 2005)',desc:'Missione Deep Impact ha sparato un impattore di 370 kg creando un cratere. Analisi della materia interna.'},
+  {n:'C/1996 B2 (Hyakutake)',p:'∼70.000 anni',last:'1996',mol:['H₂O','CO','C₂H₂','C₂H₆','HCN','CH₃OH','HCHO'],miss:'Osservazioni da Terra',desc:'Cometa vicina (15 milioni km). Prima rilevazione di C₂H₂ e C₂H₆ nelle comete. Emissione X da interazione vento solare.'},
+  {n:'C/2020 F3 (NEOWISE)',p:'∼6766 anni',last:'2020',mol:['H₂O','CO','Na','Fe','Mg'],miss:'NEOWISE satellite + osservazioni',desc:'L\'ultima grande cometa visibile a occhio nudo (2020). Na atomico rilevato nella coda. Nucleo ∼5 km.'},
+  {n:'C/2001 Q4 (NEAT)',p:'non determinato',last:'2004',mol:['H₂O','CO','HCN','CS'],miss:'Osservazioni da Terra + Spitzer',desc:'Cometa bright del 2004. Spettroscopia IR con Spitzer. Ottimo caso studio per la composizione chioma.'},
+  {n:'103P/Hartley 2',p:'6.47 anni',last:'2010',mol:['H₂O','CO₂','C₂H₆','HCN','CH₃OH'],miss:'EPOXI (NASA 2010)',desc:'Missione EPOXI (Deep Impact extended). Nucleo allungato (2.2 km). Alta produzione di CO₂ relativa all\'H₂O.'},
+  {n:'46P/Wirtanen',p:'5.44 anni',last:'2018',mol:['H₂O','CO₂','CH₃OH','H₂CO','C₂H₂'],miss:'Osservazioni JWST + ground',desc:'Cometa del passaggio ravvicinato nel 2018 (11.6 milioni km). Alcune delle migliori osservazioni radio/IR di sempre.'},
+  {n:'C/2012 S1 (ISON)',p:'non calcolabile (distrutta)',last:'2013',mol:['H₂O','CO','HCN','SO₂'],miss:'Hubble + STEREO + ground',desc:'Grande cometa che si disintegrò al perielio (2013). Analisi pre-disintegrazione: composizione rara, origine nube di Oort.'},
+  {n:'17P/Holmes',p:'6.88 anni',last:'2007',mol:['H₂O','CO','OH','NH'],miss:'Osservazioni amatoriali + pro',desc:'Famosa per la esplosione di brillosità di 1 milione× in ottobre 2007. Chioma espansa fino a >1 UA di diametro.'}
+];
+
+var QUIZ=[
+  {q:'Quale molecola è il principale tracer delle nubi molecolari galattiche via radioastronomia?',opts:['CO (115 GHz)','H₂ (UV)','NH₃ (23 GHz)','HCN (88 GHz)'],a:0,exp:'CO a 115 GHz (J=1→0) è il tracer standard. H₂ è simmetrico e non emette in radio facilmente. CO è abbondante e facilmente osservabile dalla Terra.'},
+  {q:'Quale missione NASA ha trovato glicina nella cometa Wild 2?',opts:['Stardust (2004)','Deep Impact (2005)','Rosetta (2014)','New Horizons (2015)'],a:0,exp:'La missione Stardust (NASA) ha raccolto campioni dalla coda di Wild 2 nel 2004 e trovato glicina, il più semplice amminoacido, riportati sulla Terra nel 2006.'},
+  {q:'A quale temperatura si trovano tipicamente le nubi molecolari dense (core)?',opts:['10–30 K','100–300 K','1000 K','10.000 K'],a:0,exp:'Le nubi molecolari dense hanno T∼10–30 K, protette dalla fotodissociazione UV dall\'estinzione dei grani di polvere. Queste T permettono la sopravvivenza di molecole complesse.'},
+  {q:'Quale esopianeta ha mostrato per primo la CO₂ confermata dal JWST?',opts:['WASP-39 b','K2-18 b','HD 209458 b','GJ 1214 b'],a:0,exp:'WASP-39 b è stato il primo target JWST con rilevazione inequivocabile di CO₂ nell\'atmosfera (luglio 2022), dimostrando le straordinarie capacità spettroscopiche del telescopio.'},
+  {q:'Le UIBs (Unidentified Infrared Bands) sono la firma spettrale di:',opts:['PAH (Idrocarburi Policiclici Aromatici)','Silicati','Ghiacci di H₂O','CO₂'],a:0,exp:'Le UIBs a 3.3, 6.2, 7.7, 8.6, 11.3 µm sono la firma dei PAH (Polycyclic Aromatic Hydrocarbons). Contengono ∼15% del carbonio galattico e sono ubiqui nell\'ISM.'},
+  {q:'Quale tipo spettrale stellare mostra bande di TiO dominanti nel suo spettro?',opts:['Tipo M','Tipo G','Tipo A','Tipo O'],a:0,exp:'Le stelle di tipo M (2400–3700 K) sono abbastanza fredde da avere TiO molecolare nell\'atmosfera. Il Sole (tipo G, 5800 K) è troppo caldo per le molecole TiO.'},
+  {q:'Il C₆₀⁺ (Buckyball ionizzato) è stato confermato nell\'ISM tramite:',opts:['DIBs a 9577/9632 Å','UIBs a 11.3 µm','Emissione radio 115 GHz','Campioni meteoriti'],a:0,exp:'Nel 2015, Campbell et al. (Science) hanno assegnato le DIBs (Diffuse Interstellar Bands) a 9577 e 9632 Å al C₆₀⁺, confermando i fullereni ionizzati nell\'ISM.'},
+  {q:'Quale processo produce ORO (Au) nell\'universo?',opts:['r-process in fusioni stelle di neutroni','s-process in stelle AGB','Combustione del Si in supernovae','Big Bang Nucleosynthesis'],a:0,exp:'L\'oro è prodotto dal r-process (rapid neutron capture) principalmente nelle fusioni di stelle di neutroni (kilonova). Confermato definitivamente dall\'evento GW170817 nel 2017.'},
+  {q:'K2-18 b è astrobiochimica mente rilevante perché:',opts:['Possibile Hycean world con CH₄/CO₂ e tracce DMS','Ha ossigeno libero nell\'atmosfera','È nel sistema solare','È una Super-Terra di tipo Venere'],a:0,exp:'K2-18 b è un possibile "Hycean world" con oceano liquido. JWST 2023 ha rilevato CH₄ e CO₂. Il dimetilsolfuro (DMS) potrebbe essere una biosignature, benché sia controverso.'},
+  {q:'I maser di metanolo (CH₃OH) di Classe II a 6.7 GHz sono associati a:',opts:['Regioni di formazione stellare massiccia (HMSFR)','Atmosfere di nane brune','Cintura di Kuiper','Buchi neri supermassicci'],a:0,exp:'I maser di metanolo Classe II a 6.7 GHz sono pompati radiativamenta e associati esclusivamente alle regioni di formazione stellare massiccia (High-Mass SFR) come W3(OH).'},
+  {q:'La nebulosa di Orione (M42) è famosa per:',opts:['Essere la più studiata regione di formazione stellare vicina','Avere una pulsar al centro','Essere un resto di supernova','Orbitare attorno a una stella di neutroni'],a:0,exp:'M42 è la più studiata regione di formazione stellare vicina (450 a.l.). Ospita il Trapezio OB1, ha temperatura di 10 K nei core densi e contiene 300+ molecole ISM note.'},
+  {q:'Il processo triple-alpha produce:',opts:['Carbonio-12 (³ ⁴He → ¹²C)','Azoto-14 (ciclo CNO)','Ferro-56 (combustione Si)','Idrogeno (BBN)'],a:0,exp:'Il processo triple-alpha fonde 3 nuclei di He-4 in un nucleo di C-12 via un ⁸Be intermedio instabile (τ∼10⁻¹⁶ s). Avviene nelle giganti rosse a T∼10⁸ K. Predetto da Hoyle.'},
+  {q:'La missione Rosetta (ESA) ha orbitato la cometa:',opts:['67P/Churyumov-Gerasimenko','1P/Halley','81P/Wild 2','9P/Tempel 1'],a:0,exp:'Rosetta ha orbitato 67P per 2 anni (2014–2016) e rilasciato il lander Philae. Ha trovato O₂ molecolare, glicina, e studiato in dettaglio la chioma. Il nucleo ha forma "di gomma".'},
+  {q:'Quale molecola forma i "maser più luminosi" nell\'ISM tra quelle elencate?',opts:['CH₃OH a 6.7 GHz','H₂O a 22 GHz','OH a 1665 MHz','SiO a 43 GHz'],a:0,exp:'I maser di metanolo (CH₃OH) di Classe II a 6.7 GHz sono i più luminosi dell\'ISM, con luminosità fino a 10⁴ L☉. I maser H₂O a 22 GHz sono forti, ma non altrettanto luminosi.'},
+  {q:'L\'uracio (uracile) è stato trovato nell\'asteroide Ryugu da quale missione?',opts:['Hayabusa2 (JAXA 2022)','OSIRIS-REx (NASA)','Dawn (NASA)','Cassini (NASA/ESA)'],a:0,exp:'La missione Hayabusa2 (JAXA) ha riportato campioni da Ryugu nel 2020. Nel 2022 l\'analisi dei campioni ha rivelato uracile e vitamina B3 — confermando la chimica prebiotica negli asteroidi.'},
+  {q:'Il "problema del litio cosmologico" si riferisce a:',opts:['Il Li-7 osservato è meno del previsto dalla BBN','Il Li non esiste nell\'ISM','Il Li è troppo abbondante nelle stelle','Il Li non può formarsi nelle stelle'],a:0,exp:'La BBN predice un\'abbondanza di ⁷Li circa 3× superiore a quella osservata nelle stelle metal-poor. Il problema del Li cosmologico rimane irrisolto — fisica oltre il modello standard?'},
+  {q:'GW170817 (2017) ha confermato la produzione di elementi pesanti via:',opts:['Fusione di stelle di neutroni (kilonova)','Esplosione di supernova di tipo Ia','Accrescimento su buco nero','Vento stellare di stelle AGB'],a:0,exp:'GW170817 è la prima fusione di stelle di neutroni osservata sia via onde gravitazionali (LIGO/Virgo) che via luce (kilonova). Spettri ottici hanno confermato Sr, Au, Pt — prodotti dal r-process.'},
+  {q:'Quale tipo di stella produce l\'s-process (cattura neutronica lenta)?',opts:['Stelle AGB (1.5–8 M☉)','Stelle di tipo O (>30 M☉)','Nane bianche','Stelle di neutroni'],a:0,exp:'Il processo s (slow) avviene nelle stelle AGB di massa intermedia. Sorgenti di neutroni: ¹³C(α,n)¹⁶O e ²²Ne(α,n)²⁵Mg. Produce ∼50% degli elementi oltre il ferro (Sr, Ba, Pb).'},
+  {q:'Le stelle di tipo spettrale L e T (nane brune) mostrano:',opts:['Bande molecolari di CH₄ e H₂O dominanti','Righe ionizzate di He','Bande di TiO al massimo','Assenza totale di righe spettrali'],a:0,exp:'Le nane brune di tipo T (700–1300 K) mostrano CH₄ dominante (come Giove!). Tipo L: TiO/VO iniziano a condensare in nubi di silicati. Tipo Y (<500 K): NH₃, H₂O abbondante.'},
+  {q:'La costellazione di quale sistema ospita il maggior numero di esopianeti Earth-like nella zona abitabile confermati?',opts:['TRAPPIST-1 (Aquario)','Kepler-452 (Cigno)','Proxima Centauri (Centauro)','GJ 667C (Scorpione)'],a:0,exp:'Il sistema TRAPPIST-1 (nana ultrafredda, 39 a.l.) ospita 7 pianeti terrestri di cui 3 (e, f, g) nella zona abitabile. È il record assoluto per pianeti terrestri in ZA intorno a una singola stella.'},
+  {q:'Quale molecola è l\'ione più abbondante nell\'ISM e motore della chimica interstellare?',opts:['H₃⁺ (triidrogeno catione)','H₂⁺','CO⁺','HCO⁺'],a:0,exp:'H₃⁺ è l\'ione più abbondante dell\'ISM diffuso. Si forma da H₂ + raggi cosmici → H₂⁺ + H₂ → H₃⁺ + H. Trasferisce protoni avviando catene di reazione ione-molecola.'},
+  {q:'La nebulosa Testa di Cavallo (B33) è un esempio di:',opts:['Nebulosa oscura (nube molecolare)','Nebulosa in emissione (HII)','Nebulosa planetaria','Resto di supernova'],a:0,exp:'B33 è una nebulosa oscura — una densa nube molecolare di gas e polvere che oscura la luce della nebulosa in emissione IC 434 dietro di essa. La silhouette caratteristica è data dai grani interstellari.'},
+  {q:'Il processo "r" (rapid neutron capture) avviene su scale temporali di:',opts:['Millisecondi-secondi (fusioni NS)','Miliardi di anni (stelle AGB)','Milioni di anni (stelle massicce)','Minuti (Big Bang)'],a:0,exp:'Il r-process richiede τ_cattura << τ_decadimento (millisecondi). Avviene nelle fugaci condizioni di fusioni di stelle di neutroni o nei core di supernovae collassanti.'},
+  {q:'Quale molecola è stata la prima organica poliatomica rilevata nell\'ISM (1969)?',opts:['H₂CO (formaldeide)','NH₃ (ammoniaca)','HCN','CH₃OH'],a:0,exp:'H₂CO (formaldeide) è stata la prima molecola organica poliatomica rilevata nell\'ISM nel 1969 alla frequenza di 4830 MHz (6 cm). NH₃ fu trovata un anno prima (1968) come prima molecola poliatomica.'},
+  {q:'WASP-121 b è notevole per:',opts:['Presenza di metalli gassosi (Fe, V) a T>3000 K','Avere ossigeno libero','Essere nella zona abitabile','Avere anelli planetari'],a:0,exp:'WASP-121 b è un "ultra-hot Jupiter" con T_eq>3000 K. JWST e Hubble hanno rilevato Fe, V, TiO, VO gassosi nell\'alta atmosfera. La stratosfera è più calda della fotosfere stellare (thermal inversion).'},
+  {q:'La combustione del Si nelle stelle massicce produce principalmente:',opts:['Ferro-56 (nucleo più stabile)','Carbonio-12','Ossigeno-16','Elio-4'],a:0,exp:'La combustione del Si (T>3×10⁹ K) produce un equilibrio nucleare tra Si, Ni, Fe e altri. ⁵⁶Ni è il prodotto finale più abbondante, poi decade: ⁵⁶Ni→⁵⁶Co→⁵⁶Fe (τ∼77 giorni, curva luce SN Ia).'},
+  {q:'Quale missione spaziale ha rilevato O₂ molecolare nella chioma di una cometa?',opts:['Rosetta (67P, 2015)','Stardust (Wild 2)','Deep Impact (Tempel 1)','Giotto (Halley)'],a:0,exp:'La missione Rosetta (ESA) ha rilevato O₂ molecolare nella chioma di 67P/Churyumov-Gerasimenko nel 2015. È stata una scoperta sorprendente — O₂ intrappolato nella struttura del nucleo.'},
+  {q:'Il "proton-proton chain" (catena p-p) domina nelle stelle con massa:',opts:['≤ 1.3 M☉ (come il Sole)','> 8 M☉','> 20 M☉','< 0.08 M☉ (nane brune)'],a:0,exp:'La catena p-p domina in stelle con T_core<20×10⁶ K (M≤1.3M☉). Nelle stelle più massive il ciclo CNO diventa dominante (scala più veloce con T). Il Sole usa pp per il 99% della sua luminosità.'},
+  {q:'Quale base azotata è stata confermata nell\'asteroide Ryugu da Hayabusa2 nel 2022?',opts:['Uracile (C₄H₄N₂O₂)','Adenina','Guanina','Timina'],a:0,exp:'Uracile (base pirimidinidica dell\'RNA) è stato rilevato in campioni di Ryugu analizzati nel 2022. Insieme a vitamina B3 (niacina). Hayabusa2 ha riportato ∼5.4 g di materiale da Ryugu nel 2020.'},
+  {q:'Le stelle di tipo O emettono principalmente in quale banda dello spettro?',opts:['Ultravioletto e raggi X morbidi','Visibile (blu)','Infrarosso','Radio'],a:0,exp:'Le stelle O (T>30.000 K) emettono prevalentemente in UV e X morbidi. La loro luce ionizza l\'idrogeno circostante formando regioni HII. Solo ~0.01% delle stelle è di tipo O — ma dominano l\'energia interstellare.'}
+];
+
+// ─── THREE.JS ENGINE ────────────────────────────────────────────────────────
+var scene,camera,renderer,animId,viewMode='r',molGroup=null;
+var drag={on:false,lx:0,ly:0,phi:0,theta:0,r:16};
+
+function initThree(){
+  var wrap=document.getElementById('vwrap');
+  var canvas=document.getElementById('three-canvas');
+  var W=wrap.offsetWidth||320,H=wrap.offsetHeight||260;
+  canvas.width=W;canvas.height=H;
+  if(typeof THREE==='undefined'){
+    document.getElementById('mol-label').textContent='Three.js non caricato — riprova tra un momento';
+    setTimeout(initThree,2000);return;
+  }
+  scene=new THREE.Scene();scene.background=new THREE.Color(0x020508);scene.fog=new THREE.FogExp2(0x020508,0.006);
+  camera=new THREE.PerspectiveCamera(60,W/H,0.1,1000);camera.position.set(0,0,16);
+  renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H);
+  scene.add(new THREE.AmbientLight(0x112244,0.9));
+  var dl=new THREE.DirectionalLight(0x00c9b7,1.2);dl.position.set(5,8,6);scene.add(dl);
+  var dl2=new THREE.DirectionalLight(0x7c6fff,0.7);dl2.position.set(-6,-4,3);scene.add(dl2);
+  addStarfield();addOrbitCtrl(canvas);
+  animate();showDefault();
+}
+
+function addStarfield(){
+  var g=new THREE.BufferGeometry();
+  var N=2500,p=new Float32Array(N*3),c=new Float32Array(N*3);
+  for(var i=0;i<N;i++){
+    p[i*3]=(Math.random()-.5)*500;p[i*3+1]=(Math.random()-.5)*500;p[i*3+2]=(Math.random()-.5)*500;
+    var t=Math.random();c[i*3]=.6+t*.4;c[i*3+1]=.6+t*.4;c[i*3+2]=.7+t*.3;
+  }
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({size:.7,vertexColors:true,sizeAttenuation:true})));
+}
+
+function addOrbitCtrl(canvas){
+  canvas.addEventListener('mousedown',function(e){drag.on=true;drag.lx=e.clientX;drag.ly=e.clientY;});
+  window.addEventListener('mouseup',function(){drag.on=false;});
+  window.addEventListener('mousemove',function(e){
+    if(!drag.on||viewMode==='f')return;
+    drag.phi-=(e.clientX-drag.lx)*.009;drag.theta-=(e.clientY-drag.ly)*.009;
+    drag.theta=Math.max(-Math.PI/2+.05,Math.min(Math.PI/2-.05,drag.theta));
+    drag.lx=e.clientX;drag.ly=e.clientY;updCam();
+  });
+  canvas.addEventListener('touchstart',function(e){if(e.touches.length===1){drag.on=true;drag.lx=e.touches[0].clientX;drag.ly=e.touches[0].clientY;}},false);
+  window.addEventListener('touchend',function(){drag.on=false;},false);
+  window.addEventListener('touchmove',function(e){
+    if(!drag.on||e.touches.length!==1)return;
+    drag.phi-=(e.touches[0].clientX-drag.lx)*.012;drag.theta-=(e.touches[0].clientY-drag.ly)*.012;
+    drag.theta=Math.max(-Math.PI/2+.05,Math.min(Math.PI/2-.05,drag.theta));
+    drag.lx=e.touches[0].clientX;drag.ly=e.touches[0].clientY;updCam();
+  },false);
+  canvas.addEventListener('wheel',function(e){drag.r=Math.max(4,Math.min(60,drag.r+e.deltaY*.05));updCam();e.preventDefault();},{passive:false});
+}
+function updCam(){
+  camera.position.x=drag.r*Math.cos(drag.theta)*Math.sin(drag.phi);
+  camera.position.y=drag.r*Math.sin(drag.theta);
+  camera.position.z=drag.r*Math.cos(drag.theta)*Math.cos(drag.phi);
+  camera.lookAt(0,0,0);
+}
+var _ft=0;
+function animate(){
+  animId=requestAnimationFrame(animate);
+  if(viewMode==='r'){if(molGroup)molGroup.rotation.y+=.005;}
+  else{_ft+=.001;camera.position.set(Math.sin(_ft*.7)*18,Math.sin(_ft*.5)*8,Math.cos(_ft*.3)*22);camera.lookAt(0,0,0);}
+  renderer.render(scene,camera);
+}
+function showDefault(){buildCloud(0x00c9b7,0x7c6fff,150);}
+function buildCloud(c1,c2,n){
+  clearMol();
+  var g=new THREE.BufferGeometry();var p=new Float32Array(n*3),c=new Float32Array(n*3);
+  for(var i=0;i<n;i++){
+    var r=2+Math.random()*5,phi=Math.random()*Math.PI*2,th=Math.acos(2*Math.random()-1);
+    p[i*3]=r*Math.sin(th)*Math.cos(phi);p[i*3+1]=r*Math.sin(th)*Math.sin(phi);p[i*3+2]=r*Math.cos(th);
+    var t=Math.random();
+    p[i*3]=r*Math.sin(th)*Math.cos(phi);
+    var r1=(c1>>16&0xff)/255,g1=(c1>>8&0xff)/255,b1=(c1&0xff)/255;
+    var r2=(c2>>16&0xff)/255,g2=(c2>>8&0xff)/255,b2=(c2&0xff)/255;
+    c[i*3]=r1+(r2-r1)*t;c[i*3+1]=g1+(g2-g1)*t;c[i*3+2]=b1+(b2-b1)*t;
+  }
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3));
+  molGroup=new THREE.Points(g,new THREE.PointsMaterial({size:.22,vertexColors:true,sizeAttenuation:true}));
+  scene.add(molGroup);
+}
+function clearMol(){if(molGroup){scene.remove(molGroup);molGroup=null;}}
+var ATOMCOL={H:0xffffff,C:0x333333,N:0x3050f8,O:0xff2200,S:0xe8e800,F:0x90e050,Cl:0x1ff01f,P:0xffa500};
+var ATOMR={H:.27,C:.40,N:.38,O:.36,S:.48,F:.32,Cl:.42,P:.44};
+var LAYOUTS={
+  h2:[{e:'H',x:-.5,y:0,z:0},{e:'H',x:.5,y:0,z:0}],
+  co:[{e:'C',x:-.5,y:0,z:0},{e:'O',x:.5,y:0,z:0}],
+  h2o:[{e:'O',x:0,y:0,z:0},{e:'H',x:-.9,y:-.6,z:0},{e:'H',x:.9,y:-.6,z:0}],
+  nh3:[{e:'N',x:0,y:.4,z:0},{e:'H',x:-.9,y:-.3,z:.5},{e:'H',x:.9,y:-.3,z:.5},{e:'H',x:0,y:-.3,z:-1}],
+  hcn:[{e:'H',x:-1.2,y:0,z:0},{e:'C',x:0,y:0,z:0},{e:'N',x:1.2,y:0,z:0}],
+  hcho:[{e:'C',x:0,y:0,z:0},{e:'H',x:-.9,y:.8,z:0},{e:'H',x:.9,y:.8,z:0},{e:'O',x:0,y:-1.1,z:0}],
+  ch3oh:[{e:'C',x:-.5,y:0,z:0},{e:'O',x:.7,y:0,z:0},{e:'H',x:1.3,y:.7,z:0},{e:'H',x:-1,y:.9,z:0},{e:'H',x:-1,y:-.9,z:0},{e:'H',x:-.5,y:0,z:1}],
+  c6h6:[{e:'C',x:1.4,y:0,z:0},{e:'C',x:.7,y:1.2,z:0},{e:'C',x:-.7,y:1.2,z:0},{e:'C',x:-1.4,y:0,z:0},{e:'C',x:-.7,y:-1.2,z:0},{e:'C',x:.7,y:-1.2,z:0},{e:'H',x:2.5,y:0,z:0},{e:'H',x:1.25,y:2.1,z:0},{e:'H',x:-1.25,y:2.1,z:0},{e:'H',x:-2.5,y:0,z:0},{e:'H',x:-1.25,y:-2.1,z:0},{e:'H',x:1.25,y:-2.1,z:0}],
+  gly:[{e:'N',x:-1.6,y:.5,z:0},{e:'C',x:-.5,y:0,z:0},{e:'C',x:.7,y:.5,z:0},{e:'O',x:1.6,y:-.2,z:0},{e:'O',x:.7,y:1.6,z:0},{e:'H',x:-.5,y:-1,z:0}],
+  co2:[{e:'O',x:-1.2,y:0,z:0},{e:'C',x:0,y:0,z:0},{e:'O',x:1.2,y:0,z:0}],
+  h2s:[{e:'S',x:0,y:0,z:0},{e:'H',x:-.9,y:-.7,z:0},{e:'H',x:.9,y:-.7,z:0}]
+};
+function buildMol(mol){
+  clearMol();
+  if(!scene)return;
+  var group=new THREE.Group();scene.add(group);molGroup=group;
+  var atoms=LAYOUTS[mol.id]||[{e:'C',x:0,y:0,z:0}];
+  var bMat=new THREE.MeshPhongMaterial({color:0x445566});
+  atoms.forEach(function(a){
+    var col=ATOMCOL[a.e]||0x888888;var rad=ATOMR[a.e]||.35;
+    var m=new THREE.Mesh(new THREE.SphereGeometry(rad,16,12),new THREE.MeshPhongMaterial({color:col,shininess:80}));
+    m.position.set(a.x,a.y,a.z);group.add(m);
+  });
+  var blen=atoms.length;
+  if(mol.id==='c6h6'){for(var i=0;i<6;i++)drawBond(group,atoms[i],atoms[(i+1)%6],bMat);}
+  else{for(var i=0;i<blen-1;i++)drawBond(group,atoms[i],atoms[i+1],bMat);}
+  document.getElementById('mol-label').textContent=mol.f+' — '+mol.n;
+}
+function drawBond(g,a1,a2,mat){
+  var v1=new THREE.Vector3(a1.x,a1.y,a1.z),v2=new THREE.Vector3(a2.x,a2.y,a2.z);
+  var dir=new THREE.Vector3().subVectors(v2,v1);var len=dir.length();
+  if(len<.1||len>4)return;
+  var cyl=new THREE.CylinderGeometry(.1,.1,len,8);
+  var m=new THREE.Mesh(cyl,mat);
+  m.position.copy(new THREE.Vector3().addVectors(v1,v2).multiplyScalar(.5));
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());
+  g.add(m);
+}
+function zoom(d){drag.r=Math.max(4,Math.min(60,drag.r-d*2));updCam();}
+function resetV(){drag.phi=0;drag.theta=0;drag.r=16;updCam();}
+function setMode(m){viewMode=m;document.getElementById('mb-r').classList.toggle('active',m==='r');document.getElementById('mb-f').classList.toggle('active',m==='f');}
+
+// ─── MOL GRID ───────────────────────────────────────────────────────────────
+var _cat='all';
+function filterM(cat,btn){
+  _cat=cat;
+  document.querySelectorAll('.cchip').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderMgrid();
+}
+function renderMgrid(){
+  var grid=document.getElementById('mgrid');
+  var mols=_cat==='all'?MOLS:MOLS.filter(function(m){return m.cat===_cat;});
+  grid.innerHTML=mols.map(function(m){
+    return '<div class="mcard" id="mc-'+m.id+'" onclick="selMol(\''+m.id+'\')">'+
+      '<div class="mi">'+m.ic+'</div><div class="mn">'+m.n+'</div>'+
+      '<div class="mf">'+m.f+'</div><div class="ml">'+m.loc.slice(0,35)+'</div></div>';
+  }).join('');
+}
+function selMol(id){
+  var mol=MOLS.find(function(m){return m.id===id;});if(!mol)return;
+  document.querySelectorAll('.mcard').forEach(function(c){c.classList.remove('sel');});
+  var c=document.getElementById('mc-'+id);if(c)c.classList.add('sel');
+  if(scene)buildMol(mol);else document.getElementById('mol-label').textContent=mol.f;
+  var panel=document.getElementById('ipanel');panel.style.display='';
+  document.getElementById('iname').textContent=mol.n+' ('+mol.f+') — MW '+mol.mw;
+  document.getElementById('idesc').textContent=mol.desc;
+  document.getElementById('iprops').innerHTML=Object.entries(mol.p).map(function(kv){
+    return '<div class="iprop"><div class="pk">'+kv[0]+'</div><div class="pv">'+kv[1]+'</div></div>';
+  }).join('');
+}
+
+// ─── EXOPLANETS ─────────────────────────────────────────────────────────────
+function renderExo(){
+  var g=document.getElementById('egrid');
+  g.innerHTML=EXOPLANETS.map(function(p){
+    var chem=p.mol.map(function(c){return '<span style="background:rgba(124,111,255,.15);border:1px solid rgba(124,111,255,.3);border-radius:4px;padding:2px 5px;font-size:10px;font-weight:600;color:#a78bfa;margin:2px;display:inline-block">'+c+'</span>';}).join('');
+    var htxt={yes:'Abitabile',maybe:'Forse abitabile',no:'Non abitabile'}[p.hab];
+    return '<div class="ecard"><div class="ename">'+p.n+'</div>'+
+      '<div class="estar">⭐ '+p.star+' · '+p.ty+' · '+p.d+' a.l.</div>'+
+      '<span class="ehab '+p.hab+'">'+htxt+'</span>'+
+      '<div style="margin:6px 0">'+chem+'</div>'+
+      '<div class="ebar"><div class="ebl">Abitabilità: '+p.hs+'%</div>'+
+        '<div class="ebt"><div class="ebf" style="width:'+p.hs+'%"></div></div></div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-top:7px;line-height:1.5">'+p.desc+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+// ─── NEBULE ─────────────────────────────────────────────────────────────────
+var _nebAnim=null,_nebIdx=0;
+function renderNebula(){
+  var canvas=document.getElementById('neb-canvas');
+  var pane=document.getElementById('p-neb');
+  canvas.width=pane.offsetWidth||320;canvas.height=pane.offsetHeight-80||300;
+  if(_nebAnim)cancelAnimationFrame(_nebAnim);
+  startNebParticles(canvas);nextNeb(0);
+}
+function nextNeb(i){
+  var nb=NEBULAE[i%NEBULAE.length];
+  document.getElementById('nb-name').textContent=nb.n;
+  document.getElementById('nb-desc').textContent=nb.desc;
+  setTimeout(function(){nextNeb(i+1);},6000);
+}
+function startNebParticles(canvas){
+  var ctx=canvas.getContext('2d');var W=canvas.width,H=canvas.height;
+  var cols=['#7c6fff','#00c9b7','#c084fc','#f59e0b','#ff6b8a','#60a5fa','#34d399'];
+  var ps=[];
+  for(var i=0;i<250;i++)ps.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2.5+.5,col:cols[Math.floor(Math.random()*cols.length)],a:Math.random()*.6+.2,life:Math.random()*300});
+  function frame(){
+    ctx.fillStyle='rgba(3,8,18,.2)';ctx.fillRect(0,0,W,H);
+    ps.forEach(function(p){
+      p.life++;p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      p.a=.2+.5*Math.abs(Math.sin(p.life*.015));
+      ctx.save();ctx.globalAlpha=p.a;
+      var grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*5);
+      grd.addColorStop(0,p.col);grd.addColorStop(1,'transparent');
+      ctx.fillStyle=grd;ctx.beginPath();ctx.arc(p.x,p.y,p.r*5,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    var cx=W/2,cy=H*.45;
+    ctx.save();ctx.globalAlpha=.04;
+    var grd2=ctx.createRadialGradient(cx,cy,10,cx,cy,Math.min(W,H)*.38);
+    grd2.addColorStop(0,'#c084fc');grd2.addColorStop(.5,'#7c6fff');grd2.addColorStop(1,'transparent');
+    ctx.fillStyle=grd2;ctx.fillRect(0,0,W,H);ctx.restore();
+    _nebAnim=requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ─── SPETTRI ────────────────────────────────────────────────────────────────
+function renderSpectra(){
+  var grid=document.getElementById('specgrid');
+  grid.innerHTML=SPECTRA.map(function(s){
+    var lh=s.lines.map(function(l){return '<span class="sline" style="background:rgba('+s.rgb.join(',')+',.2);color:rgb('+s.rgb.join(',')+')">'+(l.length>14?l.slice(0,14)+'…':l)+'</span>';}).join('');
+    var mh=s.mol.map(function(m){return '<span class="sline" style="background:rgba(0,201,183,.12);color:var(--accent)">'+m+'</span>';}).join('');
+    var cid='sc-'+s.ty.replace(/\//g,'-').replace(/ /g,'-');
+    return '<div class="speccard"><canvas id="'+cid+'" width="300" height="70"></canvas>'+
+      '<div class="specinfo"><div class="stype">Tipo '+s.ty+' · '+s.T+'</div>'+
+      '<div class="sdesc">'+s.desc+'</div>'+
+      '<div class="slines" style="margin-top:5px">'+lh+'</div>'+
+      (mh?'<div class="slines" style="margin-top:4px">'+mh+'</div>':'')+
+      '</div></div>';
+  }).join('');
+  setTimeout(function(){SPECTRA.forEach(function(s){drawSpec('sc-'+s.ty.replace(/\//g,'-').replace(/ /g,'-'),s);});},60);
+}
+function drawSpec(cid,s){
+  var canvas=document.getElementById(cid);if(!canvas)return;
+  var ctx=canvas.getContext('2d'),W=canvas.parentElement.offsetWidth||300,H=70;
+  canvas.width=W;canvas.height=H;
+  var grd=ctx.createLinearGradient(0,0,W,0);
+  grd.addColorStop(0,'#5500ff');grd.addColorStop(.12,'#0055ff');grd.addColorStop(.28,'#00aaff');
+  grd.addColorStop(.45,'#00ff88');grd.addColorStop(.55,'#aaff00');grd.addColorStop(.7,'#ffff00');
+  grd.addColorStop(.85,'#ff8800');grd.addColorStop(1,'#ff2200');
+  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+  var lp=[.1,.16,.25,.35,.44,.52,.61,.72,.82,.91];
+  ctx.strokeStyle='rgba(0,0,0,.85)';ctx.lineWidth=1.5;
+  lp.slice(0,s.lines.length).forEach(function(p){ctx.beginPath();ctx.moveTo(p*W,0);ctx.lineTo(p*W,H);ctx.stroke();});
+  ctx.fillStyle='rgba('+s.rgb.join(',')+',.22)';ctx.fillRect(0,0,W,H);
+}
+
+// ─── NUCLEOSINTESI ──────────────────────────────────────────────────────────
+function renderNuc(){
+  var leg=document.getElementById('nuc-legend');
+  leg.innerHTML=NUC_LEGEND.map(function(l){
+    return '<div class="nuc-leg"><div class="nuc-dot" style="background:'+l.col+'"></div>'+l.name+'</div>';
+  }).join('');
+  var grid=document.getElementById('nuc-grid');
+  grid.innerHTML=NUC_ELEMENTS.map(function(el){
+    var src=NUC_LEGEND.find(function(l){return l.key===el.src;});
+    var col=src?src.col:'#888';
+    return '<div class="nuc-card" style="background:'+col+'22;border-color:'+col+'55" title="'+el.desc.replace(/"/g,"'")+'" onclick="alert(\''+el.sym+' — '+el.name+'\\n\\n'+el.desc.replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">'+
+      '<div class="el-sym" style="color:'+col+'">'+el.sym+'</div>'+
+      '<div class="el-name">'+el.name+'</div>'+
+      '<div class="el-src">'+(src?src.name.slice(0,20):el.src)+'</div>'+
+      '</div>';
+  }).join('');
+  var proc=document.getElementById('nuc-processes');
+  proc.innerHTML=NUC_PROCESSES.map(function(p){
+    return '<div class="process-card">'+
+      '<h4 style="color:'+p.col+'">'+p.n+'</h4>'+
+      '<div class="formula">'+p.f+'</div>'+
+      '<p style="margin-top:8px">'+p.desc+'</p>'+
+      '</div>';
+  }).join('');
+}
+
+// ─── COMETE ─────────────────────────────────────────────────────────────────
+function renderComets(){
+  var g=document.getElementById('cometgrid');
+  g.innerHTML=COMETS.map(function(c){
+    var mh=c.mol.map(function(m){return '<span>'+m+'</span>';}).join('');
+    return '<div class="cometcard">'+
+      '<div class="cname">'+c.n+'</div>'+
+      '<div class="cperiod">⏱ Periodo: '+c.p+' · Ultimo: '+c.last+'</div>'+
+      (c.miss?'<div class="cmission">🚀 '+c.miss+'</div>':'')+
+      '<div class="cmol">'+mh+'</div>'+
+      '<div class="cdesc">'+c.desc+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+// ─── QUIZ ───────────────────────────────────────────────────────────────────
+var _qi=0,_qs=0,_qa=false;
+function renderQuiz(){_qi=0;_qs=0;showQ();}
+function showQ(){
+  var w=document.getElementById('qwrap');
+  if(_qi>=QUIZ.length){
+    w.innerHTML='<div class="qscore">✨ Quiz completato!<br>Punteggio: '+_qs+'/'+QUIZ.length+'<br>'+
+      Math.round(_qs/QUIZ.length*100)+'%<br>'+(_qs>=QUIZ.length*.8?'🌟 Eccellente!':_qs>=QUIZ.length*.6?'👍 Buono!':'📚 Ripassare!')+
+      '<br><button class="btn" onclick="renderQuiz()" style="margin-top:16px">Ricomincia</button></div>';
+    return;
+  }
+  _qa=false;
+  var q=QUIZ[_qi];
+  w.innerHTML='<div class="qcard">'+
+    '<div class="qnum">Domanda '+(_qi+1)+'/'+QUIZ.length+'</div>'+
+    '<div class="qtext">'+q.q+'</div>'+
+    '<div class="qopts">'+q.opts.map(function(o,i){return '<button class="qopt" onclick="ansQ('+i+')">'+o+'</button>';}).join('')+'</div>'+
+    '<div class="qexp" id="qexp">'+q.exp+'</div>'+
+    '<button class="btn-next" id="btn-next" onclick="nextQ()">Prossima →</button>'+
+    '</div>';
+}
+function ansQ(i){
+  if(_qa)return;_qa=true;
+  var q=QUIZ[_qi];
+  document.querySelectorAll('.qopt').forEach(function(b,j){
+    if(j===q.a)b.classList.add('ok');else if(j===i&&i!==q.a)b.classList.add('ko');
+    b.disabled=true;
+  });
+  if(i===q.a)_qs++;
+  document.getElementById('qexp').style.display='block';
+  document.getElementById('btn-next').style.display='inline-flex';
+}
+function nextQ(){_qi++;showQ();}
+
+// ─── TAB SWITCH ──────────────────────────────────────────────────────────────
+var _init={};
+function ST(id){
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('active');});
+  var p=document.getElementById('p-'+id);if(p)p.classList.add('active');
+  document.querySelectorAll('.tb').forEach(function(b){if(b.getAttribute('onclick')==="ST('"+id+"')")b.classList.add('active');});
+  if(!_init[id]){_init[id]=true;
+    if(id==='exo')renderExo();
+    else if(id==='neb')setTimeout(renderNebula,80);
+    else if(id==='spec')setTimeout(renderSpectra,80);
+    else if(id==='nuc')renderNuc();
+    else if(id==='com')renderComets();
+    else if(id==='quiz')renderQuiz();
+    else if(id==='theory')renderTheory();
+    else if(id==='extreme')renderExtreme();
+    else if(id==='reactions')renderReactions();
+    else if(id==='missions')renderMissions();
+    else if(id==='timeline')renderTimeline();
+    else if(id==='cosmo')initCosmo();
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+window.addEventListener('load',function(){
+  renderMgrid();
+  setTimeout(function(){initThree();},400);
+});
+window.addEventListener('resize',function(){
+  if(!renderer)return;
+  var wrap=document.getElementById('vwrap');
+  var W=wrap.offsetWidth,H=wrap.offsetHeight;
+  renderer.setSize(W,H);camera.aspect=W/H;camera.updateProjectionMatrix();
+});
+
+function renderTheory(){
+  var c=document.getElementById('theory-container'); if(!c) return;
+  var blocks=[
+    ['#00c9b7','☁️ Chimica del mezzo interstellare (ISM)',
+     'Le reazioni <b>ione-molecola</b> dominano il gas freddo (10-50 K) perché non hanno barriera di attivazione: X⁺ + Y → prodotti. Il motore è lo ione <b>H₃⁺</b>: H₂ + cosmic ray → H₂⁺; H₂⁺ + H₂ → H₃⁺ + H. Poi H₃⁺ cede un protone (acido di Brønsted universale del cosmo) avviando la chimica di O, C, N. Sui <b>grani di polvere ghiacciati</b> avviene l\'idrogenazione: CO + 4H → CH₃OH.'],
+    ['#f5a623','⭐ Equazione di Saha — ionizzazione stellare',
+     '<span style="font-family:monospace;font-size:1.05em;color:#e9eef6">n<sub>i+1</sub>·n<sub>e</sub> / n<sub>i</sub> = (2/λ³)·(g<sub>i+1</sub>/g<sub>i</sub>)·e<sup>−χ/kT</sup></span><br>Determina il grado di ionizzazione di un gas all\'equilibrio termico. χ = energia di ionizzazione, λ = lunghezza d\'onda termica di de Broglie, g = pesi statistici. Spiega perché le classi spettrali stellari (O,B,A,F,G,K,M) mostrano righe diverse: dipende da T.'],
+    ['#6bcfff','🌡️ Corpo nero: Wien, Planck, Stefan-Boltzmann',
+     'Legge di Wien: <span style="font-family:monospace;color:#e9eef6">λ<sub>max</sub> = b/T</span> (b = 2.898×10⁻³ m·K) → dal picco spettrale si ricava T stellare.<br>Planck: distribuzione spettrale completa B(λ,T).<br>Stefan-Boltzmann: <span style="font-family:monospace;color:#e9eef6">L = 4πR²σT⁴</span> → luminosità stellare.'],
+    ['#ad7be0','🪐 Leggi di Keplero &amp; equazione vis-viva',
+     '1ª: orbite ellittiche (Sole in un fuoco). 2ª: aree uguali in tempi uguali. 3ª: <span style="font-family:monospace;color:#e9eef6">T² = (4π²/GM)·a³</span>.<br>Vis-viva (velocità orbitale a distanza r): <span style="font-family:monospace;color:#e9eef6">v² = GM(2/r − 1/a)</span>. Fondamentali per orbite di pianeti, comete e sonde.'],
+    ['#e0678b','💥 Nucleosintesi — origine degli elementi',
+     '<b>Big Bang</b>: H, He, tracce di Li. <b>Stellare</b>: catena protone-protone e ciclo CNO (H→He); processo <b>3α</b> (3 ⁴He → ¹²C) nelle giganti rosse; fusione fino al <b>Fe</b> (nucleo più stabile). Oltre il Fe: cattura neutronica <b>processo-s</b> (lento, in AGB) e <b>processo-r</b> (rapido, in supernovae e fusioni di stelle di neutroni). Gli elementi pesanti che ci compongono nascono così.'],
+    ['#7be0a3','🔭 Spettroscopia astrochimica',
+     'Le molecole si identificano dalle transizioni: <b>rotazionali</b> (radio/mm — ALMA, radiotelescopi), <b>vibrazionali</b> (IR — JWST, Spitzer), <b>elettroniche</b> (UV-vis). Ogni molecola ha un\'impronta unica. La <b>spettroscopia di transito</b> rivela le atmosfere degli esopianeti: la luce stellare filtrata dall\'atmosfera porta le firme di H₂O, CO₂, CH₄, Na, K.'],
+    ['#fbbf24','🌍 Zona abitabile &amp; biofirme',
+     'La zona abitabile è la fascia orbitale dove l\'acqua liquida è stabile in superficie; dipende dalla luminosità stellare (∝ √L). Le <b>biofirme</b> sono squilibri chimici atmosferici difficili da spiegare senza vita: la coesistenza di <b>O₂ + CH₄</b> (che reagirebbero) è l\'esempio terrestre. Altri marker: N₂O, CH₃Cl, DMS.'],
+    ['#8ab4f8','🧬 Chimica prebiotica nello spazio',
+     'Molecole organiche complesse (COM) e precursori della vita si formano nel cosmo: <b>HCN</b> (→ adenina), <b>formammide</b> (contiene il legame peptidico), <b>glicolaldeide</b> (zucchero), e amminoacidi come la <b>glicina</b> (trovata nella cometa 67P e nel meteorite di Murchison). Suggeriscono che i mattoni della biochimica siano diffusi nell\'universo.']
+  ];
+  var html='<div class="sec-head" style="font-size:1.3rem;margin-bottom:6px">📐 Teoria &amp; Formule dell\'Astrochimica</div>';
+  html+='<div class="sec-sub" style="margin-bottom:14px;opacity:.75">Le leggi fisico-chimiche che governano la chimica dell\'universo, dalle nubi molecolari alle stelle.</div>';
+  blocks.forEach(function(b){
+    html+='<div style="background:rgba(255,255,255,.03);border-left:3px solid '+b[0]+';border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:12px">'
+      +'<div style="color:'+b[0]+';font-weight:800;font-size:1rem;margin-bottom:6px">'+b[1]+'</div>'
+      +'<div style="color:#cdd9e6;font-size:.9rem;line-height:1.75">'+b[2]+'</div></div>';
+  });
+  c.innerHTML=html;
+}
+
+
+function renderExtreme(){
+  var c=document.getElementById('extreme-container'); if(!c) return;
+  var bodies=[
+    {ic:'🕳️',col:'#a78bfa',n:'Buco Nero',sub:'Singolarità con orizzonte degli eventi',
+     txt:'Regione dove la gravità è così intensa che nulla, nemmeno la luce, può sfuggire oltre l\'<b>orizzonte degli eventi</b> (raggio di Schwarzschild R<sub>s</sub>=2GM/c²). Il gas che vi cade forma un <b>disco di accrescimento</b> incandescente (milioni di K) che emette raggi X. Chimica: la materia viene dissociata in plasma di ioni ed elettroni. I buchi neri supermassicci al centro delle galassie regolano la formazione stellare.',anim:'bh'},
+    {ic:'📡',col:'#6bcfff',n:'Pulsar',sub:'Stella di neutroni rotante',
+     txt:'Stella di neutroni magnetizzata che ruota fino a centinaia di volte al secondo, emettendo fasci di onde radio dai poli magnetici (effetto faro). Densità estrema: <b>~10¹⁷ kg/m³</b> (un cucchiaino pesa miliardi di tonnellate). La "crosta" è un reticolo di nuclei ricchi di neutroni; l\'interno è un superfluido di neutroni.',anim:'pulsar'},
+    {ic:'⚛️',col:'#34d399',n:'Stella di Neutroni',sub:'Nucleo collassato di supernova',
+     txt:'Ciò che resta dopo il collasso del nucleo di una stella massiccia (8-25 M☉). La pressione di degenerazione dei neutroni bilancia la gravità. Massa ~1.4 M☉ (limite di Chandrasekhar) compressa in ~20 km di diametro. La fusione di due stelle di neutroni (kilonova) produce gli elementi pesanti (oro, platino) via processo-r.',anim:'ns'},
+    {ic:'🧲',col:'#f5a623',n:'Magnetar',sub:'Campo magnetico estremo',
+     txt:'Stella di neutroni con il <b>campo magnetico più forte dell\'universo</b> (~10¹¹ Tesla, mille miliardi di volte quello terrestre). Produce potenti flare di raggi gamma. Il campo è così intenso da deformare la struttura atomica: gli atomi diventano cilindrici, alterando la chimica quantistica.',anim:'magnetar'},
+    {ic:'💠',col:'#e0678b',n:'Quasar',sub:'Nucleo galattico attivo',
+     txt:'Il buco nero supermassiccio di una galassia giovane che divora materia a ritmo vorticoso: il disco di accrescimento brilla più di un\'intera galassia. Getti relativistici di plasma vengono espulsi ai poli a velocità prossime a quella della luce. Sono gli oggetti persistenti più luminosi del cosmo, visibili a miliardi di anni luce.',anim:'bh'},
+    {ic:'⚪',col:'#8ab4f8',n:'Nana Bianca',sub:'Resto di stella tipo Sole',
+     txt:'Il destino del Sole: nucleo di <b>carbonio e ossigeno</b> degenere, grande come la Terra ma con massa solare. Si raffredda lentamente per miliardi di anni. La pressione di degenerazione degli elettroni la sostiene. Se accresce massa oltre 1.44 M☉ esplode come <b>supernova di tipo Ia</b> (candele standard cosmologiche).',anim:'wd'}
+  ];
+  var css='<style>@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.1)}}.xbody-disc{animation:spin 3s linear infinite}.xbody-pulse{animation:pulse 1.2s ease-in-out infinite}</style>';
+  var html=css+'<div class="sec-head" style="font-size:1.3rem;margin-bottom:6px">💫 Corpi Celesti Estremi</div><div class="sec-sub" style="margin-bottom:14px;opacity:.75">Gli oggetti più densi, energetici e affascinanti dell\'universo.</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">';
+  bodies.forEach(function(b){
+    var visual='';
+    if(b.anim==='bh'||b.anim==='wd'){
+      visual='<div style="position:relative;width:80px;height:80px;margin:0 auto 10px"><div class="xbody-disc" style="position:absolute;inset:0;border-radius:50%;background:conic-gradient('+b.col+',transparent,'+b.col+',transparent,'+b.col+')"></div><div style="position:absolute;inset:22px;border-radius:50%;background:#030812;box-shadow:0 0 20px '+b.col+'"></div></div>';
+    } else {
+      visual='<div style="position:relative;width:80px;height:80px;margin:0 auto 10px"><div class="xbody-pulse" style="position:absolute;inset:20px;border-radius:50%;background:'+b.col+';box-shadow:0 0 30px '+b.col+'"></div></div>';
+    }
+    html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-top:3px solid '+b.col+';border-radius:12px;padding:16px">'
+      +visual
+      +'<div style="text-align:center;color:'+b.col+';font-weight:800;font-size:1.05rem">'+b.ic+' '+b.n+'</div>'
+      +'<div style="text-align:center;color:#9fb3c8;font-size:.78rem;margin-bottom:8px">'+b.sub+'</div>'
+      +'<div style="color:#cdd9e6;font-size:.84rem;line-height:1.65">'+b.txt+'</div></div>';
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+
+
+// ═══════════════ COSMO 3D — motore cinematografico ═══════════════
+var _cosmo={scene:null,cam:null,ren:null,anim:null,clock:null,speed:1,paused:false,objects:[],curScene:'blackhole',raf:null};
+function _cosmoClear(){
+  if(!_cosmo.scene)return;
+  _cosmo.objects.forEach(function(o){ _cosmo.scene.remove(o); if(o.geometry)o.geometry.dispose(); if(o.material){ if(o.material.dispose)o.material.dispose(); } });
+  _cosmo.objects=[];
+  // rimuovo tutto tranne luci base
+  for(var i=_cosmo.scene.children.length-1;i>=0;i--){ var c=_cosmo.scene.children[i]; if(!c.isLight) _cosmo.scene.remove(c); }
+}
+function initCosmo(){
+  var wrap=document.getElementById('cosmo-wrap');
+  var canvas=document.getElementById('cosmo-canvas');
+  if(typeof THREE==='undefined'){ setTimeout(initCosmo,800); return; }
+  var ld=document.getElementById('cosmo-loading'); if(ld)ld.style.display='none';
+  if(!_cosmo.ren){
+    var W=wrap.offsetWidth||900,H=wrap.offsetHeight||460;
+    _cosmo.scene=new THREE.Scene();
+    _cosmo.cam=new THREE.PerspectiveCamera(55,W/H,0.01,2000);
+    _cosmo.cam.position.set(0,3,18);
+    _cosmo.ren=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:false});
+    _cosmo.ren.setPixelRatio(Math.min(devicePixelRatio,2));
+    _cosmo.ren.setSize(W,H);
+    _cosmo.clock=new THREE.Clock();
+    _cosmo.scene.add(new THREE.AmbientLight(0x223344,0.6));
+    // starfield di sfondo
+    var sg=new THREE.BufferGeometry(),sv=[];
+    for(var i=0;i<3000;i++){ var r=400+Math.random()*400; var th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1); sv.push(r*Math.sin(ph)*Math.cos(th),r*Math.sin(ph)*Math.sin(th),r*Math.cos(ph)); }
+    sg.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
+    var stars=new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:1.2,sizeAttenuation:false}));
+    stars.name='_stars'; _cosmo.scene.add(stars);
+    // controlli drag+zoom
+    _cosmoControls(canvas);
+    _cosmoResize();
+    window.addEventListener('resize',_cosmoResize);
+    _cosmoAnimate();
+    // bottoni scena
+    document.querySelectorAll('.cosmo-btn').forEach(function(b){ if(b._w)return; b._w=1;
+      b.onclick=function(){ document.querySelectorAll('.cosmo-btn').forEach(function(x){x.style.background='#0c1f33';x.style.color='#e9eef6';x.style.borderColor='rgba(0,201,183,.3)';}); b.style.background='#a78bfa';b.style.color='#0a0a1a';b.style.borderColor='#a78bfa'; _cosmoLoad(b.getAttribute('data-scene')); };
+    });
+    var sp=document.getElementById('cosmo-speed'); if(sp&&!sp._w){sp._w=1;sp.onclick=function(){ var sq=[1,2,5,10,0.25,0.5]; var idx=sq.indexOf(_cosmo.speed); _cosmo.speed=sq[(idx+1)%sq.length]; sp.textContent='⏩ Velocità: '+_cosmo.speed+'×'; };}
+    var pa=document.getElementById('cosmo-pause'); if(pa&&!pa._w){pa._w=1;pa.onclick=function(){ _cosmo.paused=!_cosmo.paused; pa.textContent=_cosmo.paused?'▶ Riprendi moti':'⏸ Pausa moti'; };}
+  }
+  _cosmoLoad(_cosmo.curScene||'blackhole');
+}
+function _cosmoResize(){ if(!_cosmo.ren)return; var wrap=document.getElementById('cosmo-wrap'); var W=wrap.offsetWidth||900,H=wrap.offsetHeight||460; _cosmo.cam.aspect=W/H; _cosmo.cam.updateProjectionMatrix(); _cosmo.ren.setSize(W,H); }
+function _cosmoControls(canvas){
+  var drag=false,px=0,py=0,rotX=0.2,rotY=0,dist=18;
+  canvas.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;});
+  window.addEventListener('pointerup',function(){drag=false;});
+  window.addEventListener('pointermove',function(e){ if(!drag)return; rotY+=(e.clientX-px)*0.005; rotX+=(e.clientY-py)*0.005; rotX=Math.max(-1.4,Math.min(1.4,rotX)); px=e.clientX;py=e.clientY; });
+  canvas.addEventListener('wheel',function(e){ e.preventDefault(); dist=Math.max(3,Math.min(120,dist+(e.deltaY>0?2:-2))); },{passive:false});
+  _cosmo._updCam=function(){ _cosmo.cam.position.x=Math.sin(rotY)*Math.cos(rotX)*dist; _cosmo.cam.position.y=Math.sin(rotX)*dist; _cosmo.cam.position.z=Math.cos(rotY)*Math.cos(rotX)*dist; _cosmo.cam.lookAt(0,0,0); };
+}
+function _cosmoAnimate(){
+  _cosmo.raf=requestAnimationFrame(_cosmoAnimate);
+  var dt=_cosmo.clock?_cosmo.clock.getDelta():0.016;
+  var t=_cosmo.paused?0:dt*_cosmo.speed;
+  if(_cosmo._tick) _cosmo._tick(t);
+  if(_cosmo._updCam) _cosmo._updCam();
+  if(_cosmo.ren&&_cosmo.scene&&_cosmo.cam) _cosmo.ren.render(_cosmo.scene,_cosmo.cam);
+}
+
+
+// ─── Caricamento scene Cosmo ───
+function _cosmoLoad(name){
+  _cosmo.curScene=name; _cosmoClear(); _cosmo._tick=null;
+  var hud=document.getElementById('cosmo-hud');
+  var info=document.getElementById('cosmo-info');
+  if(name==='blackhole'){ _buildBlackhole(); hud.innerHTML='<b style="color:#a78bfa">🕳️ Gargantua</b><br>Buco nero supermassiccio con disco di accrescimento. Trascina per ruotare, rotella per zoom.'; info.innerHTML=_infoBlackhole(); }
+  else if(name==='solar'){ _buildSolar(); hud.innerHTML='<b style="color:#f5a623">☀️ Sistema Solare</b><br>Pianeti in orbita kepleriana. Le orbite non sono in scala reale.'; info.innerHTML=_infoSolar(); }
+  else if(name==='exo'){ _buildExo3D(); hud.innerHTML='<b style="color:#7c6fff">🪐 Esopianeti 3D</b><br>Sistemi planetari reali scoperti da Kepler/TESS/JWST.'; info.innerHTML=_infoExo(); }
+  else if(name==='galaxy'){ _buildGalaxy(); hud.innerHTML='<b style="color:#6bcfff">🌀 Galassie</b><br>Galassia a spirale in rotazione differenziale.'; info.innerHTML=_infoGalaxy(); }
+  else if(name==='comet3d'){ _buildComet(); hud.innerHTML='<b style="color:#88ddff">☄️ Cometa</b><br>Nucleo di ghiaccio e polvere con coda che punta sempre lontano dal Sole.'; info.innerHTML=_infoComet(); }
+  else if(name==='universe'){ hud.innerHTML='<b style="color:#00c9b7">🌌 Mappa dell\'Universo</b><br>Ogni corpo è cliccabile: apri la sua struttura 3D reale dalle fonti ufficiali NASA/ESA.'; _buildUniverse(); }
+  else if(name==='map'){ _buildMap(); hud.innerHTML='<b style="color:#34d399">🗺️ Mappa Interstellare</b><br>Stelle ed esopianeti vicini. Clicca i link sotto per le fonti ufficiali.'; info.innerHTML=_infoMap(); }
+}
+
+// ═══ BUCO NERO GARGANTUA ═══
+function _buildBlackhole(){
+  var sc=_cosmo.scene;
+  // orizzonte degli eventi (sfera nera)
+  var eh=new THREE.Mesh(new THREE.SphereGeometry(2.2,64,64),new THREE.MeshBasicMaterial({color:0x000000}));
+  sc.add(eh);_cosmo.objects.push(eh);
+  // anello di fotoni (glow)
+  var photon=new THREE.Mesh(new THREE.SphereGeometry(2.35,64,64),new THREE.MeshBasicMaterial({color:0xffaa33,transparent:true,opacity:0.25,side:THREE.BackSide}));
+  sc.add(photon);_cosmo.objects.push(photon);
+  // disco di accrescimento con shader (gradiente caldo + rotazione)
+  var discGeo=new THREE.RingGeometry(2.8,9,128,1);
+  var discMat=new THREE.ShaderMaterial({
+    uniforms:{ uTime:{value:0} },
+    transparent:true, side:THREE.DoubleSide,
+    vertexShader:'varying vec2 vUv; varying float vR; void main(){ vUv=uv; vec4 p=vec4(position,1.0); vR=length(position.xy); gl_Position=projectionMatrix*modelViewMatrix*p; }',
+    fragmentShader:[
+      'varying vec2 vUv; varying float vR; uniform float uTime;',
+      'void main(){',
+      ' float ang=atan(vUv.y-0.5,vUv.x-0.5);',
+      ' float r=(vR-2.8)/6.2;',
+      ' float swirl=sin(ang*3.0+uTime*2.0 - r*8.0)*0.5+0.5;',
+      ' vec3 hot=vec3(1.0,0.95,0.75); vec3 mid=vec3(1.0,0.55,0.15); vec3 cool=vec3(0.85,0.2,0.35);',
+      ' vec3 col=mix(hot,mid,smoothstep(0.0,0.5,r)); col=mix(col,cool,smoothstep(0.5,1.0,r));',
+      ' float bright=(1.0-r)*(0.6+0.4*swirl);',
+      ' // lato che si avvicina piu luminoso (Doppler beaming)',
+      ' float doppler=0.6+0.6*cos(ang-1.2);',
+      ' float alpha=smoothstep(1.0,0.75,r)*bright*doppler;',
+      ' gl_FragColor=vec4(col*(1.3+doppler),alpha);',
+      '}'
+    ].join('\n')
+  });
+  var disc=new THREE.Mesh(discGeo,discMat);
+  disc.rotation.x=Math.PI/2.35;
+  sc.add(disc);_cosmo.objects.push(disc);
+  // secondo disco (illusione di lensing: arco sopra il buco nero)
+  var disc2=new THREE.Mesh(discGeo.clone(),discMat.clone());
+  disc2.rotation.x=Math.PI/2.35; disc2.rotation.z=Math.PI;
+  disc2.scale.set(1,1,1);
+  var lensRing=new THREE.Mesh(new THREE.TorusGeometry(2.55,0.12,16,100),new THREE.MeshBasicMaterial({color:0xffcc66,transparent:true,opacity:0.55}));
+  lensRing.rotation.x=Math.PI/2.35;
+  sc.add(lensRing);_cosmo.objects.push(lensRing);
+  _cosmo._tick=function(t){ discMat.uniforms.uTime.value+=t*2; disc.rotation.z-=t*0.15; };
+  _cosmo.cam.position.set(0,4,17);
+}
+function _infoBlackhole(){
+  return '<div style="background:rgba(167,139,250,.08);border-left:3px solid #a78bfa;border-radius:0 10px 10px 0;padding:12px 14px">'
+    +'<b style="color:#a78bfa">🕳️ Fisica del buco nero</b><br>'
+    +'<div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px">'
+    +'<b>Orizzonte degli eventi</b>: raggio di Schwarzschild R<sub>s</sub>=2GM/c². Oltre questo confine la velocità di fuga supera c: nulla sfugge.<br>'
+    +'<b>Disco di accrescimento</b>: gas in spirale riscaldato per attrito fino a milioni di K, emette raggi X. Un lato appare più luminoso per <b>Doppler beaming</b> relativistico (come in Interstellar).<br>'
+    +'<b>Lensing gravitazionale</b>: la gravità curva la luce, permettendo di vedere il disco "dietro" il buco nero come un arco sopra e sotto.<br>'
+    +'<b>Chimica</b>: nessuna molecola sopravvive — solo plasma di ioni ed elettroni a temperature estreme.</div>'
+    +'<div style="margin-top:8px"><a href="https://science.nasa.gov/universe/black-holes/" target="_blank" style="color:#6bcfff;font-size:.8rem">NASA · Black Holes ↗</a> &nbsp; <a href="https://www.esa.int/Science_Exploration/Space_Science/Black_holes" target="_blank" style="color:#6bcfff;font-size:.8rem">ESA · Black Holes ↗</a></div></div>';
+}
+
+
+// ═══ SISTEMA SOLARE con moti orbitali ═══
+var _SOLAR=[
+  {n:'Mercurio',c:0x9c8871,r:0.28,a:4,T:0.24,ic:'☿'},
+  {n:'Venere',c:0xd9a441,r:0.45,a:5.6,T:0.62,ic:'♀'},
+  {n:'Terra',c:0x2a6fdb,r:0.48,a:7.2,T:1.0,ic:'🌍'},
+  {n:'Marte',c:0xc1440e,r:0.36,a:9,T:1.88,ic:'♂'},
+  {n:'Giove',c:0xd8a066,r:1.1,a:12.5,T:11.9,ic:'♃'},
+  {n:'Saturno',c:0xe3c88a,r:0.95,a:16,T:29.5,ic:'♄',ring:true},
+  {n:'Urano',c:0x9fe0e6,r:0.6,a:19,T:84,ic:'⛢'},
+  {n:'Nettuno',c:0x4060d0,r:0.58,a:22,T:165,ic:'♆'}
+];
+function _buildSolar(){
+  var sc=_cosmo.scene;
+  var sun=new THREE.Mesh(new THREE.SphereGeometry(1.8,48,48),new THREE.MeshBasicMaterial({color:0xfdb813}));
+  sc.add(sun);_cosmo.objects.push(sun);
+  var glow=new THREE.Mesh(new THREE.SphereGeometry(2.3,32,32),new THREE.MeshBasicMaterial({color:0xff8800,transparent:true,opacity:0.2,side:THREE.BackSide}));
+  sc.add(glow);_cosmo.objects.push(glow);
+  var pl=new THREE.PointLight(0xffffff,2,200); sc.add(pl);_cosmo.objects.push(pl);
+  var planets=[];
+  _SOLAR.forEach(function(p){
+    // orbita (anello sottile)
+    var orb=new THREE.Mesh(new THREE.RingGeometry(p.a-0.02,p.a+0.02,96),new THREE.MeshBasicMaterial({color:0x334455,transparent:true,opacity:0.4,side:THREE.DoubleSide}));
+    orb.rotation.x=Math.PI/2; sc.add(orb);_cosmo.objects.push(orb);
+    var m=new THREE.Mesh(new THREE.SphereGeometry(p.r,32,32),new THREE.MeshStandardMaterial({color:p.c,roughness:0.8,emissive:p.c,emissiveIntensity:0.15}));
+    var ph=Math.random()*Math.PI*2;
+    m.position.set(Math.cos(ph)*p.a,0,Math.sin(ph)*p.a);
+    m.userData={a:p.a,T:p.T,ph:ph};
+    sc.add(m);_cosmo.objects.push(m); planets.push(m);
+    if(p.ring){ var rg=new THREE.Mesh(new THREE.RingGeometry(p.r*1.3,p.r*2,48),new THREE.MeshBasicMaterial({color:0xccaa88,transparent:true,opacity:0.6,side:THREE.DoubleSide})); rg.rotation.x=Math.PI/2.5; m.add(rg); }
+  });
+  _cosmo._tick=function(t){ sun.rotation.y+=t*0.1; planets.forEach(function(m){ m.userData.ph+=t*(0.5/m.userData.T); m.position.x=Math.cos(m.userData.ph)*m.userData.a; m.position.z=Math.sin(m.userData.ph)*m.userData.a; m.rotation.y+=t*0.5; }); };
+  _cosmo.cam.position.set(0,14,26);
+}
+function _infoSolar(){
+  return '<div style="background:rgba(245,166,35,.08);border-left:3px solid #f5a623;border-radius:0 10px 10px 0;padding:12px 14px"><b style="color:#f5a623">☀️ Moti orbitali (3ª legge di Keplero)</b><div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px">La velocità orbitale segue T²∝a³: i pianeti interni orbitano più veloci. Qui i periodi sono rispettati in proporzione (Mercurio 88 giorni → Nettuno 165 anni). <b>Chimica</b>: pianeti rocciosi (silicati, Fe) all\'interno, giganti gassosi (H₂/He, NH₃, CH₄) all\'esterno oltre la "linea del ghiaccio".</div><div style="margin-top:8px"><a href="https://science.nasa.gov/solar-system/" target="_blank" style="color:#6bcfff;font-size:.8rem">NASA · Solar System ↗</a></div></div>';
+}
+
+// ═══ ESOPIANETI 3D ═══
+function _buildExo3D(){
+  var sc=_cosmo.scene;
+  // stella centrale (usa dati EXOPLANETS se disponibili, altrimenti sistema demo TRAPPIST-1)
+  var star=new THREE.Mesh(new THREE.SphereGeometry(1.4,48,48),new THREE.MeshBasicMaterial({color:0xff6644}));
+  sc.add(star);_cosmo.objects.push(star);
+  sc.add(new THREE.PointLight(0xffaa88,2,200));
+  var TRAPPIST=[{n:'b',c:0xc98850,a:3.5,T:1.5,r:0.4},{n:'c',c:0xb07840,a:4.6,T:2.4,r:0.42},{n:'d',c:0x8899cc,a:6,T:4,r:0.32},{n:'e',c:0x3a7fd8,a:7.6,T:6.1,r:0.36},{n:'f',c:0x4a9fd8,a:9.3,T:9.2,r:0.4},{n:'g',c:0x5566aa,a:11.2,T:12.4,r:0.43},{n:'h',c:0x99aacc,a:13.5,T:18.8,r:0.3}];
+  var ps=[];
+  TRAPPIST.forEach(function(p){
+    var orb=new THREE.Mesh(new THREE.RingGeometry(p.a-0.02,p.a+0.02,96),new THREE.MeshBasicMaterial({color:0x445566,transparent:true,opacity:0.35,side:THREE.DoubleSide})); orb.rotation.x=Math.PI/2; sc.add(orb);_cosmo.objects.push(orb);
+    var m=new THREE.Mesh(new THREE.SphereGeometry(p.r,32,32),new THREE.MeshStandardMaterial({color:p.c,roughness:0.9,emissive:p.c,emissiveIntensity:0.1}));
+    var ph=Math.random()*6.28; m.position.set(Math.cos(ph)*p.a,0,Math.sin(ph)*p.a); m.userData={a:p.a,T:p.T,ph:ph};
+    sc.add(m);_cosmo.objects.push(m); ps.push(m);
+  });
+  _cosmo._tick=function(t){ star.rotation.y+=t*0.1; ps.forEach(function(m){ m.userData.ph+=t*(1.2/m.userData.T); m.position.x=Math.cos(m.userData.ph)*m.userData.a; m.position.z=Math.sin(m.userData.ph)*m.userData.a; }); };
+  _cosmo.cam.position.set(0,10,22);
+}
+function _infoExo(){
+  return '<div style="background:rgba(124,111,255,.08);border-left:3px solid #7c6fff;border-radius:0 10px 10px 0;padding:12px 14px"><b style="color:#7c6fff">🪐 TRAPPIST-1 — 7 pianeti terrestri</b><div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px">Sistema a 40 anni luce con 7 pianeti rocciosi, 3 nella zona abitabile. Studiato dal JWST per cercare atmosfere (H₂O, CO₂, CH₄). Le orbite sono in <b>risonanza</b>. È uno dei bersagli principali nella ricerca di biofirme.</div><div style="margin-top:8px"><a href="https://exoplanets.nasa.gov/exoplanet-catalog/" target="_blank" style="color:#6bcfff;font-size:.8rem">NASA Exoplanet Archive ↗</a> &nbsp; <a href="https://webb.nasa.gov/" target="_blank" style="color:#6bcfff;font-size:.8rem">JWST ↗</a></div></div>';
+}
+
+// ═══ GALASSIA ═══
+function _buildGalaxy(){
+  var sc=_cosmo.scene;
+  var N=8000; var g=new THREE.BufferGeometry(); var pos=[],col=[];
+  var arms=4;
+  for(var i=0;i<N;i++){
+    var r=Math.pow(Math.random(),0.5)*18;
+    var arm=Math.floor(Math.random()*arms);
+    var ang=(arm/arms)*Math.PI*2 + r*0.35 + (Math.random()-0.5)*0.5;
+    var x=Math.cos(ang)*r, z=Math.sin(ang)*r, y=(Math.random()-0.5)*(1.5-r*0.05);
+    pos.push(x,y,z);
+    var c=r<3?[1,0.9,0.7]:r<9?[0.7,0.8,1]:[0.5,0.6,1];
+    col.push(c[0],c[1],c[2]);
+  }
+  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  var gal=new THREE.Points(g,new THREE.PointsMaterial({size:0.13,vertexColors:true,transparent:true,opacity:0.9}));
+  sc.add(gal);_cosmo.objects.push(gal);
+  // nucleo brillante
+  var core=new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32),new THREE.MeshBasicMaterial({color:0xfff0cc,transparent:true,opacity:0.8}));
+  sc.add(core);_cosmo.objects.push(core);
+  _cosmo._tick=function(t){ gal.rotation.y+=t*0.05; };
+  _cosmo.cam.position.set(0,14,24);
+}
+function _infoGalaxy(){
+  return '<div style="background:rgba(107,207,255,.08);border-left:3px solid #6bcfff;border-radius:0 10px 10px 0;padding:12px 14px"><b style="color:#6bcfff">🌀 Galassia a spirale</b><div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px">Miliardi di stelle in <b>rotazione differenziale</b> attorno a un buco nero supermassiccio centrale. I bracci a spirale sono onde di densità dove nascono nuove stelle (regioni HII, ricche di H ionizzato). La <b>materia oscura</b> spiega perché le stelle esterne ruotano più veloci del previsto. La nostra Via Lattea è una spirale barrata.</div><div style="margin-top:8px"><a href="https://esahubble.org/images/" target="_blank" style="color:#6bcfff;font-size:.8rem">ESA/Hubble Images ↗</a> &nbsp; <a href="https://science.nasa.gov/universe/galaxies/" target="_blank" style="color:#6bcfff;font-size:.8rem">NASA · Galaxies ↗</a></div></div>';
+}
+
+// ═══ MAPPA INTERSTELLARE ═══
+function _buildMap(){
+  var sc=_cosmo.scene;
+  var STARS=[
+    {n:'Sole',c:0xffdd00,x:0,y:0,z:0,r:0.5},
+    {n:'Proxima Centauri',c:0xff6644,x:-4,y:1,z:2,r:0.3},
+    {n:'TRAPPIST-1',c:0xff5533,x:6,y:-2,z:4,r:0.35},
+    {n:'Kepler-186',c:0xffaa66,x:-7,y:3,z:-5,r:0.4},
+    {n:'TAU Ceti',c:0xffdd88,x:5,y:2,z:-3,r:0.42},
+    {n:'Gliese 581',c:0xff7744,x:-6,y:-3,z:3,r:0.33},
+    {n:'51 Pegasi',c:0xffee99,x:8,y:1,z:6,r:0.45},
+    {n:'HD 209458',c:0xffcc77,x:-9,y:2,z:-2,r:0.4}
+  ];
+  STARS.forEach(function(st){
+    var m=new THREE.Mesh(new THREE.SphereGeometry(st.r,24,24),new THREE.MeshBasicMaterial({color:st.c}));
+    m.position.set(st.x,st.y,st.z); sc.add(m);_cosmo.objects.push(m);
+    var glow=new THREE.Mesh(new THREE.SphereGeometry(st.r*1.8,16,16),new THREE.MeshBasicMaterial({color:st.c,transparent:true,opacity:0.25,side:THREE.BackSide})); glow.position.copy(m.position); sc.add(glow);_cosmo.objects.push(glow);
+  });
+  // linee di connessione dal Sole
+  STARS.slice(1).forEach(function(st){ var geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(st.x,st.y,st.z)]); var ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x225544,transparent:true,opacity:0.4})); sc.add(ln);_cosmo.objects.push(ln); });
+  _cosmo._tick=function(t){ _cosmo.scene.rotation.y+=t*0.02; };
+  _cosmo.cam.position.set(0,8,20);
+}
+function _infoMap(){
+  return '<div style="background:rgba(52,211,153,.08);border-left:3px solid #34d399;border-radius:0 10px 10px 0;padding:12px 14px"><b style="color:#34d399">🗺️ Stelle ed esopianeti vicini</b><div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px">Mappa delle stelle vicine con sistemi planetari noti. Fonti ufficiali per esplorare in tempo reale:</div><div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'
+    +'<a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" style="color:#6bcfff;font-size:.8rem;background:#0c1f33;padding:4px 8px;border-radius:6px">NASA Exoplanet Archive ↗</a>'
+    +'<a href="https://exoplanets.nasa.gov/eyes-on-exoplanets/" target="_blank" style="color:#6bcfff;font-size:.8rem;background:#0c1f33;padding:4px 8px;border-radius:6px">Eyes on Exoplanets (NASA 3D) ↗</a>'
+    +'<a href="https://sci.esa.int/web/gaia" target="_blank" style="color:#6bcfff;font-size:.8rem;background:#0c1f33;padding:4px 8px;border-radius:6px">ESA Gaia (mappa 3D stelle) ↗</a>'
+    +'<a href="https://science.nasa.gov/mission/hubble/" target="_blank" style="color:#6bcfff;font-size:.8rem;background:#0c1f33;padding:4px 8px;border-radius:6px">Hubble ↗</a>'
+    +'<a href="https://webb.nasa.gov/" target="_blank" style="color:#6bcfff;font-size:.8rem;background:#0c1f33;padding:4px 8px;border-radius:6px">JWST ↗</a></div></div>';
+}
+
+
+// ═══════════ DATABASE UNIVERSALE CORPI CELESTI (con link 3D ufficiali) ═══════════
+var UNIVERSE_DB=[
+  // ── STELLE ──
+  {cat:'Stella',n:'Sole',type:'Nana gialla G2V',dist:'0 (8 min luce)',chem:'H (73%), He (25%), O, C, Fe',phys:'T superficie 5.778 K · massa 1 M☉',
+   links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/sun'],['NASA Sun','https://science.nasa.gov/sun/'],['Solar System Scope','https://www.solarsystemscope.com/']]},
+  {cat:'Stella',n:'Proxima Centauri',type:'Nana rossa M5.5Ve',dist:'4.24 anni luce',chem:'H, He, metalli (bassa metallicità)',phys:'T 3.042 K · 0.12 M☉ · stella più vicina',
+   links:[['NASA','https://science.nasa.gov/exoplanet-catalog/proxima-centauri-b/'],['ESA','https://www.esa.int/']]},
+  {cat:'Stella',n:'Betelgeuse',type:'Supergigante rossa M1-2',dist:'~640 anni luce',chem:'H, He, C, O, elementi pesanti',phys:'T 3.500 K · ~700 R☉ · candidata supernova',
+   links:[['NASA','https://science.nasa.gov/'],['ESA Hubble','https://esahubble.org/']]},
+  // ── PIANETI ──
+  {cat:'Pianeta',n:'Terra',type:'Pianeta roccioso',dist:'1 UA',chem:'N₂ (78%), O₂ (21%), H₂O, silicati, Fe',phys:'T media 15°C · atmosfera + idrosfera + vita',
+   links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/earth'],['Solar System Scope','https://www.solarsystemscope.com/']]},
+  {cat:'Pianeta',n:'Marte',type:'Pianeta roccioso',dist:'1.52 UA',chem:'CO₂ (95%), ossidi di ferro (ruggine), silicati',phys:'T media -63°C · atmosfera sottile',
+   links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/mars'],['NASA Mars','https://mars.nasa.gov/']]},
+  {cat:'Pianeta',n:'Giove',type:'Gigante gassoso',dist:'5.2 UA',chem:'H₂ (90%), He, NH₃, CH₄, tracce',phys:'T -108°C · 318 M⊕ · Grande Macchia Rossa',
+   links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/jupiter'],['NASA','https://science.nasa.gov/jupiter/']]},
+  {cat:'Pianeta',n:'Saturno',type:'Gigante gassoso',dist:'9.5 UA',chem:'H₂, He, anelli di ghiaccio d\'acqua + roccia',phys:'T -139°C · sistema di anelli spettacolare',
+   links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/saturn'],['NASA','https://science.nasa.gov/saturn/']]},
+  // ── ESOPIANETI ──
+  {cat:'Esopianeta',n:'TRAPPIST-1e',type:'Terrestre, zona abitabile',dist:'40 anni luce',chem:'possibile H₂O, atmosfera in studio (JWST)',phys:'0.92 R⊕ · in risonanza orbitale',
+   links:[['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/'],['Eyes on Exoplanets','https://exoplanets.nasa.gov/eyes-on-exoplanets/'],['JWST','https://webb.nasa.gov/']]},
+  {cat:'Esopianeta',n:'Kepler-186f',type:'Terrestre, zona abitabile',dist:'~580 anni luce',chem:'composizione ignota, probabilmente rocciosa',phys:'1.11 R⊕ · primo pianeta Terra-size in HZ',
+   links:[['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/'],['Eyes on Exoplanets','https://exoplanets.nasa.gov/eyes-on-exoplanets/']]},
+  {cat:'Esopianeta',n:'51 Pegasi b',type:'Gigante gassoso (Hot Jupiter)',dist:'50 anni luce',chem:'H₂/He, atmosfera >1000°C',phys:'primo esopianeta scoperto (1995, Nobel 2019)',
+   links:[['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/'],['ESA','https://www.esa.int/']]},
+  // ── CORPI ESTREMI ──
+  {cat:'Estremo',n:'Sagittarius A*',type:'Buco nero supermassiccio',dist:'26.000 anni luce (centro galattico)',chem:'plasma, disco di accrescimento',phys:'4 milioni M☉ · fotografato da EHT 2022',
+   links:[['NASA','https://science.nasa.gov/universe/black-holes/'],['ESO EHT','https://www.eso.org/public/']]},
+  {cat:'Estremo',n:'Nebulosa di Orione',type:'Regione HII / vivaio stellare',dist:'1.344 anni luce',chem:'H ionizzato, H₂, polvere, molecole organiche',phys:'culla di nuove stelle · osservata da Hubble/JWST',
+   links:[['ESA Hubble','https://esahubble.org/images/'],['JWST','https://webb.nasa.gov/']]},
+  // ── GALASSIE ──
+  {cat:'Galassia',n:'Via Lattea',type:'Spirale barrata',dist:'0 (ci siamo dentro)',chem:'stelle, gas H/He, polvere, materia oscura',phys:'~100-400 miliardi di stelle · 100.000 anni luce',
+   links:[['NASA','https://science.nasa.gov/universe/galaxies/'],['ESA Gaia','https://sci.esa.int/web/gaia']]},
+  {cat:'Galassia',n:'Andromeda (M31)',type:'Spirale',dist:'2.5 milioni anni luce',chem:'stelle, gas, in rotta di collisione con noi',phys:'~1000 miliardi di stelle · visibile a occhio nudo',
+   links:[['ESA Hubble','https://esahubble.org/'],['NASA','https://science.nasa.gov/']]}
+  ,
+  // ── PIANETI (completamento) ──
+  {cat:'Pianeta',n:'Mercurio',type:'Roccioso',dist:'0.39 UA',chem:'silicati, grande nucleo di Fe, tracce di Na',phys:'T -173/427°C · nessuna atmosfera',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/mercury'],['NASA','https://science.nasa.gov/mercury/']]},
+  {cat:'Pianeta',n:'Venere',type:'Roccioso',dist:'0.72 UA',chem:'CO₂ (96%), nubi di H₂SO₄, silicati',phys:'T 464°C (effetto serra estremo)',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/venus'],['NASA','https://science.nasa.gov/venus/']]},
+  {cat:'Pianeta',n:'Urano',type:'Gigante ghiacciato',dist:'19.2 UA',chem:'H₂, He, CH₄ (colore ciano), ghiacci',phys:'T -224°C · ruota "coricato"',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/uranus'],['NASA','https://science.nasa.gov/uranus/']]},
+  {cat:'Pianeta',n:'Nettuno',type:'Gigante ghiacciato',dist:'30.1 UA',chem:'H₂, He, CH₄, venti più veloci del Sistema Solare',phys:'T -218°C · Grande Macchia Scura',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/neptune'],['NASA','https://science.nasa.gov/neptune/']]},
+  {cat:'Pianeta',n:'Plutone',type:'Pianeta nano',dist:'39.5 UA',chem:'ghiacci di N₂, CH₄, CO, nucleo roccioso',phys:'T -229°C · cuore di azoto ghiacciato (Sputnik Planitia)',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/pluto'],['NASA New Horizons','https://science.nasa.gov/mission/new-horizons/']]},
+  // ── LUNE ──
+  {cat:'Luna',n:'Luna (Terra)',type:'Satellite roccioso',dist:'384.400 km dalla Terra',chem:'regolite, anortosite, basalti, Fe, Ti',phys:'nessuna atmosfera · faccia sempre uguale (tidal lock)',links:[['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/earth/moon'],['NASA Moon','https://science.nasa.gov/moon/']]},
+  {cat:'Luna',n:'Europa (Luna)',type:'Luna ghiacciata di Giove',dist:'628 milioni km (Giove)',chem:'crosta di H₂O ghiacciata, oceano salato sotto',phys:'candidata per vita · missione Europa Clipper',links:[['NASA Europa','https://europa.nasa.gov/'],['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/europa']]},
+  {cat:'Luna',n:'Titano (Luna)',type:'Luna di Saturno',dist:'1.4 miliardi km (Saturno)',chem:'atmosfera densa di N₂/CH₄, laghi di metano liquido',phys:'chimica prebiotica (toline) · esplorata da Cassini-Huygens',links:[['NASA Titan','https://science.nasa.gov/saturn/moons/titan/'],['ESA Huygens','https://www.esa.int/']]},
+  {cat:'Luna',n:'Io (Luna)',type:'Luna vulcanica di Giove',dist:'628 milioni km (Giove)',chem:'zolfo, SiO₂, vulcani attivi di zolfo',phys:'corpo più vulcanico del Sistema Solare',links:[['NASA Io','https://science.nasa.gov/jupiter/moons/io/'],['NASA Eyes','https://eyes.nasa.gov/apps/solar-system/#/io']]},
+  {cat:'Luna',n:'Encelado (Luna)',type:'Luna ghiacciata di Saturno',dist:'1.3 miliardi km (Saturno)',chem:'geyser di H₂O, oceano sotto il ghiaccio, molecole organiche',phys:'pennacchi al polo sud · candidata astrobiologica',links:[['NASA Enceladus','https://science.nasa.gov/saturn/moons/enceladus/']]},
+  // ── ESOPIANETI (completamento) ──
+  {cat:'Esopianeta',n:'Proxima Centauri b',type:'Terrestre, zona abitabile',dist:'4.24 anni luce',chem:'composizione ignota, forse rocciosa',phys:'esopianeta potenzialmente abitabile più vicino',links:[['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/'],['Eyes on Exoplanets','https://exoplanets.nasa.gov/eyes-on-exoplanets/']]},
+  {cat:'Esopianeta',n:'WASP-96 b',type:'Gigante gassoso',dist:'~1150 anni luce',chem:'atmosfera con H₂O rilevata dal JWST',phys:'primo spettro atmosferico pubblicato dal JWST (2022)',links:[['JWST','https://webb.nasa.gov/'],['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/']]},
+  {cat:'Esopianeta',n:'K2-18 b',type:'Sub-Nettuno, zona abitabile',dist:'124 anni luce',chem:'H₂O, CH₄, CO₂, possibile DMS (JWST 2023)',phys:'candidato "mondo Hycean" (oceano sotto atmosfera H₂)',links:[['JWST','https://webb.nasa.gov/'],['NASA Archive','https://exoplanetarchive.ipac.caltech.edu/']]},
+  {cat:'Esopianeta',n:'HD 189733 b',type:'Hot Jupiter blu',dist:'64.5 anni luce',chem:'silicati vetrosi (piove vetro), atmosfera blu cobalto',phys:'venti a 8700 km/h',links:[['NASA','https://science.nasa.gov/'],['ESA','https://www.esa.int/']]},
+  // ── NEBULOSE ──
+  {cat:'Nebulosa',n:'Nebulosa di Orione (M42)',type:'Regione HII / vivaio stellare',dist:'1.344 anni luce',chem:'H ionizzato, H₂, polvere, PAH, molecole organiche',phys:'culla di stelle · fotografata da Hubble e JWST',links:[['ESA Hubble','https://esahubble.org/images/'],['JWST','https://webb.nasa.gov/']]},
+  {cat:'Nebulosa',n:'Nebulosa Aquila (Pilastri)',type:'Regione di formazione stellare',dist:'~7.000 anni luce',chem:'H₂ molecolare, polvere, gas denso',phys:'i celebri "Pilastri della Creazione"',links:[['ESA Hubble','https://esahubble.org/'],['JWST','https://webb.nasa.gov/']]},
+  {cat:'Nebulosa',n:'Nebulosa del Granchio (M1)',type:'Resto di supernova',dist:'6.500 anni luce',chem:'plasma, filamenti di H, He, elementi pesanti',phys:'esplosione osservata nel 1054 d.C. · pulsar al centro',links:[['ESA Hubble','https://esahubble.org/'],['NASA','https://science.nasa.gov/']]},
+  {cat:'Nebulosa',n:'Nebulosa Anello (M57)',type:'Nebulosa planetaria',dist:'2.283 anni luce',chem:'gas ionizzato espulso da stella morente, O, N, H',phys:'resto di stella tipo Sole · nana bianca al centro',links:[['ESA Hubble','https://esahubble.org/']]},
+  // ── AMMASSI E ALTRO ──
+  {cat:'Ammasso',n:'Pleiadi (M45)',type:'Ammasso aperto',dist:'444 anni luce',chem:'stelle blu giovani, gas riflettente',phys:'~1000 stelle · visibili a occhio nudo (7 sorelle)',links:[['ESA Hubble','https://esahubble.org/'],['NASA','https://science.nasa.gov/']]},
+  {cat:'Ammasso',n:'Omega Centauri',type:'Ammasso globulare',dist:'17.000 anni luce',chem:'stelle vecchie, bassa metallicità',phys:'~10 milioni di stelle · il più grande della Via Lattea',links:[['ESA Hubble','https://esahubble.org/']]},
+  // ── GALASSIE (completamento) ──
+  {cat:'Galassia',n:'Galassia Vortice (M51)',type:'Spirale con compagna',dist:'23 milioni anni luce',chem:'bracci ricchi di gas e formazione stellare',phys:'interazione gravitazionale con NGC 5195',links:[['ESA Hubble','https://esahubble.org/'],['NASA','https://science.nasa.gov/']]},
+  {cat:'Galassia',n:'Grande Nube di Magellano',type:'Galassia nana irregolare',dist:'163.000 anni luce',chem:'gas, regioni HII (Nebulosa Tarantola)',phys:'satellite della Via Lattea',links:[['ESA','https://www.esa.int/'],['NASA','https://science.nasa.gov/']]},
+  // ── STELLE (completamento) ──
+  {cat:'Stella',n:'Sirio',type:'Stella bianca A1V + nana bianca',dist:'8.6 anni luce',chem:'H, He, metalli',phys:'stella più brillante del cielo notturno',links:[['NASA','https://science.nasa.gov/'],['ESA','https://www.esa.int/']]},
+  {cat:'Stella',n:'Vega',type:'Stella bianca A0V',dist:'25 anni luce',chem:'H, He, disco di detriti',phys:'stella di riferimento fotometrico',links:[['NASA','https://science.nasa.gov/'],['ESA','https://www.esa.int/']]}
+
+];
+
+
+// ═══ MAPPA UNIVERSO 3D — corpi cliccabili con link 3D ufficiali (stile PubChem) ═══
+var _CATCOL={'Stella':0xffdd44,'Pianeta':0x4a9fd8,'Esopianeta':0x7c6fff,'Estremo':0xa78bfa,'Galassia':0x6bcfff,'Luna':0xc0c0c0,'Nebulosa':0xff77bb,'Ammasso':0x88ffcc};
+function _buildUniverse(){
+  var sc=_cosmo.scene;
+  // dispongo i corpi in cluster per categoria su una sfera
+  var cats={}; UNIVERSE_DB.forEach(function(b){ (cats[b.cat]=cats[b.cat]||[]).push(b); });
+  var catNames=Object.keys(cats); var meshes=[];
+  catNames.forEach(function(cat,ci){
+    var baseAng=(ci/catNames.length)*Math.PI*2;
+    cats[cat].forEach(function(b,bi){
+      var R=6+bi*2.2; var ang=baseAng+(bi*0.5);
+      var x=Math.cos(ang)*R, z=Math.sin(ang)*R, y=(ci-catNames.length/2)*2.2+(Math.random()-0.5)*1.5;
+      var col=_CATCOL[cat]||0xffffff;
+      var m=new THREE.Mesh(new THREE.SphereGeometry(cat==='Galassia'?0.9:cat==='Estremo'?0.7:0.5,24,24),new THREE.MeshBasicMaterial({color:col}));
+      m.position.set(x,y,z); m.userData={body:b}; sc.add(m);_cosmo.objects.push(m); meshes.push(m);
+      var glow=new THREE.Mesh(new THREE.SphereGeometry((cat==='Galassia'?0.9:0.5)*1.9,16,16),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,side:THREE.BackSide})); glow.position.set(x,y,z); sc.add(glow);_cosmo.objects.push(glow);
+    });
+  });
+  _cosmo._tick=function(t){ _cosmo.scene.rotation.y+=t*0.03; };
+  _cosmo.cam.position.set(0,6,30);
+  // pannello di ricerca + lista (sotto il canvas)
+  _renderUniversePanel();
+  // click sui corpi nel 3D → apre scheda
+  var canvas=document.getElementById('cosmo-canvas');
+  if(canvas && !canvas._uniClick){
+    canvas._uniClick=1;
+    canvas.addEventListener('click',function(e){
+      if(_cosmo.curScene!=='universe' || typeof THREE.Raycaster==='undefined') return;
+      var rect=canvas.getBoundingClientRect();
+      var mouse=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1, -((e.clientY-rect.top)/rect.height)*2+1);
+      var ray=new THREE.Raycaster(); ray.setFromCamera(mouse,_cosmo.cam);
+      var hits=ray.intersectObjects(meshes);
+      if(hits.length && hits[0].object.userData.body){ _showBodyCard(hits[0].object.userData.body); }
+    });
+  }
+}
+function _renderUniversePanel(){
+  var info=document.getElementById('cosmo-info'); if(!info) return;
+  var cats=['Tutti','Stella','Pianeta','Luna','Esopianeta','Nebulosa','Ammasso','Estremo','Galassia'];
+  var html='<div style="margin-bottom:10px"><input id="uni-search" placeholder="🔍 Cerca un corpo celeste…" oninput="_filterUniverse()" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,201,183,.3);background:#0c1f33;color:#e9eef6;font-size:.9rem"/></div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+  cats.forEach(function(c,i){ html+='<button class="uni-cat" data-cat="'+c+'" onclick="_filterUniverse(\''+c+'\')" style="padding:4px 10px;border-radius:8px;border:1px solid rgba(0,201,183,.25);background:'+(i===0?'#00c9b7':'#0c1f33')+';color:'+(i===0?'#04121e':'#cdd9e6')+';cursor:pointer;font-size:.75rem">'+c+'</button>'; });
+  html+='</div><div id="uni-list"></div><div id="uni-card"></div>';
+  info.innerHTML=html;
+  _filterUniverse();
+}
+var _uniFilter='Tutti';
+function _filterUniverse(cat){
+  if(cat){ _uniFilter=cat; document.querySelectorAll('.uni-cat').forEach(function(b){ var on=b.getAttribute('data-cat')===cat; b.style.background=on?'#00c9b7':'#0c1f33'; b.style.color=on?'#04121e':'#cdd9e6'; }); }
+  var q=(document.getElementById('uni-search')||{}).value||''; q=q.toLowerCase();
+  var list=document.getElementById('uni-list'); if(!list) return;
+  var items=UNIVERSE_DB.filter(function(b){ return (_uniFilter==='Tutti'||b.cat===_uniFilter) && (!q||b.n.toLowerCase().indexOf(q)>=0||b.type.toLowerCase().indexOf(q)>=0); });
+  list.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">'+items.map(function(b){
+    var col='#'+(_CATCOL[b.cat]||0xffffff).toString(16).padStart(6,'0');
+    return '<div onclick=\'_showBodyCard('+JSON.stringify(b).replace(/'/g,"&#39;")+')\' style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:3px solid '+col+';border-radius:8px;padding:8px 10px;cursor:pointer">'
+      +'<div style="color:'+col+';font-weight:700;font-size:.85rem">'+b.n+'</div>'
+      +'<div style="color:#9fb3c8;font-size:.72rem">'+b.cat+' · '+b.type+'</div></div>';
+  }).join('')+'</div>';
+}
+function _showBodyCard(b){
+  var card=document.getElementById('uni-card'); if(!card) card=document.getElementById('cosmo-info');
+  var col='#'+(_CATCOL[b.cat]||0xffffff).toString(16).padStart(6,'0');
+  var linkBtns=b.links.map(function(l){ return '<a href="'+l[1]+'" target="_blank" style="display:inline-block;background:'+col+';color:#04121e;font-weight:700;font-size:.78rem;padding:6px 12px;border-radius:8px;margin:3px;text-decoration:none">🔭 '+l[0]+' ↗</a>'; }).join('');
+  card.innerHTML='<div style="background:rgba(255,255,255,.04);border:1.5px solid '+col+';border-radius:12px;padding:16px;margin-top:12px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:start"><div><div style="color:'+col+';font-weight:800;font-size:1.15rem">'+b.n+'</div><div style="color:#9fb3c8;font-size:.82rem">'+b.cat+' · '+b.type+'</div></div><button onclick="document.getElementById(\'uni-card\').innerHTML=\'\'" style="background:none;border:none;color:#9fb3c8;font-size:20px;cursor:pointer">×</button></div>'
+    +'<div style="margin-top:10px;color:#cdd9e6;font-size:.86rem;line-height:1.7">'
+    +'<b style="color:'+col+'">📏 Distanza:</b> '+b.dist+'<br>'
+    +'<b style="color:'+col+'">⚗️ Chimica:</b> '+b.chem+'<br>'
+    +'<b style="color:'+col+'">🔬 Fisica:</b> '+b.phys+'</div>'
+    +'<div style="margin-top:12px"><div style="color:#9fb3c8;font-size:.78rem;margin-bottom:4px">Vedi la struttura 3D reale (fonti ufficiali):</div>'+linkBtns+'</div></div>';
+  if(card.scrollIntoView)card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+
+// ═══ COMETA 3D con coda di particelle ═══
+function _buildComet(){
+  var sc=_cosmo.scene;
+  // Sole in lontananza
+  var sun=new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32),new THREE.MeshBasicMaterial({color:0xffdd44}));
+  sun.position.set(-16,0,0); sc.add(sun);_cosmo.objects.push(sun);
+  // nucleo della cometa
+  var nucleus=new THREE.Mesh(new THREE.SphereGeometry(0.7,24,24),new THREE.MeshStandardMaterial({color:0x8899aa,roughness:1,emissive:0x223344,emissiveIntensity:0.3}));
+  nucleus.position.set(6,0,0); sc.add(nucleus);_cosmo.objects.push(nucleus);
+  // chioma (coma) attorno al nucleo
+  var coma=new THREE.Mesh(new THREE.SphereGeometry(1.5,24,24),new THREE.MeshBasicMaterial({color:0x66ccff,transparent:true,opacity:0.2,side:THREE.BackSide}));
+  coma.position.copy(nucleus.position); sc.add(coma);_cosmo.objects.push(coma);
+  // coda di ioni (blu, dritta, lontano dal Sole) + coda di polvere (curva, gialla)
+  var tailGeo=new THREE.BufferGeometry(), tv=[], tc=[];
+  for(var i=0;i<1500;i++){
+    var len=Math.random()*12;
+    var spread=len*0.12;
+    // direzione: lontano dal Sole (verso +x poiché Sole è a -x)
+    var x=6+len, y=(Math.random()-0.5)*spread, z=(Math.random()-0.5)*spread;
+    tv.push(x,y,z);
+    // ioni blu vicino, polvere gialla lontano
+    if(Math.random()>0.5){ tc.push(0.4,0.7,1.0); } else { tc.push(1.0,0.9,0.6); }
+  }
+  tailGeo.setAttribute('position',new THREE.Float32BufferAttribute(tv,3));
+  tailGeo.setAttribute('color',new THREE.Float32BufferAttribute(tc,3));
+  var tail=new THREE.Points(tailGeo,new THREE.PointsMaterial({size:0.12,vertexColors:true,transparent:true,opacity:0.7}));
+  sc.add(tail);_cosmo.objects.push(tail);
+  _cosmo._tick=function(t){ nucleus.rotation.y+=t*0.5; tail.rotation.x+=t*0.02; };
+  _cosmo.cam.position.set(4,6,20);
+}
+function _infoComet(){
+  return '<div style="background:rgba(136,221,255,.08);border-left:3px solid #88ddff;border-radius:0 10px 10px 0;padding:12px 14px"><b style="color:#88ddff">☄️ Anatomia di una cometa</b><div style="color:#cdd9e6;font-size:.85rem;line-height:1.7;margin-top:6px"><b>Nucleo</b>: "palla di neve sporca" di ghiaccio (H₂O, CO₂, CO) e polvere. <b>Chioma</b>: gas che sublima avvicinandosi al Sole. <b>Due code</b>: quella di ioni (blu, dritta, spinta dal vento solare) e quella di polvere (giallastra, curva). Le code puntano sempre <b>lontano dal Sole</b>. La cometa 67P (Rosetta/ESA) conteneva glicina e fosforo — mattoni della vita.</div><div style="margin-top:8px"><a href="https://www.esa.int/Science_Exploration/Space_Science/Rosetta" target="_blank" style="color:#6bcfff;font-size:.8rem">ESA Rosetta ↗</a> &nbsp; <a href="https://science.nasa.gov/solar-system/comets/" target="_blank" style="color:#6bcfff;font-size:.8rem">NASA Comets ↗</a></div></div>';
+}
+
+
+function renderReactions(){
+  var c=document.getElementById('reactions-container'); if(!c) return;
+  var groups=[
+    ['#00c9b7','⚡ Reazioni ione-molecola','Dominano il gas freddo (10-50 K) perché prive di barriera di attivazione.',[
+      ['H₂ + raggio cosmico → H₂⁺ + e⁻','Ionizzazione iniziale che innesca tutta la chimica'],
+      ['H₂⁺ + H₂ → H₃⁺ + H','Formazione di H₃⁺, il "protonatore" universale del cosmo'],
+      ['H₃⁺ + CO → HCO⁺ + H₂','HCO⁺ è tracciante chiave delle nubi molecolari'],
+      ['H₃⁺ + O → OH⁺ + H₂','Avvio della chimica dell\'ossigeno e dell\'acqua']
+    ]],
+    ['#f5a623','❄️ Chimica sui grani di polvere','Superfici ghiacciate a ~10 K fanno da catalizzatori: gli atomi si muovono e reagiscono.',[
+      ['H + H → H₂ (su grano)','L\'idrogeno molecolare si forma quasi solo così'],
+      ['CO + H → HCO → H₂CO → CH₃OH','Idrogenazione: dal CO al metanolo, passo dopo passo'],
+      ['O + H → OH → H₂O (ghiaccio)','L\'acqua cosmica nasce sui grani'],
+      ['CO + H (+N) → complessi organici','Verso glicina, formammide e precursori prebiotici']
+    ]],
+    ['#6bcfff','☀️ Fotochimica (UV stellare)','La radiazione UV rompe e riorganizza le molecole nelle regioni esposte.',[
+      ['H₂O + hν → OH + H','Fotodissociazione dell\'acqua'],
+      ['CO + hν → C + O','Distrugge il CO ai bordi delle nubi (PDR)'],
+      ['CH₄ + hν → CH₃ + H','Chimica degli idrocarburi e formazione di PAH']
+    ]],
+    ['#e0678b','💥 Chimica ad alta temperatura','Vicino a stelle, shock e dischi protoplanetari (>1000 K), si attivano reazioni neutre.',[
+      ['C + H₂ → CH + H','Reazioni endotermiche possibili solo se c\'è calore'],
+      ['SiO + OH → SiO₂ + H','Formazione di silicati, mattoni della polvere'],
+      ['3 C → C₃ ... → fullereni (C₆₀)','Nascita di grandi molecole di carbonio']
+    ]]
+  ];
+  var html='<div class="sec-head" style="font-size:1.3rem;margin-bottom:4px">🔬 Reazioni Astrochimiche</div><div class="sec-sub" style="margin-bottom:14px;opacity:.75">Come nascono le molecole nell\'universo: i meccanismi chimici reali dello spazio.</div>';
+  groups.forEach(function(g){
+    html+='<div style="background:rgba(255,255,255,.03);border-left:3px solid '+g[0]+';border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:12px">'
+      +'<div style="color:'+g[0]+';font-weight:800;font-size:1rem">'+g[1]+'</div>'
+      +'<div style="color:#9fb3c8;font-size:.82rem;margin:4px 0 10px">'+g[2]+'</div>';
+    g[3].forEach(function(r){
+      html+='<div style="background:rgba(0,0,0,.2);border-radius:8px;padding:8px 10px;margin-bottom:6px"><div style="font-family:monospace;color:#e9eef6;font-size:.88rem">'+r[0]+'</div><div style="color:#9fb3c8;font-size:.76rem;margin-top:2px">'+r[1]+'</div></div>';
+    });
+    html+='</div>';
+  });
+  c.innerHTML=html;
+}
+
+
+function renderMissions(){
+  var c=document.getElementById('missions-container'); if(!c) return;
+  var M=[
+    {ic:'🔭',col:'#f5a623',n:'JWST (James Webb)',ag:'NASA/ESA/CSA',y:'2021',desc:'Telescopio a infrarossi: studia atmosfere di esopianeti, molecole nelle nubi, prime galassie.',url:'https://webb.nasa.gov/'},
+    {ic:'🌌',col:'#6bcfff',n:'Hubble',ag:'NASA/ESA',y:'1990',desc:'Telescopio in luce visibile/UV: immagini iconiche di nebulose, galassie, esopianeti.',url:'https://science.nasa.gov/mission/hubble/'},
+    {ic:'📡',col:'#00c9b7',n:'ALMA',ag:'ESO',y:'2011',desc:'Rete di radiotelescopi (Cile): rivela molecole fredde nelle nubi e nei dischi protoplanetari.',url:'https://www.almaobservatory.org/'},
+    {ic:'☄️',col:'#88ddff',n:'Rosetta',ag:'ESA',y:'2004',desc:'Sonda che orbitò e atterrò sulla cometa 67P: trovò glicina, fosforo, molecole prebiotiche.',url:'https://www.esa.int/Science_Exploration/Space_Science/Rosetta'},
+    {ic:'🛰️',col:'#a78bfa',n:'Gaia',ag:'ESA',y:'2013',desc:'Mappa 3D di oltre 1 miliardo di stelle della Via Lattea con precisione altissima.',url:'https://sci.esa.int/web/gaia'},
+    {ic:'🪐',col:'#7c6fff',n:'Kepler / TESS',ag:'NASA',y:'2009/2018',desc:'Cacciatori di esopianeti col metodo del transito: migliaia di mondi scoperti.',url:'https://exoplanets.nasa.gov/'},
+    {ic:'🌑',col:'#c0c0c0',n:'Cassini-Huygens',ag:'NASA/ESA',y:'1997',desc:'Esplorò Saturno, i suoi anelli e Titano (laghi di metano) ed Encelado (geyser).',url:'https://science.nasa.gov/mission/cassini/'},
+    {ic:'🔴',col:'#c1440e',n:'Perseverance / Curiosity',ag:'NASA',y:'2020/2011',desc:'Rover su Marte: cercano molecole organiche e tracce di abitabilità passata.',url:'https://mars.nasa.gov/'},
+    {ic:'🌍',col:'#4a9fd8',n:'Europa Clipper',ag:'NASA',y:'2024',desc:'Diretta alla luna Europa per studiarne l\'oceano sotto il ghiaccio (astrobiologia).',url:'https://europa.nasa.gov/'},
+    {ic:'💫',col:'#e0678b',n:'Event Horizon Telescope',ag:'Internazionale',y:'2019',desc:'Rete globale che ha fotografato i primi buchi neri (M87* e Sagittarius A*).',url:'https://eventhorizontelescope.org/'}
+  ];
+  var html='<div class="sec-head" style="font-size:1.3rem;margin-bottom:4px">🛰️ Missioni &amp; Telescopi</div><div class="sec-sub" style="margin-bottom:14px;opacity:.75">Gli occhi dell\'umanità sull\'universo. Clicca per le pagine ufficiali.</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">';
+  M.forEach(function(m){
+    html+='<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-top:3px solid '+m.col+';border-radius:12px;padding:14px">'
+      +'<div style="font-size:1.6rem">'+m.ic+'</div>'
+      +'<div style="color:'+m.col+';font-weight:800;font-size:.95rem;margin-top:4px">'+m.n+'</div>'
+      +'<div style="color:#9fb3c8;font-size:.72rem;margin-bottom:6px">'+m.ag+' · '+m.y+'</div>'
+      +'<div style="color:#cdd9e6;font-size:.8rem;line-height:1.55">'+m.desc+'</div>'
+      +'<a href="'+m.url+'" target="_blank" style="display:inline-block;margin-top:8px;background:'+m.col+';color:#04121e;font-weight:700;font-size:.76rem;padding:5px 10px;border-radius:8px;text-decoration:none">Sito ufficiale ↗</a></div>';
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+function renderTimeline(){
+  var c=document.getElementById('timeline-container'); if(!c) return;
+  var T=[
+    ['#ff6644','13.8 mld anni fa','Big Bang','L\'universo nasce. In pochi minuti: nucleosintesi primordiale → H, He, tracce di Li.'],
+    ['#f5a623','380.000 anni dopo','Ricombinazione','L\'universo si raffredda, gli elettroni si legano ai nuclei: nascono i primi atomi neutri. Luce libera (fondo cosmico a microonde).'],
+    ['#fbbf24','~200 milioni anni','Prime stelle (Pop III)','Il gas H/He collassa: nascono stelle giganti che iniziano a fondere elementi più pesanti.'],
+    ['#7be0a3','~1 miliardo anni','Prime galassie','Le stelle si raggruppano. Le supernovae arricchiscono il cosmo di C, O, Fe.'],
+    ['#00c9b7','~9 miliardi anni','Molecole complesse','Nelle nubi molecolari si formano H₂O, CO, NH₃, metanolo, amminoacidi. Chimica organica diffusa.'],
+    ['#6bcfff','4.6 miliardi anni fa','Sistema Solare','Una nube collassa: nasce il Sole, i pianeti si formano dal disco. La "linea del ghiaccio" separa rocciosi e gassosi.'],
+    ['#4a9fd8','4.0 miliardi anni fa','Chimica prebiotica','Comete e meteoriti portano acqua e molecole organiche sulla Terra. Inizia la chimica della vita.'],
+    ['#a78bfa','3.8 miliardi anni fa','Prima vita','Compaiono i primi organismi. La biochimica eredita i mattoni forgiati nel cosmo.'],
+    ['#e0678b','Oggi','Noi','Siamo "polvere di stelle": ogni atomo di C, O, N, Fe nel tuo corpo è nato in una stella.']
+  ];
+  var html='<div class="sec-head" style="font-size:1.3rem;margin-bottom:4px">⏳ Timeline Cosmica</div><div class="sec-sub" style="margin-bottom:16px;opacity:.75">Dal Big Bang alla vita: la storia chimica dell\'universo.</div>';
+  html+='<div style="position:relative;padding-left:24px">';
+  html+='<div style="position:absolute;left:7px;top:0;bottom:0;width:2px;background:linear-gradient(#ff6644,#00c9b7,#e0678b)"></div>';
+  T.forEach(function(e){
+    html+='<div style="position:relative;margin-bottom:16px">'
+      +'<div style="position:absolute;left:-24px;top:2px;width:14px;height:14px;border-radius:50%;background:'+e[0]+';box-shadow:0 0 10px '+e[0]+'"></div>'
+      +'<div style="color:'+e[0]+';font-size:.74rem;font-weight:700">'+e[1]+'</div>'
+      +'<div style="color:#e9eef6;font-weight:800;font-size:1rem">'+e[2]+'</div>'
+      +'<div style="color:#cdd9e6;font-size:.85rem;line-height:1.6;margin-top:2px">'+e[3]+'</div></div>';
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+
+</script>
+</body>
+</html>
